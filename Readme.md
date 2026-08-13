@@ -1,470 +1,355 @@
-# 🅿️ Automated Parking Lot System
-### Embedded Systems Final Project
+# 🚗 Automotive Electronic Control Unit (Mini ECU)
 
-An embedded smart parking management system built using the **ATmega32 AVR Microcontroller** to automate vehicle entry and exit, monitor parking availability, control gate access, and provide real-time parking information through an intuitive operator interface.
-
-The project demonstrates real-time control, state machine implementation, PWM-based servo control, external interrupt handling, and modular embedded software architecture.
+### AVR Embedded Systems Graduation Project
 
 ---
 
-# 📌 Project Overview
+<p align="center">
 
-Smart parking systems improve traffic flow, reduce waiting time, and efficiently utilize parking spaces.
+**ATmega32 | Embedded C | Layered Architecture | State Machine | Automotive Control**
 
-This project simulates an automated parking lot controller capable of detecting vehicle movement, managing entry and exit gates, tracking available parking spaces, displaying occupancy status, and allowing administrators to manually control the system when required.
-
----
-
-# 🎯 Project Objectives
-
-- Automate vehicle entry and exit
-- Control parking gates using Servo Motor (PWM)
-- Count occupied and available parking spaces
-- Display parking status on LCD
-- Prevent entry when parking is full
-- Support administrator override mode
-- Handle external events using interrupts
-- Implement reliable State Machine architecture
-- Build reusable embedded drivers
+</p>
 
 ---
 
-# 📋 Functional Requirements
+# 🚀 Message from the Team Leader
 
-## Vehicle Entry Detection
+**Hello Team — CtrlDrive,**
 
-The system detects an arriving vehicle using an external sensor or push button.
+Welcome to the **Automotive Electronic Control Unit (Mini ECU)** project! This is one of the most technically demanding and exciting projects in the program. We are going to simulate a real-world automotive ECU that manages and supervises multiple vehicle subsystems based on operating conditions, sensor inputs, and predefined control logic.
 
-If parking spaces are available:
+This is not just another embedded project. The automotive domain requires a **high level of discipline** in our software architecture. We will implement a **proper State Machine** with well-defined operating modes (OFF, START, RUN, FAULT, DIAGNOSTIC), a **Fault Management System** with real fault codes, and a **UART Diagnostic Interface** to communicate ECU status like a real vehicle OBD system.
 
-- Open entry gate
-- Increment occupied spaces
-- Decrease available spaces
-- Update LCD
+Every function you write must be documented using the **Doxygen comment style**. Every module must be independent and tested in isolation before integration. We follow a strict **Layered Architecture (MCAL → HAL → APP)**.
 
-If parking is full:
+**Important Note:** Before we move to physical hardware, we will design and fully simulate the circuit using **Proteus Professional**. This will let us validate the entire ignition sequence, fault injection, and UART diagnostics in a safe environment.
 
-- Keep gate closed
-- Display **Parking Full**
-- Activate warning indicator
+Let's build something we're proud of — a system worthy of the automotive industry!
+
+*— Eng. Hesham Ahmed, Team Supervisor*
 
 ---
 
-## Vehicle Exit Detection
+# 📋 Table of Contents
 
-When a vehicle leaves:
-
-- Detect exit event
-- Open exit gate
-- Decrement occupied spaces
-- Increase available spaces
-- Update LCD
-
----
-
-## Gate Control
-
-Both entry and exit gates are controlled using a Servo Motor.
-
-Servo Positions:
-
-- Closed → 0°
-- Open → 90°
-
-Gate operation includes:
-
-- Open
-- Delay
-- Close Automatically
+1. [Project Overview](#project-overview)
+2. [Functional Requirements](#functional-requirements)
+3. [Non-Functional Requirements](#non-functional-requirements)
+4. [System Architecture &amp; Layers](#system-architecture--layers)
+5. [Hardware Components](#hardware-components)
+6. [ATmega32 Pin Assignment](#atmega32-pin-assignment)
+7. [Modules &amp; Drivers to Develop](#modules--drivers-to-develop)
+8. [System Diagrams](#system-diagrams)
+   * [ECU State Machine](#ecu-state-machine)
+   * [ECU Operating Flow](#ecu-operating-flow)
+   * [Module Dependency Diagram](#module-dependency-diagram)
+9. [Fault Management System](#fault-management-system)
+10. [UART Diagnostic Interface](#uart-diagnostic-interface)
+11. [Project Organization &amp; Team](#project-organization--team)
 
 ---
 
-## Parking Spot Counting
+# 📖 Project Overview
 
-The controller continuously maintains:
-
-- Total Capacity
-- Occupied Spaces
-- Available Spaces
-
-Example
-
-```
-Total : 20
-Free  : 12
-Busy  : 8
-```
+The **Automotive Mini ECU** is an embedded control system built around the **ATmega32 AVR Microcontroller**. It simulates the core behavior of a vehicle's Electronic Control Unit — from startup ignition sequences to fault detection and safe-state management. The system monitors analog sensors (temperature, battery voltage), controls PWM-driven actuators (engine fan/motor simulation), manages visual/audio warning indicators, and communicates diagnostic data to a PC terminal over UART.
 
 ---
 
-## Lot Full Lockdown
+# ⚙️ Functional Requirements
 
-When all parking spaces are occupied:
+Our system must implement the following core functionalities:
 
-- Entry gate remains closed
-- "Parking Full" displayed
-- Entry requests rejected
-- Exit gate remains operational
+## 1. Ignition & Startup Sequence
 
----
+* On power-on, the ECU performs a structured initialization:
+  1. **Power On** → Hardware initialization
+  2. **Self-Test** → Verify peripheral health
+  3. **Sensor Validation** → Check ADC inputs are within range
+  4. **Ignition Enable** → Unlock RUN mode
+* If Self-Test or Sensor Validation fails → System enters **FAULT Mode** immediately.
 
-## Administrator Override Mode
+## 2. Operating Modes
 
-Administrator can:
+### OFF Mode
 
-- Open/Close gates manually
-- Reset parking counter
-- Change parking capacity
-- Enable maintenance mode
-- Clear system faults
+* Ignition is disabled. All outputs are inactive. System waits for an Ignition ON event.
 
-Access is protected using a password entered via Keypad.
+### START Mode
 
----
+* Runs initialization and self-check routines. Transitions to RUN on success or FAULT on failure.
 
-## System Monitoring
+### RUN Mode (Normal Operation)
 
-The controller continuously monitors:
+* Continuously reads sensors via ADC.
+* Controls outputs and PWM actuators (fan/motor speed).
+* Monitors for faults in real-time.
+* Updates any status LEDs and UART diagnostics.
 
-- Entry Requests
-- Exit Requests
-- Parking Capacity
-- Gate Position
-- System Status
+### FAULT Mode
 
----
+* Entered when a critical fault is detected (over-temperature, low battery, sensor failure).
+* All PWM outputs are disabled.
+* Warning LED and Buzzer are activated.
+* ECU enters **SAFE MODE** — preventing unsafe restart until fault is acknowledged.
 
-## Event Logging
+### DIAGNOSTIC Mode
 
-UART reports major events including:
+* Triggered via a UART command from the PC terminal.
+* Transmits real-time ECU Status: Sensor values, Engine mode, Fault codes, PWM duty cycle.
+* Returns to RUN mode after diagnostic session ends.
 
-```
-SYSTEM READY
+## 3. Fault Detection & Reporting
 
-VEHICLE ENTERED
+* ECU continuously monitors:
+  * Engine temperature (LM35 via ADC): triggers fault if `Temp > Threshold`.
+  * Battery voltage (Potentiometer via ADC): triggers fault if `V < Low Limit`.
+  * Sensor disconnection: detects out-of-range ADC readings.
+  * Communication failure: UART timeout detection.
+* Every detected fault generates a **Fault Code**, activates a **Warning Indicator**, and logs a **UART Report**.
 
-VEHICLE EXITED
+## 4. Warning Indicators
 
-ENTRY GATE OPENED
+* **Power LED:** System is powered and initialized.
+* **Engine Status LED:** Engine is running normally in RUN mode.
+* **Warning LED:** A fault condition has been detected.
+* **Fault LED:** System is in SAFE MODE after a critical fault.
+* **Buzzer:** Audible alarm for critical fault states.
 
-EXIT GATE OPENED
+## 5. UART Diagnostic Interface
 
-PARKING FULL
-
-ADMIN LOGIN
-
-SYSTEM RESET
-```
-
----
-
-# 🛠 Hardware Requirements
-
-- ATmega32
-- Servo Motor (Entry Gate)
-- Servo Motor (Exit Gate)
-- LCD 16x2
-- 4x4 Keypad
-- IR Sensor / Push Button (Vehicle Detection)
-- LEDs
-- UART (CH340)
+* Sends periodic status messages to a PC terminal (e.g., Serial Monitor).
+* Accepts incoming commands to trigger a DIAGNOSTIC session.
+* Data format includes mode, temperature, battery voltage, and fault code.
 
 ---
 
-# 💻 Software Requirements
+# 🛡️ Non-Functional Requirements
 
-- Microchip Studio
-- Proteus
-- AVR-GCC
-- Git
-- GitHub
+To ensure a professional, automotive-grade software product, the team must adhere to:
 
----
-
-# 📚 Drivers Used
-
-## MCAL
-
-- DIO
-- TIMER1 (PWM)
-- EXTI
-- UART
+* **Modular Design:** Strictly follow the Layered Architecture (MCAL → HAL → APP).
+* **State Machine Integrity:** Never access hardware directly from APP — always go through HAL.
+* **Fault-Safe Behavior:** Any unhandled condition must default to the FAULT/SAFE state, never undefined behavior.
+* **Interrupt-Driven:** Use EXTI for ignition button events; use Timers for periodic tasks — no busy waiting.
+* **Doxygen Documentation:** All source files, functions, and macros **must** be documented using the **Doxygen** comment style. Every driver file must include a file header block, and every function must have a description, `@param`, and `@return` tags.
+* **Code Reusability:** Drivers must be portable and independent of application logic.
 
 ---
 
-## HAL
-
-- LCD
-- Keypad
-- Servo Motor
-- LEDs
-- Vehicle Sensors
-
----
-
-## LIB
-
-- STD_TYPES
-- BIT_MATH
-- Common Macros
-
----
-
-# 📂 Project Structure
-
-```
-Automated_Parking_System/
-│
-├── APP
-│      main.c
-│      Parking_Controller.c
-│      Parking_Manager.c
-│
-├── HAL
-│      LCD
-│      Keypad
-│      Servo
-│      Sensor
-│      LED
-│
-├── MCAL
-│      DIO
-│      TIMER
-│      UART
-│      EXTI
-│
-├── LIB
-│      STD_TYPES.h
-│      BIT_MATH.h
-│
-└── README.md
-```
-
----
-
-# 🚗 System Flow
+# 🏗️ System Architecture & Layers
 
 ```mermaid
-flowchart TD
+flowchart TB
 
-PowerOn --> Initialization
+APP["Application Layer\n(ECU Manager, State Machine, Fault Handler, Diagnostics)"]
+HAL["Hardware Abstraction Layer\n(LED, Buzzer, Button, Sensor, LCD)"]
+MCAL["Microcontroller Abstraction Layer\n(DIO, ADC, UART, TIMER/PWM, EXTI)"]
+REG["ATmega32 Hardware Registers"]
 
-Initialization --> Idle
-
-Idle --> VehicleDetected
-
-VehicleDetected --> CheckAvailability
-
-CheckAvailability -->|Available| OpenEntryGate
-
-OpenEntryGate --> VehicleEnter
-
-VehicleEnter --> UpdateCounter
-
-UpdateCounter --> CloseEntryGate
-
-CloseEntryGate --> Idle
-
-CheckAvailability -->|Full| ParkingFull
-
-ParkingFull --> Idle
-
-Idle --> VehicleExit
-
-VehicleExit --> OpenExitGate
-
-OpenExitGate --> UpdateCounterExit
-
-UpdateCounterExit --> CloseExitGate
-
-CloseExitGate --> Idle
+APP --> HAL
+HAL --> MCAL
+MCAL --> REG
 ```
 
 ---
 
-# 🧠 State Machine
+# 🔌 Hardware Components
+
+| Component                         | Purpose / Function in Project                   |
+| :-------------------------------- | :---------------------------------------------- |
+| **ATmega32**                | Main ECU Microcontroller                        |
+| **LM35 Sensor**             | Engine Temperature Monitoring (via ADC)         |
+| **Potentiometer**           | Battery Voltage Simulation (via ADC)            |
+| **LEDs (x4)**               | Power, Engine Status, Warning, Fault indicators |
+| **Push Buttons**            | Ignition ON/OFF, Fault Reset                    |
+| **Buzzer**                  | Audible Fault Alarm                             |
+| **LCD 16x2** *(Optional)* | ECU Status Display                              |
+| **UART (CH340)**            | PC Diagnostic Interface                         |
+| **PWM Output**              | Motor/Fan Speed Control (Engine Simulation)     |
+
+---
+
+# 📌 ATmega32 Pin Assignment
+
+To ensure everyone is on the same page while designing the Proteus schematic and writing the MCAL drivers, here is the unified hardware pin mapping:
+
+| Port            | Pin            | Hardware Component           | Description                                  |
+| :-------------- | :------------- | :--------------------------- | :------------------------------------------- |
+| **PORTA** | `PA0` (ADC0) | **LM35 Sensor**        | Engine Temperature Analog Input              |
+|                 | `PA1` (ADC1) | **Potentiometer**      | Battery Voltage Simulation Input             |
+| **PORTB** | `PB3` (OC0)  | **PWM Output**         | Timer0 PWM for Motor/Fan Speed Control       |
+| **PORTC** | `PC2`        | **LCD RS**             | Register Select*(Optional)*                |
+|                 | `PC3`        | **LCD EN**             | Enable*(Optional)*                         |
+|                 | `PC4`        | **LCD D4**             | Data Line 4*(Optional)*                    |
+|                 | `PC5`        | **LCD D5**             | Data Line 5*(Optional)*                    |
+|                 | `PC6`        | **LCD D6**             | Data Line 6*(Optional)*                    |
+|                 | `PC7`        | **LCD D7**             | Data Line 7*(Optional)*                    |
+| **PORTD** | `PD0` (RXD)  | **UART**               | Receive Commands from PC Diagnostic Terminal |
+|                 | `PD1` (TXD)  | **UART**               | Transmit ECU Status & Fault Codes to PC      |
+|                 | `PD2` (INT0) | **Ignition Button**    | Ignition ON (External Interrupt)             |
+|                 | `PD3` (INT1) | **Fault Reset Button** | Reset fault and return to OFF state          |
+|                 | `PD4`        | **Power LED**          | System Initialized                           |
+|                 | `PD5`        | **Engine Status LED**  | RUN Mode Active                              |
+|                 | `PD6`        | **Warning LED**        | Fault Detected                               |
+|                 | `PD7`        | **Buzzer**             | Critical Fault Alarm                         |
+
+> **Action Item for the Hardware Team:** Please strictly follow this mapping when building the Proteus simulation. This guarantees our software drivers will perfectly match the hardware without integration conflicts.
+
+---
+
+# 🛠️ Modules & Drivers to Develop
+
+The team needs to develop the following modules from scratch.
+*(Note: Tasks will be divided among the team members)*
+
+### MCAL (Microcontroller Abstraction Layer)
+
+* `DIO`: Digital Input/Output for all LEDs, Buttons, and Buzzer.
+* `ADC`: Analog to Digital Conversion for temperature and battery voltage sensors.
+* `UART`: Serial communication for the PC diagnostic interface.
+* `TIMER / PWM`: Timer0 in Fast PWM mode to control the motor/fan duty cycle.
+* `EXTI`: External interrupts for the Ignition button and Fault Reset button.
+
+### HAL (Hardware Abstraction Layer)
+
+* `LED Driver`: Manages the 4 indicator LEDs with named identifiers.
+* `Buzzer Driver`: Alarm activation/deactivation.
+* `Button Driver`: Interrupt-driven and polling-based button reading.
+* `Sensor Driver`: ADC wrapper to map raw readings to `°C` (LM35) and `Voltage` (battery).
+
+### APP (Application Layer)
+
+To keep the application logic organized, we will divide the APP layer into the following sub-modules:
+
+* `Main Scheduler`: The core loop executing all ECU tasks without blocking.
+* `ECU State Machine`: Manages transitions between (OFF, START, RUN, FAULT, SAFE_MODE, DIAGNOSTIC) states.
+* `Fault Manager`: Checks sensor readings against thresholds, assigns fault codes, and triggers protection responses.
+* `PWM Controller`: Sets the duty cycle of the motor/fan output based on temperature readings in RUN mode.
+* `UART Diagnostic Protocol`: Formats and transmits ECU data to PC. Parses incoming commands to initiate DIAGNOSTIC mode.
+* `Warning Handler`: Translates active fault flags into LED and Buzzer outputs.
+
+---
+
+# 📊 System Diagrams
+
+## ECU State Machine
 
 ```mermaid
 stateDiagram-v2
 
-[*] --> INIT
+[*] --> OFF
+OFF --> START : Ignition ON Button
 
-INIT --> IDLE
+START --> RUN : Self-Test Passed
+START --> FAULT : Self-Test Failed
 
-IDLE --> ENTRY_REQUEST
+RUN --> FAULT : Fault Detected
+RUN --> DIAGNOSTIC : UART Request Received
+RUN --> OFF : Ignition OFF Button
 
-ENTRY_REQUEST --> GATE_OPEN
+DIAGNOSTIC --> RUN : Diagnostic Session End
 
-GATE_OPEN --> VEHICLE_ENTERED
-
-VEHICLE_ENTERED --> IDLE
-
-IDLE --> EXIT_REQUEST
-
-EXIT_REQUEST --> EXIT_GATE_OPEN
-
-EXIT_GATE_OPEN --> VEHICLE_EXITED
-
-VEHICLE_EXITED --> IDLE
-
-ENTRY_REQUEST --> PARKING_FULL
-
-PARKING_FULL --> IDLE
-
-IDLE --> ADMIN_MODE
-
-ADMIN_MODE --> IDLE
+FAULT --> SAFE_MODE : Enter Protection State
+SAFE_MODE --> OFF : Fault Cleared & Reset Button
 ```
 
----
+## ECU Operating Flow
 
-# 🏗 Layered Architecture
+```mermaid
+flowchart TD
+    A[Power ON] --> B[Hardware Initialization]
+    B --> C[Self-Test All Peripherals]
+  
+    C -->|Pass| D[Validate Sensor Readings]
+    C -->|Fail| FAULT
+  
+    D -->|Valid| E((RUN Mode))
+    D -->|Invalid| FAULT[FAULT Mode]
+  
+    E --> F[Read ADC Sensors]
+    F --> G{Fault Detected?}
+  
+    G -->|Yes| FAULT
+    G -->|No| H[Adjust PWM Output]
+  
+    H --> I[Update Warning Indicators]
+    I --> J[Transmit UART Status]
+    J --> E
+  
+    FAULT --> K[Disable All Outputs]
+    K --> L[Activate Warning LED & Buzzer]
+    L --> M[SAFE MODE - Wait for Reset]
+```
+
+## Module Dependency Diagram
 
 ```mermaid
 graph TD
 
-Application --> HAL
+APP[ECU_Manager APP]
 
-HAL --> MCAL
+APP --> FaultManager
+APP --> PWMController
+APP --> UARTDiag
+APP --> WarningHandler
 
-MCAL --> Hardware
+FaultManager --> Sensor_HAL
+PWMController --> Timer_MCAL
+UARTDiag --> UART_MCAL
+WarningHandler --> LED_HAL
+WarningHandler --> Buzzer_HAL
 
-LIB --> Application
-
-LIB --> HAL
-
-LIB --> MCAL
+Sensor_HAL --> ADC_MCAL
+LED_HAL --> DIO_MCAL
+Buzzer_HAL --> DIO_MCAL
 ```
 
 ---
 
-# 📊 Software Modules
+# 🚨 Fault Management System
 
-```mermaid
-graph LR
+| Fault Code | Condition                              | Action                                     |
+| :--------: | :------------------------------------- | :----------------------------------------- |
+|  `F001`  | Engine Temperature > Limit             | Disable PWM, Activate Warning, Enter FAULT |
+|  `F002`  | Battery Voltage < Limit                | Disable all outputs, Enter FAULT           |
+|  `F003`  | Sensor Disconnection (ADC = 0 or 1023) | Flag invalid reading, Enter FAULT          |
+|  `F004`  | ADC Conversion Timeout                 | Log ADC error, Enter FAULT                 |
+|  `F005`  | UART Communication Failure             | Log UART error, Continue in RUN mode       |
 
-Main --> ParkingManager
+---
 
-ParkingManager --> GateController
+# 🩺 UART Diagnostic Interface
 
-ParkingManager --> SpotCounter
+When in DIAGNOSTIC mode, the ECU will transmit the following status report to the PC terminal:
 
-ParkingManager --> LCD
-
-ParkingManager --> Keypad
-
-ParkingManager --> UART
-
-ParkingManager --> EXTI
-
-GateController --> Servo
-
-SpotCounter --> VehicleSensor
+```
+================================
+    ECU DIAGNOSTIC REPORT
+================================
+ ECU STATUS   : RUNNING
+ ENGINE MODE  : RUN
+ TEMPERATURE  : 42 C
+ BATTERY      : 12.3 V
+ PWM DUTY     : 75%
+ ACTIVE FAULT : NONE
+================================
 ```
 
 ---
 
-# 📈 Real-Time Tasks
+# 👥 Project Organization & Team
 
-| Task | Period |
-|-------|---------|
-| Check Entry Sensor | Event Driven |
-| Check Exit Sensor | Event Driven |
-| Update LCD | 500 ms |
-| Gate Control | On Demand |
-| UART Status | 1 sec |
+We will be following an Agile approach, tracking our tasks and ensuring every layer is thoroughly tested before integration.
 
----
-
-# 🚨 System States
-
-| State | Description |
-|--------|-------------|
-| INIT | Hardware Initialization |
-| IDLE | Waiting for Vehicle |
-| ENTRY | Processing Vehicle Entry |
-| EXIT | Processing Vehicle Exit |
-| FULL | Parking Capacity Reached |
-| ADMIN | Administrator Mode |
-| ERROR | Fault Handling |
+| Role                      | Name                        | Suggested Responsibilities                    |
+| :------------------------ | :-------------------------- | :-------------------------------------------- |
+| **Team Supervisor** | **Eng. Hesham Ahmed** | Architecture Review, Integration, Code Review |
+|                           |                             |                                               |
 
 ---
 
-# 🚀 Future Improvements
-
-- RFID Vehicle Authentication
-- License Plate Recognition (LPR)
-- Mobile Reservation System
-- GSM Notifications
-- IoT Cloud Dashboard
-- Multi-Level Parking Support
-- Payment Integration
-- Camera Monitoring
-- CAN Bus Communication
-- Smart City Integration
-
----
-
-# 📖 Course Information
-
-Embedded Systems Diploma
-
-Topics Covered
-
-- Embedded C
-- AVR Architecture
-- PWM
-- Timers
-- DIO
-- LCD
-- Keypad
-- External Interrupts
-- UART
-- State Machine
-- Driver Development
-
----
-
-# 👥 Team
-
-| Name |
-|------|
-| Abdulrahman Ali Abdelaziz Ali |
-| Yousef Mohamed Al-Sayed Abohashem Hassan |
-| Omar Hamdy Hamed Abdelrahman |
-| Omar Alaa Eldin Abdelrady |
-| Mina Ramy Rizk Youssef |
-
----
-
-# 👨‍💼 Team Leader
-
-**Eng. Hesham Ahmed**
-
----
-
-# 📜 License
-
-This project was developed during the **NTI Embedded Systems Training Program**.
-
-Licensed under the **MIT License**.
-
-Project Organization: **Gestell**
-
----
-
-# 🙏 Acknowledgment
-
-Special thanks to:
-
-- National Telecommunication Institute (NTI)
-- Eng. Hesham Ahmed
-- Gestell Team
-
-for their guidance and continuous support throughout this project.
-
----
-
-# ⭐ Final Note
-
-The Automated Parking Lot System demonstrates the fundamentals of smart infrastructure by integrating vehicle detection, gate automation, parking management, operator interaction, and real-time embedded control into a scalable and modular embedded application. The project reflects real-world smart parking solutions used in commercial buildings, shopping malls, airports, and smart city environments.
+<p align="center">
+<b>Let's build a system worthy of the automotive industry. Good luck team CtrlDrive!</b><br><br>
+Embedded Systems Graduation Project using <b>ATmega32 AVR Microcontroller</b><br>
+Made with ❤️ by Team CtrlDrive.
+</p>
