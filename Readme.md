@@ -480,57 +480,204 @@ The **Gestell Web Dashboard** (`/Dashboard`) is a full-featured, web-based ECU m
 > [!IMPORTANT]
 > The Dashboard's Fault Injection Panel can trigger all DTC fault conditions remotely — critical for testing ECU fail-safe responses without needing physical sensor manipulation.
 
-### 🖼️ Web Dashboard — UI Wireframe
+### 🖼️ Web Dashboard — UI Wireframes (All Pages)
+
+> **5 Pages:** Overview • DTC Manager • Fault Injection • Live Console • Settings
+
+---
+
+#### Page 1 — Telemetry Overview (Home)
 
 ```
-+-----------------------------------------------------------------------------------------------+
-|  Gestell ECU Dashboard   [● ONLINE]  [MODE: RUN]  [IGN: ON]   GESTELL_ECU_01  WiFi  01420s  |
-+===============================================================================================+
-|                                                                                               |
-|  +----------------------------------+  +--------------------+  +---------------------------+  |
-|  | Engine Temperature               |  |   Temp Gauge       |  |  Fan PWM                  |  |
-|  | 60-second rolling window         |  |                    |  |                           |  |
-|  |  100 |          .---.            |  |      .-----.       |  |       .-------.           |  |
-|  |   85 |--------./     '.          |  |    /    |    '.    |  |     /          '.         |  |
-|  |   70 |  .----'         '-----.   |  |   |  42.5 C   |   |  |   |    75%        |        |  |
-|  |   45 | .(42.5C)               .  |  |   |  ENGINE   |   |  |   |  COOLING FAN  |        |  |
-|  |    0 +---+---+---+---+---+---+   |  |    '.       .'    |  |   |               |        |  |
-|  |        0  10  20  30  40  50  60s|  |      '-----'       |  |     '.         .'         |  |
-|  |  [==========GREEN===YELLOW==RED] |  |  MIN 0C    MAX 100C|  |       '---------'         |  |
-|  +----------------------------------+  +--------------------+  |  [====|=======|=====] 75% |  |
-|                                                                 +---------------------------+  |
-|  +----------------------------------+  +--------------------+  +---------------------------+  |
-|  | Battery Voltage                  |  |  Remote Ignition   |  |  Active DTCs              |  |
-|  |  14.5|       .----------.        |  |                    |  |                           |  |
-|  |  12.4| .----'            '.(12.4)|  |  IGNITION CONTROL  |  |  [v] No Active Faults     |  |
-|  |  10.5|                           |  |  +----------------+|  |                           |  |
-|  |       0  10  20  30  40  50  60s |  |  |  ( ON )        ||  |  - - - - - - - - - - - -  |  |
-|  |  [====NOMINAL ZONE: 10.5-14.5V=] |  |  +----------------+|  |  Fault Injection Panel:   |  |
-|  |  [   START   ]     [   STOP   ]  |  |  [START]  [STOP]   |  |  [F001] [F002] [F003][F004]|  |
-|  +----------------------------------+  +--------------------+  +---------------------------+  |
-|                                                                                               |
-|  +-----------------------------------------------------------------------------------------+  |
-|  | Live Packet Console                                                                     |  |
-|  | [00:23:40]  { "ecu_id": "GESTELL_ECU_01", "mode": "RUN", "temp_c": 42.5, ... }          |  |
-|  | [00:23:41]  { "ecu_id": "GESTELL_ECU_01", "mode": "RUN", "temp_c": 42.8, ... }          |  |
-|  | [00:23:42]  { "ecu_id": "GESTELL_ECU_01", "fan_pwm": 75, "fault": "NONE", ... }         |  |
-|  | [00:23:43]  { "ecu_id": "GESTELL_ECU_01", "battery_v": 12.4, "uptime_s": 1423 }        |  |
-|  +-----------------------------------------------------------------------------------------+  |
-+-----------------------------------------------------------------------------------------------+
++----[ Gestell ECU Dashboard ]--------------------------------------------------[ GESTELL_ECU_01 ]-+
+|  [ Overview ] [ DTC Manager ] [ Fault Injection ] [ Live Console ] [ Settings ]   WiFi  01420s   |
++===================================================================================================+
+|                                                                                                   |
+|  STATUS:  [ MODE: RUN ]  [ IGN: ON ]  [ ONLINE ]  [ BT: OK ]  [ Uptime: 00:23:43 ]              |
+|                                                                                                   |
+|  +------------------------------------+   +-----------------------+   +-----------------------+  |
+|  |  Engine Temperature  (ADC0/LM35)  |   |    Temp Gauge         |   |    Fan PWM Speed      |  |
+|  |                                   |   |                       |   |                       |  |
+|  |  100 |                    .---.   |   |       .-------.       |   |       .-------.       |  |
+|  |   85 |---RED-ZONE------./       . |   |      / |       \      |   |      /         \      |  |
+|  |   70 |--YELLOW------./           .|   |     |   42.5 C  |     |   |     |    75 %   |     |  |
+|  |   45 |  .------./  42.5 C        .|   |     |  ENGINE   |     |   |     | COOLING   |     |  |
+|  |    0 +--+---+---+---+---+---+----+|   |      \         /      |   |      \   FAN   /      |  |
+|  |       0  10  20  30  40  50  60 s |   |       '-------'       |   |       '-------'       |  |
+|  |  ZONE: [GREEN < 70][YLW 70-85][RED]   |   MIN  0 C   MAX 100 C |   |  [===|========|==] 75%|  |
+|  +------------------------------------+   +-----------------------+   +-----------------------+  |
+|                                                                                                   |
+|  +------------------------------------+   +-----------------------+   +-----------------------+  |
+|  |  Battery Voltage (ADC1/Pot Divider)|   |  Remote Ignition      |   |  Active DTCs          |  |
+|  |                                   |   |                       |   |                       |  |
+|  |  16.0 |                           |   |   IGNITION CONTROL    |   |  Status:  [ OK ]      |  |
+|  |  14.5 |------GREEN ZONE-----------|   |                       |   |                       |  |
+|  |  12.4 |  .--------. (12.4 V)      |   |   +------------------+|   |  [v] No Active Faults |  |
+|  |  10.5 |------GREEN ZONE-----------|   |   |   ( IGN ON )      ||   |                       |  |
+|  |       0  10  20  30  40  50  60 s |   |   +------------------+|   |  - - - - - - - - - -  |  |
+|  |  ZONE: [RED<10.5][GREEN][YLW>14.5]|   |   [ START ]  [ STOP ] |   |  [  SCAN DTCs  ]      |  |
+|  +------------------------------------+   +-----------------------+   +-----------------------+  |
+|                                                                                                   |
++===================================================================================================+
+```
+
+---
+
+#### Page 2 — DTC Manager
+
+```
++----[ Gestell ECU Dashboard ]--------------------------------------------------[ GESTELL_ECU_01 ]-+
+|  [ Overview ] [ DTC Manager ] [ Fault Injection ] [ Live Console ] [ Settings ]   WiFi  01420s   |
++===================================================================================================+
+|                                                                                                   |
+|  DTC MANAGER                           Active Faults: 1           Stored Faults: 3               |
+|                                                                                                   |
+|  +-----------------------------------------------------------------------------------------------+|
+|  |  ACTIVE FAULT CODES                                                                          ||
+|  +-------+-------------------+---------------------------+-----------+---------+----------------+|
+|  |  Code |  Fault Name       |  Description              | Threshold |  Since  |  Action        ||
+|  +-------+-------------------+---------------------------+-----------+---------+----------------+|
+|  | [F001]| Over-Temperature  | Engine Temp > 90 C        |  > 90 C   | 00:21:10| [CLEAR]        ||
+|  +-------+-------------------+---------------------------+-----------+---------+----------------+|
+|                                                                                                  ||
+|  +-----------------------------------------------------------------------------------------------+|
+|  |  STORED / HISTORY FAULT CODES                                                                ||
+|  +-------+-------------------+---------------------------+-----------+---------+----------------+|
+|  |  Code |  Fault Name       |  Description              | Detected  | Cleared |  Status        ||
+|  +-------+-------------------+---------------------------+-----------+---------+----------------+|
+|  | [F002]| Battery Voltage   | Voltage < 10.5 V          | 00:10:05  | 00:12:30|  CLEARED       ||
+|  | [F003]| Sensor Disconnect | ADC0 saturated (1023)     | 00:05:44  | 00:06:10|  CLEARED       ||
+|  | [F004]| Comms Timeout     | No BT RX > 10 sec         | 00:01:22  | 00:01:35|  CLEARED       ||
+|  +-------+-------------------+---------------------------+-----------+---------+----------------+|
+|                                                                                                   |
+|  [ CLEAR ALL ]    [ EXPORT LOG ]    [ REFRESH ]                                                  |
+|                                                                                                   |
++===================================================================================================+
+```
+
+---
+
+#### Page 3 — Fault Injection Panel (Testing)
+
+```
++----[ Gestell ECU Dashboard ]--------------------------------------------------[ GESTELL_ECU_01 ]-+
+|  [ Overview ] [ DTC Manager ] [ Fault Injection ] [ Live Console ] [ Settings ]   WiFi  01420s   |
++===================================================================================================+
+|                                                                                                   |
+|  FAULT INJECTION PANEL             [!] FOR TESTING PURPOSES ONLY                                 |
+|                                                                                                   |
+|  +--------------------------------+   +--------------------------------+                          |
+|  |  F001 - Engine Over-Temp       |   |  F002 - Battery Voltage Fault  |                          |
+|  |                                |   |                                |                          |
+|  |  Simulates engine temp         |   |  Simulates battery voltage     |                          |
+|  |  exceeding 90 C threshold.     |   |  dropping below 10.5 V.        |                          |
+|  |  ECU should: cut fan, alarm,   |   |  ECU should: disable actuators,|                          |
+|  |  → FAULT → SAFE MODE.          |   |  → FAULT → SAFE MODE.          |                          |
+|  |                                |   |                                |                          |
+|  |  [ INJECT F001 ]               |   |  [ INJECT F002 ]               |                          |
+|  +--------------------------------+   +--------------------------------+                          |
+|                                                                                                   |
+|  +--------------------------------+   +--------------------------------+                          |
+|  |  F003 - Sensor Disconnection   |   |  F004 - Comms Timeout          |                          |
+|  |                                |   |                                |                          |
+|  |  Simulates ADC0 or ADC1        |   |  Simulates loss of Bluetooth   |                          |
+|  |  reading as 0 or 1023          |   |  or Wi-Fi for more than 10 s.  |                          |
+|  |  (open/short circuit).         |   |  ECU continues local mode.     |                          |
+|  |  → FAULT → SAFE MODE.          |   |  Logs warning, no SAFE MODE.   |                          |
+|  |                                |   |                                |                          |
+|  |  [ INJECT F003 ]               |   |  [ INJECT F004 ]               |                          |
+|  +--------------------------------+   +--------------------------------+                          |
+|                                                                                                   |
+|  [ RESET ALL FAULTS ]     [ SEND CLEAR_DTC ]     ECU State: [ MODE: RUN ] [ OK ]                 |
+|                                                                                                   |
++===================================================================================================+
+```
+
+---
+
+#### Page 4 — Live Packet Console
+
+```
++----[ Gestell ECU Dashboard ]--------------------------------------------------[ GESTELL_ECU_01 ]-+
+|  [ Overview ] [ DTC Manager ] [ Fault Injection ] [ Live Console ] [ Settings ]   WiFi  01420s   |
++===================================================================================================+
+|                                                                                                   |
+|  LIVE PACKET CONSOLE   [USART1 / TCP Port 80]   Baud: 115200   [ PAUSE ] [ CLEAR ] [ EXPORT ]   |
+|  Filter: [ All ] [ Telemetry ] [ Commands ] [ Faults ] [ AT ]                                    |
+|                                                                                                   |
+|  +-----------------------------------------------------------------------------------------------+|
+|  |  [00:23:40.012]  TX  >>  { "ecu_id": "GESTELL_ECU_01", "mode": "RUN", "ignition": true,      ||
+|  |                           "temp_c": 42.5, "battery_v": 12.4, "fan_pwm": 75,                 ||
+|  |                           "fault": "NONE", "dtc_list": [], "uptime_s": 1420 }                ||
+|  |  ............................................................................               ||
+|  |  [00:23:40.512]  TX  >>  { "ecu_id": "GESTELL_ECU_01", "mode": "RUN", "temp_c": 42.8 ... }  ||
+|  |  ............................................................................               ||
+|  |  [00:23:41.001]  RX  <<  { "cmd": "READ_DTC", "src": "WEB_DASHBOARD" }                      ||
+|  |  [00:23:41.012]  TX  >>  { "dtc_list": [], "mode": "RUN", "fault": "NONE" }                 ||
+|  |  ............................................................................               ||
+|  |  [00:23:41.512]  TX  >>  { "ecu_id": "GESTELL_ECU_01", "mode": "RUN", "temp_c": 43.1 ... }  ||
+|  |  ............................................................................               ||
+|  |  [00:23:42.000]  RX  <<  { "cmd": "IGN_STOP", "src": "WEB_DASHBOARD" }                      ||
+|  |  [00:23:42.010]  TX  >>  { "mode": "OFF", "ignition": false, "fan_pwm": 0 }                 ||
+|  |  ............................................................................               ||
+|  |  [00:23:43.512]  TX  >>  { "ecu_id": "GESTELL_ECU_01", "mode": "OFF", "uptime_s": 1423 }   ||
+|  +-----------------------------------------------------------------------------------------------+|
+|                                                                                                   |
+|  Packets RX: 12   Packets TX: 47   Errors: 0   Uptime: 00:23:43                                  |
+|                                                                                                   |
++===================================================================================================+
+```
+
+---
+
+#### Page 5 — Settings
+
+```
++----[ Gestell ECU Dashboard ]--------------------------------------------------[ GESTELL_ECU_01 ]-+
+|  [ Overview ] [ DTC Manager ] [ Fault Injection ] [ Live Console ] [ Settings ]   WiFi  01420s   |
++===================================================================================================+
+|                                                                                                   |
+|  SETTINGS                                                                                         |
+|                                                                                                   |
+|  +------------------------------------+   +-------------------------------------------+          |
+|  |  CONNECTION                        |   |  DISPLAY                                  |          |
+|  |  --------------------------------  |   |  ---------------------------------------  |          |
+|  |  ECU Device ID:  GESTELL_ECU_01   |   |  Temperature Unit:  ( C )  ( F )          |          |
+|  |  Wi-Fi TCP Port:  [ 80       ]    |   |  Voltage Decimals:  ( 1dp ) ( 2dp )       |          |
+|  |  Baud Rate:       [ 115200   ]    |   |  Chart Window:      [ 60 s ]              |          |
+|  |  SSID:            [ MyNet    ]    |   |  Dark Mode:         ( ON )  ( OFF )       |          |
+|  |  Password:        [ ****     ]    |   |                                           |          |
+|  |  Retry Count:     [ 3        ]    |   |  [ APPLY DISPLAY ]                        |          |
+|  |  Timeout (s):     [ 10       ]    |   +-------------------------------------------+          |
+|  |                                   |                                                          |
+|  |  [ SAVE CONNECTION ]              |   +-------------------------------------------+          |
+|  +------------------------------------+   |  TELEMETRY                                |          |
+|                                           |  ---------------------------------------  |          |
+|  +------------------------------------+   |  Broadcast Interval:  [ 500 ms ]         |          |
+|  |  ABOUT                             |   |  LCD Refresh:         [ 200 ms ]         |          |
+|  |  --------------------------------  |   |  ADC Sample Rate:     [ 100 ms ]         |          |
+|  |  Firmware:  Gestell ECU v1.0.0    |   |  Watchdog Timeout:    [ 10 s  ]          |          |
+|  |  MCU:       ATmega128 @ 16 MHz    |   |                                           |          |
+|  |  Build:     2026-09-13            |   |  [ APPLY TELEMETRY ]                      |          |
+|  |  License:   MIT                   |   +-------------------------------------------+          |
+|  +------------------------------------+                                                          |
+|                                                                                                   |
++===================================================================================================+
 ```
 
 ### Dashboard Interface Panels
 
 | Panel | Description | Data Source |
 |:---|:---|:---:|
-| **📊 Engine Temperature Chart** | Live line chart showing engine temperature (°C) over a 60-second rolling window. Color-coded: Green (<70°C), Yellow (70–85°C), Red (>85°C). | `temp_c` JSON field |
-| **🔋 Battery Voltage Gauge** | Circular gauge with needle showing battery voltage (V). Zones: Red (<10.5V), Green (10.5–14.5V), Yellow (>14.5V). | `battery_v` JSON field |
-| **🌀 Fan PWM Speed Bar** | Circular progress ring showing cooling fan PWM duty cycle (0–100%). | `fan_pwm` JSON field |
-| **🟢 ECU Mode Indicator** | Color-coded state badge: OFF (grey), START (blue), RUN (green), DIAGNOSTIC (purple), FAULT (orange), SAFE MODE (red). | `mode` JSON field |
-| **🔑 Remote Ignition Toggle** | Physical-style glowing toggle switch. Sends `IGN_START` or `IGN_STOP` as a TCP command to the ECU. | Web command |
-| **⚠️ Fault Injection Panel** | 4-button panel to inject `F001` Over-Temp, `F002` Battery, `F003` Sensor, `F004` Comms faults remotely for testing ECU fail-safe. | Web command |
-| **📜 Live Packet Console** | Dark terminal panel streaming raw JSON packets with timestamps, syntax-highlighted in green/cyan. | TCP stream |
-| **📋 Active DTC Panel** | Real-time fault status panel. Shows "No Active Faults" in green when all clear, or lists active DTC codes with one-click `CLEAR_DTC`. | `dtc_list` JSON field |
+| **📊 Engine Temperature Chart** | Live rolling 60s line chart. Color-coded zones: Green (<70°C), Yellow (70–85°C), Red (>85°C). | `temp_c` JSON field |
+| **🔋 Battery Voltage Gauge** | Area chart with zone bands: Red (<10.5V), Green nominal, Yellow (>14.5V). | `battery_v` JSON field |
+| **🌀 Fan PWM Ring** | Circular progress ring showing 0–100% duty cycle. | `fan_pwm` JSON field |
+| **🟢 ECU Mode Indicator** | Colour-coded state badge across all 6 FSM states. | `mode` JSON field |
+| **🔑 Remote Ignition Toggle** | Glowing toggle. Sends `IGN_START` / `IGN_STOP` over TCP. | Web command |
+| **⚠️ Fault Injection Panel** | 4 inject buttons for `F001`–`F004`. Full reset button. | Web command |
+| **📜 Live Packet Console** | Real-time TCP stream with RX/TX labels, JSON syntax highlight, filter bar. | TCP stream |
+| **📋 DTC Manager** | Active + stored DTC table with Clear, Export, and Refresh actions. | `dtc_list` JSON field |
+| **⚙️ Settings** | Connection config, display units, telemetry intervals, and firmware info. | App local |
 
 ---
 
@@ -538,59 +685,297 @@ The **Gestell Web Dashboard** (`/Dashboard`) is a full-featured, web-based ECU m
 
 The **Gestell Mobile Diagnostic App** (`/MobileApp`) is an OBD-II style embedded diagnostic tool communicating with the ECU via the **HC-05 Bluetooth module (USART0)** over the SPP Bluetooth Serial profile.
 
-### 🖼️ Mobile App — UI Wireframe
+### 🖼️ Mobile App — UI Mockups (All Screens)
+
+> **6 Screens:** Bluetooth Connect • Live Cockpit • DTC Scanner • Extended Diagnostic • Fault Alert • Settings
+
+---
+
+#### Screen 1 — Bluetooth Connect
+
+<div align="center">
+
+![Screen 1 - Bluetooth Connect](mob_s1_connect.jpg)
+
+</div>
+
+
 
 ```
-            +-------------------------+
-            | [BT HC-05] |||   CONNECTED |
-            +-------------------------+
-            |   Gestell ECU Diagnostic  |
-            +-------------------------+
-            |                         |
-            |  +---------------------+|
-            |  |  MODE:  RUN         ||
-            |  |  IGN:   ON    [ON]  ||
-            |  +---------------------+|
-            |                         |
-            |  +-----------+  +------+|
-            |  |ENGINE TEMP|  |BATTERY||
-            |  |   .---.   |  | .---. ||
-            |  |  / | .  \ |  |/  |  \||
-            |  | | 42.5 C| |  ||12.4V|||
-            |  |  \ .   / |  |\ . . /||
-            |  |   '---'   |  | '---' ||
-            |  +-----------+  +------+|
-            |                         |
-            |  +-----------+  +------+|
-            |  | FAN SPEED |  | FAULT ||
-            |  |           |  | CODE  ||
-            |  | [====.|..] |  |       ||
-            |  |   75%     |  | NONE  ||
-            |  |           |  |  [v]  ||
-            |  +-----------+  +------+|
-            |                         |
-            |  +-----------------------+|
-            |  | Active Fault Codes    ||
-            |  |-----------------------||
-            |  |  [v] No active faults ||
-            |  |      detected         ||
-            |  +-----------------------+|
-            |                         |
-            +-------------------------+
-            |[Dashboard][DTC][Diag][Set]|
-            +-------------------------+
+         +---------------------------+
+         | ::::::::  9:41 AM  :::::: |
+         +---------------------------+
+         |                           |
+         |    Gestell ECU Diagnostic |
+         |                           |
+         |  +------------------------+|
+         |  |   BLUETOOTH SETUP     ||
+         |  +------------------------+|
+         |                           |
+         |       *  (scanning...)    |
+         |      ***                  |
+         |     *   *                 |
+         |                           |
+         |  Devices Found:           |
+         |  +------------------------+|
+         |  |  HC-05    RSSI: -62dBm ||
+         |  |  [  CONNECT  ]        ||
+         |  +------------------------+|
+         |  |  HC-05 (old)  -80dBm  ||
+         |  |  [  CONNECT  ]        ||
+         |  +------------------------+|
+         |                           |
+         |  PIN Code: [ 1 2 3 4 ]   |
+         |                           |
+         |  [ SCAN AGAIN ]           |
+         |                           |
+         +---------------------------+
+         |[Connect][Cockpit][DTC][Set]|
+         +---------------------------+
+```
+
+---
+
+#### Screen 2 — Live Cockpit Dashboard
+
+<div align="center">
+
+![Screen 2 - Live Cockpit](mob_s2_cockpit.jpg)
+
+</div>
+
+```
+         +---------------------------+
+         | BT:HC-05 |||   CONNECTED  |
+         +---------------------------+
+         |  Gestell ECU Diagnostic   |
+         +---------------------------+
+         |                           |
+         |  +------------------------+|
+         |  |  MODE:  [ RUN  ]      ||
+         |  |  IGN:   [ ON   ]  (o) ||
+         |  +------------------------+|
+         |                           |
+         |  +-----------+ +----------+|
+         |  |ENGINE TEMP| |  BATTERY ||
+         |  |           | |          ||
+         |  |   .---.   | |  .---.   ||
+         |  |  / | . \  | | /  |  \ ||
+         |  | |  42.5C | | | 12.4 V | ||
+         |  |  \ . . / | |  \ . . / ||
+         |  |   '---'   | |  '---'  ||
+         |  +-----------+ +----------+|
+         |                           |
+         |  +-----------+ +----------+|
+         |  | FAN SPEED | |  FAULT   ||
+         |  |           | |  CODE    ||
+         |  | [======..]| |          ||
+         |  |   75 %    | |  NONE    ||
+         |  |           | |   [v]    ||
+         |  +-----------+ +----------+|
+         |                           |
+         |  +------------------------+|
+         |  |  Active Fault Codes   ||
+         |  |  [v] No faults detected||
+         |  +------------------------+|
+         |                           |
+         +---------------------------+
+         |[Cockpit] [DTC] [Diag][Set]|
+         +---------------------------+
+```
+
+---
+
+#### Screen 3 — DTC Scanner
+
+<div align="center">
+
+![Screen 3 - DTC Scanner](mob_s3_dtc.jpg)
+
+</div>
+
+```
+         +---------------------------+
+         | BT:HC-05 |||   CONNECTED  |
+         +---------------------------+
+         |  DTC Scanner              |
+         |  [ SCAN ]   [ CLEAR ALL ] |
+         +---------------------------+
+         |                           |
+         |  ACTIVE FAULTS:  1        |
+         |  +------------------------+|
+         |  | [!] F001               ||
+         |  |  Engine Over-Temp      ||
+         |  |  Temp > 90 C detected  ||
+         |  |  Since: 00:21:10       ||
+         |  |  Severity: HIGH        ||
+         |  |         [ CLEAR ]      ||
+         |  +------------------------+|
+         |                           |
+         |  STORED HISTORY:  3       |
+         |  +------------------------+|
+         |  | [v] F002  12V Battery  ||
+         |  |     Cleared: 00:12:30  ||
+         |  +------------------------+|
+         |  | [v] F003  Sensor Disc. ||
+         |  |     Cleared: 00:06:10  ||
+         |  +------------------------+|
+         |  | [v] F004  Comms Tmout  ||
+         |  |     Cleared: 00:01:35  ||
+         |  +------------------------+|
+         |                           |
+         +---------------------------+
+         |[Cockpit] [DTC] [Diag][Set]|
+         +---------------------------+
+```
+
+---
+
+#### Screen 4 — Extended Diagnostic Report
+
+<div align="center">
+
+![Screen 4 - Extended Diagnostics](mob_s4_diag.jpg)
+
+</div>
+
+```
+         +---------------------------+
+         | BT:HC-05 |||   CONNECTED  |
+         +---------------------------+
+         |  Extended Diagnostics     |
+         |  [ REQUEST REPORT ]       |
+         +---------------------------+
+         |                           |
+         |  ECU INFORMATION          |
+         |  Mode:     RUN            |
+         |  Ignition: ON             |
+         |  Uptime:   00:23:43       |
+         |  MCU:      ATmega128      |
+         |                           |
+         |  SENSOR HISTORY (last 5)  |
+         |  +------------------------+|
+         |  | #  |  Temp  |  Batt   ||
+         |  |----|--------|---------||
+         |  | 1  | 42.5 C | 12.4 V  ||
+         |  | 2  | 42.8 C | 12.3 V  ||
+         |  | 3  | 43.1 C | 12.4 V  ||
+         |  | 4  | 42.6 C | 12.5 V  ||
+         |  | 5  | 42.0 C | 12.4 V  ||
+         |  +------------------------+|
+         |                           |
+         |  ACTUATOR STATES          |
+         |  Fan PWM:   75%   ACTIVE  |
+         |  LED Power: ON            |
+         |  LED Warn:  OFF           |
+         |  Buzzer:    OFF           |
+         |                           |
+         |  FSM TRANSITIONS (last 3) |
+         |  OFF -> START  00:00:05   |
+         |  START -> RUN  00:00:07   |
+         |  RUN -> DIAG   00:21:00   |
+         |                           |
+         +---------------------------+
+         |[Cockpit] [DTC] [Diag][Set]|
+         +---------------------------+
+```
+
+---
+
+#### Screen 5 — Fault Alert Overlay
+
+<div align="center">
+
+![Screen 5 - Fault Alert](mob_s5_fault.jpg)
+
+</div>
+
+```
+         +---------------------------+
+         |!!!!!!!!!!!!!!!!!!!!!!!!!!!!|
+         |                           |
+         |   !!!  FAULT DETECTED !!!  |
+         |                           |
+         |   Code:  F001             |
+         |                           |
+         |   Engine Over-Temperature  |
+         |                           |
+         |   Measured:  93.2 C       |
+         |   Threshold: 90.0 C       |
+         |                           |
+         |   ECU State:  SAFE MODE   |
+         |   Fan PWM:    0 % (CUT)   |
+         |   Buzzer:     ACTIVE      |
+         |                           |
+         |   Recommended Action:     |
+         |   - Allow engine to cool  |
+         |   - Check coolant level   |
+         |   - Verify LM35 wiring    |
+         |                           |
+         |  +------------------------+|
+         |  |   [ SEND RESET ]      ||
+         |  +------------------------+|
+         |                           |
+         |   [ VIEW DTC LOG ]        |
+         |                           |
+         |!!!!!!!!!!!!!!!!!!!!!!!!!!!!|
+```
+
+---
+
+#### Screen 6 — Settings
+
+<div align="center">
+
+![Screen 6 - Settings](mob_s6_settings.jpg)
+
+</div>
+
+```
+         +---------------------------+
+         | BT:HC-05 |||   CONNECTED  |
+         +---------------------------+
+         |  Settings                 |
+         +---------------------------+
+         |                           |
+         |  CONNECTION               |
+         |  Baud Rate:  [ 9600   ]  |
+         |  Device:     [ HC-05  ]  |
+         |  PIN:        [ 1234   ]  |
+         |  Auto-connect:  (ON)     |
+         |                           |
+         |  DISPLAY                  |
+         |  Temp Unit:  ( C )  ( F ) |
+         |  Refresh:    [ 500 ms  ] |
+         |  Notify Fault:  (ON)     |
+         |                           |
+         |  TELEMETRY                |
+         |  RX Timeout: [ 10 s   ] |
+         |  History:    [ 5 items ] |
+         |                           |
+         |  ABOUT                    |
+         |  App:  Gestell Diagnostic |
+         |  MCU:  ATmega128 @16MHz   |
+         |  BT:   HC-05 USART0 9600  |
+         |  Ver:  v1.0.0             |
+         |                           |
+         |  [ SAVE ]  [ RESET APP ]  |
+         |                           |
+         +---------------------------+
+         |[Cockpit] [DTC] [Diag][Set]|
+         +---------------------------+
 ```
 
 ### App Interface Screens
 
 | Screen | Description | Data Source |
 |:---|:---|:---:|
-| **🔵 Bluetooth Connect Screen** | Auto-scans for `HC-05` Bluetooth device, handles pairing with PIN `1234`, shows RSSI signal strength indicator. | BT Stack |
-| **🏎️ Live Cockpit Screen** | Main dashboard: Engine Temperature circular gauge (42.5°C), Battery Voltage gauge (12.4V), Fan Speed bar (75%), ECU Mode badge (`MODE: RUN`), Ignition status (`IGN: ON`). | `$TELE` frame |
-| **🔍 DTC Scanner Screen** | Full-page OBD-II fault scanner. Lists all active and stored DTCs with code, description, severity icon, and one-tap `Clear` button per entry. | `$DTC` frame |
-| **📋 Extended Diagnostic Screen** | Detailed report view triggered by `DIAG_REQ`. Shows last 5 sensor readings, uptime counter, FSM transition log, and all actuator states. | `$DIAG` frame |
-| **🔔 Fault Alert Overlay** | Full-screen critical alert triggered automatically when `fault ≠ NONE`. Shows DTC code, fault description, recommended action, and `Send Reset` button. | `fault` field |
-| **⚙️ Settings Screen** | Configure baud rate, display units (°C/°F), telemetry refresh rate, and notification preferences. | App local |
+| **1. Bluetooth Connect** | Auto-scans for `HC-05`, shows RSSI signal strength, handles pairing with PIN `1234`. | BT Stack |
+| **2. Live Cockpit** | Main dashboard: Mode badge, Ignition toggle, Temp & Voltage gauges, Fan speed bar, Fault status. | `$TELE` frame |
+| **3. DTC Scanner** | Active + stored DTC list with code, description, severity, timestamp, and one-tap `Clear` per entry. | `$DTC` frame |
+| **4. Extended Diagnostic** | Full report: last 5 sensor readings table, actuator states, FSM transition log, ECU info. | `$DIAG` frame |
+| **5. Fault Alert Overlay** | Full-screen critical alert with DTC code, measured vs threshold, recommended action, and `Send Reset` button. | `fault` field |
+| **6. Settings** | Baud rate, device PIN, display units, refresh intervals, about info. | App local |
 
 ---
 
