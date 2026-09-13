@@ -488,6 +488,12 @@ The **Gestell Web Dashboard** (`/Dashboard`) is a full-featured, web-based ECU m
 
 #### Page 1 — Telemetry Overview (Home)
 
+<div align="center">
+
+![Page 1 - Overview](web_p1_overview.jpg)
+
+</div>
+
 ```
 +----[ Gestell ECU Dashboard ]--------------------------------------------------[ GESTELL_ECU_01 ]-+
 |  [ Overview ] [ DTC Manager ] [ Fault Injection ] [ Live Console ] [ Settings ]   WiFi  01420s   |
@@ -525,6 +531,12 @@ The **Gestell Web Dashboard** (`/Dashboard`) is a full-featured, web-based ECU m
 
 #### Page 2 — DTC Manager
 
+<div align="center">
+
+![Page 2 - DTC Manager](web_p2_dtc.jpg)
+
+</div>
+
 ```
 +----[ Gestell ECU Dashboard ]--------------------------------------------------[ GESTELL_ECU_01 ]-+
 |  [ Overview ] [ DTC Manager ] [ Fault Injection ] [ Live Console ] [ Settings ]   WiFi  01420s   |
@@ -558,6 +570,12 @@ The **Gestell Web Dashboard** (`/Dashboard`) is a full-featured, web-based ECU m
 ---
 
 #### Page 3 — Fault Injection Panel (Testing)
+
+<div align="center">
+
+![Page 3 - Fault Injection](web_p3_fault.jpg)
+
+</div>
 
 ```
 +----[ Gestell ECU Dashboard ]--------------------------------------------------[ GESTELL_ECU_01 ]-+
@@ -597,6 +615,12 @@ The **Gestell Web Dashboard** (`/Dashboard`) is a full-featured, web-based ECU m
 
 #### Page 4 — Live Packet Console
 
+<div align="center">
+
+![Page 4 - Live Console](web_p4_console.jpg)
+
+</div>
+
 ```
 +----[ Gestell ECU Dashboard ]--------------------------------------------------[ GESTELL_ECU_01 ]-+
 |  [ Overview ] [ DTC Manager ] [ Fault Injection ] [ Live Console ] [ Settings ]   WiFi  01420s   |
@@ -632,6 +656,12 @@ The **Gestell Web Dashboard** (`/Dashboard`) is a full-featured, web-based ECU m
 
 #### Page 5 — Settings
 
+<div align="center">
+
+![Page 5 - Settings](web_p5_settings.jpg)
+
+</div>
+
 ```
 +----[ Gestell ECU Dashboard ]--------------------------------------------------[ GESTELL_ECU_01 ]-+
 |  [ Overview ] [ DTC Manager ] [ Fault Injection ] [ Live Console ] [ Settings ]   WiFi  01420s   |
@@ -662,6 +692,41 @@ The **Gestell Web Dashboard** (`/Dashboard`) is a full-featured, web-based ECU m
 |  |  License:   MIT                   |   +-------------------------------------------+          |
 |  +------------------------------------+                                                          |
 |                                                                                                   |
++===================================================================================================+
+```
+
+---
+
+#### Page 6 — About
+
+<div align="center">
+
+![Page 6 - About](web_p6_about.jpg)
+
+</div>
+
+```
++----[ Gestell ECU Dashboard ]--------------------------------------------------[ GESTELL_ECU_01 ]-+
+|  [ Overview ] [ DTC Manager ] [ Fault Injection ] [ Live Console ] [ Settings* ]  WiFi  01420s   |
++===================================================================================================+
+|                                                                                                   |
+|  ABOUT                                                                                            |
+|                                                                                                   |
+|  +------------------------------+  +-------------------------------+  +------------------------+  |
+|  |  PROJECT INFORMATION         |  |  DEVELOPMENT TEAM             |  |  GESTELL COMPANY       |  |
+|  |  --------------------------  |  |  ---------------------------  |  |  --------------------  |  |
+|  |  🚗 Gestell Mini-ECU         |  |  [*] Student Name 1           |  |       [ G ]            |  |
+|  |  💾 MCU: ATmega128 @16MHz    |  |      Embedded Developer       |  |                        |  |
+|  |  🏗  AUTOSAR 4-Layer Arch.   |  |  [*] Student Name 2           |  |      Gestell           |  |
+|  |  📡 HC-05 BT + ESP-01 WiFi  |  |      Mobile App Developer     |  |  Automotive Training   |  |
+|  |  🖥  LCD 20×4 (HD44780)      |  |  [*] Student Name 3           |  |      Solutions         |  |
+|  |  🏷  Version: v1.0.0         |  |      Web Dashboard Dev        |  |  --------------------- |  |
+|  |  📖 License: MIT             |  |  [*] Student Name 4           |  |  [ gestell.io ]        |  |
+|  |                              |  |      Hardware Engineer        |  |  [ GitHub      ]       |  |
+|  |                              |  |  Academic Year: 2024 / 2025   |  |                        |  |
+|  +------------------------------+  +-------------------------------+  +------------------------+  |
+|                                                                                                   |
+|        Built with ♥ for Gestell Training Program  •  ATmega128  •  AUTOSAR-Inspired              |
 +===================================================================================================+
 ```
 
