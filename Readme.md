@@ -760,7 +760,7 @@ The **Gestell Mobile Diagnostic App** (`/MobileApp`) is an OBD-II style embedded
 
 <div align="center">
 
-![Screen 1 - Bluetooth Connect](mob_s1_connect.jpg)
+![Screen 1 - Bluetooth Connect](MobileApp/Mock/mob_s1_connect.jpg)
 
 </div>
 
@@ -805,7 +805,7 @@ The **Gestell Mobile Diagnostic App** (`/MobileApp`) is an OBD-II style embedded
 
 <div align="center">
 
-![Screen 2 - Live Cockpit](mob_s2_cockpit.jpg)
+![Screen 2 - Live Cockpit](MobileApp/Mock/mob_s2_cockpit.jpg)
 
 </div>
 
@@ -855,7 +855,7 @@ The **Gestell Mobile Diagnostic App** (`/MobileApp`) is an OBD-II style embedded
 
 <div align="center">
 
-![Screen 3 - DTC Scanner](mob_s3_dtc.jpg)
+![Screen 3 - DTC Scanner](MobileApp/Mock/mob_s3_dtc.jpg)
 
 </div>
 
@@ -900,7 +900,7 @@ The **Gestell Mobile Diagnostic App** (`/MobileApp`) is an OBD-II style embedded
 
 <div align="center">
 
-![Screen 4 - Extended Diagnostics](mob_s4_diag.jpg)
+![Screen 4 - Extended Diagnostics](MobileApp/Mock/mob_s4_diag.jpg)
 
 </div>
 
@@ -951,7 +951,7 @@ The **Gestell Mobile Diagnostic App** (`/MobileApp`) is an OBD-II style embedded
 
 <div align="center">
 
-![Screen 5 - Fault Alert](mob_s5_fault.jpg)
+![Screen 5 - Fault Alert](MobileApp/Mock/mob_s5_fault.jpg)
 
 </div>
 
@@ -992,7 +992,7 @@ The **Gestell Mobile Diagnostic App** (`/MobileApp`) is an OBD-II style embedded
 
 <div align="center">
 
-![Screen 6 - Settings](mob_s6_settings.jpg)
+![Screen 6 - Settings](MobileApp/Mock/mob_s6_settings.jpg)
 
 </div>
 
