@@ -490,7 +490,7 @@ The **Gestell Web Dashboard** (`/Dashboard`) is a full-featured, web-based ECU m
 
 <div align="center">
 
-![Page 1 - Overview](web_p1_overview.jpg)
+![Page 1 - Overview](Dashboard/Mock/web_p1_overview.jpg)
 
 </div>
 
