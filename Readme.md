@@ -533,7 +533,7 @@ The **Gestell Web Dashboard** (`/Dashboard`) is a full-featured, web-based ECU m
 
 <div align="center">
 
-![Page 2 - DTC Manager](web_p2_dtc.jpg)
+![Page 2 - DTC Manager](Dashboard/Mock/web_p2_dtc.jpg)
 
 </div>
 
@@ -573,7 +573,7 @@ The **Gestell Web Dashboard** (`/Dashboard`) is a full-featured, web-based ECU m
 
 <div align="center">
 
-![Page 3 - Fault Injection](web_p3_fault.jpg)
+![Page 3 - Fault Injection](Dashboard/Mock/web_p3_fault.jpg)
 
 </div>
 
@@ -617,7 +617,7 @@ The **Gestell Web Dashboard** (`/Dashboard`) is a full-featured, web-based ECU m
 
 <div align="center">
 
-![Page 4 - Live Console](web_p4_console.jpg)
+![Page 4 - Live Console](Dashboard/Mock/web_p4_console.jpg)
 
 </div>
 
@@ -658,7 +658,7 @@ The **Gestell Web Dashboard** (`/Dashboard`) is a full-featured, web-based ECU m
 
 <div align="center">
 
-![Page 5 - Settings](web_p5_settings.jpg)
+![Page 5 - Settings](Dashboard/Mock/web_p5_settings.jpg)
 
 </div>
 
@@ -701,7 +701,7 @@ The **Gestell Web Dashboard** (`/Dashboard`) is a full-featured, web-based ECU m
 
 <div align="center">
 
-![Page 6 - About](web_p6_about.jpg)
+![Page 6 - About](Dashboard/Mock/web_p6_about.jpg)
 
 </div>
 
