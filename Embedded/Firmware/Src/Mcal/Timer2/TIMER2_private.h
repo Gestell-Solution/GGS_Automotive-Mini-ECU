@@ -80,7 +80,7 @@ typedef void (*Timer2_TickHook_t)(void);
 #define ISR(vector)         void vector(void) __attribute__((signal, used)); \
                             void vector(void)
 #endif
-/** @} */
+
 
 
 /**
@@ -113,8 +113,11 @@ typedef void (*Timer2_TickHook_t)(void);
 
  #define TOV2   6
 
-
-#define _10ms_tick  155
+/**
+ * @def       _10ms_tick
+ * @brief     OCR2 Compare Match threshold value for 10ms tick generation.
+ */
+#define _10ms_tick  155U
 
 
 #endif /* TIMER2_PRIVATE_H */

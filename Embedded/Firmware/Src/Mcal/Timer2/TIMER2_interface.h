@@ -4,7 +4,7 @@
 * @author     (Developer: Beshoy Esmat)
 * @author     (Reviewer: Salma Mohamed)
 * @brief      Interface file for the TIMER2 driver
-* @details    This header file defines the compile-time interface of the TIMER2 driver
+* @details    declears the public API of the TIMER2 driver for use in application code
 * @version    1.0.0
 * @date       17/10/2026
 * @copyright  Copyright (c) 2026, Gestell Company
@@ -25,6 +25,7 @@
 #include <avr/interrupt.h>
 
 #include "../Atmega128Register.h"
+
 /**
  * @brief Initializes Timer2 in CTC mode with prescaler 1024 and OCR2=155.
  *        Enables Compare Match Interrupt (OCIE2) to generate 10ms heartbeats.
