@@ -210,8 +210,10 @@
 /** @} */
 
 
-
-
+/*
+SREG Global interrupt flag
+*/
+#define USART0_SREG_I    7
 
 /**
  * @enum USART0_BaudRate_t
