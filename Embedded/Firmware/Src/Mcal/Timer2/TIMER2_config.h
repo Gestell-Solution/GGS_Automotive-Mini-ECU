@@ -4,7 +4,7 @@
 * @author     (Developer: Beshoy Esmat)
 * @author     (Reviewer: Salma Mohamed)
 * @brief      Configuration file for the TIMER2 driver
-* @details    This header file defines the comile-time configuration of the TIMER2 driver (ring buffer size)
+* @details    This header file defines the compile-time configuration of the TIMER2 driver
 * @version    1.0.0
 * @date       17/10/2026
 * @copyright  Copyright (c) 2026, Gestell Company

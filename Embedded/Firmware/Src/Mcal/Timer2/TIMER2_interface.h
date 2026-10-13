@@ -22,6 +22,8 @@
 #include "TIMER2_private.h"
 #include "TIMER2_config.h" 
 
+#include <avr/interrupt.h>
+
 #include "../Atmega128Register.h"
 /**
  * @brief Initializes Timer2 in CTC mode with prescaler 1024 and OCR2=155.
@@ -60,6 +62,10 @@ void            mTimer2_ResetTick(void);
  * @param CallbackPtr Pointer to void(void) scheduler hook.
  */
 void            mTimer2_SetCallback(Timer2_TickHook_t CallbackPtr);
+
+
+void Scheduler_Tick_ISR(void) __attribute__((signal, used)); // Ensure the function is not optimized away
+
 
 #endif /* TIMER2_INTERFACE_H */
 

@@ -66,6 +66,24 @@ typedef enum {
 typedef void (*Timer2_TickHook_t)(void);
 
 /**
+ * @defgroup VectorTable ATmega128 Interrupt Vector Table Mapping
+ * @{
+ * @brief In ATmega128, Timer/Counter2 Compare Match is Vector #9 in GCC
+ *        (Flash address 0x0012, Vector 10 in Datasheet Table 30).
+ */
+#define TIMER2_COMP_vect_m    __vector_9
+
+/**
+ * @brief Standard bare-metal ISR macro using GCC signal attribute (Zero avr-libc library dependency).
+ */
+#ifndef ISR
+#define ISR(vector)         void vector(void) __attribute__((signal, used)); \
+                            void vector(void)
+#endif
+/** @} */
+
+
+/**
  * @def   OCIE2
  * @brief this is the output compare match interput enable bit
  */
