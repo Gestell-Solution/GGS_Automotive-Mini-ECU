@@ -71,7 +71,7 @@ typedef void (*Timer2_TickHook_t)(void);
  * @brief In ATmega128, Timer/Counter2 Compare Match is Vector #9 in GCC
  *        (Flash address 0x0012, Vector 10 in Datasheet Table 30).
  */
-#define TIMER2_COMP_vect_m    __vector_9
+#define TIMER2_COMP_vect    __vector_9
 
 /**
  * @brief Standard bare-metal ISR macro using GCC signal attribute (Zero avr-libc library dependency).

@@ -64,7 +64,6 @@ void            mTimer2_ResetTick(void);
 void            mTimer2_SetCallback(Timer2_TickHook_t CallbackPtr);
 
 
-void Scheduler_Tick_ISR(void) __attribute__((signal, used)); // Ensure the function is not optimized away
 
 
 #endif /* TIMER2_INTERFACE_H */

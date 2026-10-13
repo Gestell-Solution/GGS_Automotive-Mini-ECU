@@ -22,7 +22,11 @@ static volatile uint32_t g_uptime_seconds = 0UL;
 static volatile uint8_t  g_subSecondTicks = 0U;
 static volatile Timer2_TickHook_t g_timer2Callback = Null;
 
-void Scheduler_Tick_ISR(void);
+void Scheduler_Tick_ISR(void) __attribute__((weak)); // Ensure the function is not optimized away
+void Scheduler_Tick_ISR(void)
+{
+    // will be changed using the schudeler.c 
+}
 
 /**
  * @brief Initializes Timer2 in CTC mode with prescaler 1024 and OCR2=155.
@@ -137,7 +141,7 @@ void mTimer2_SetCallback(Timer2_TickHook_t CallbackPtr)
 }
 
 // it triggers every 9.984ms
-ISR(TIMER2_COMP_vect_m)
+ISR(TIMER2_COMP_vect)
 {
     g_sysTick_ms += 10; // incremnt by 10ms
 
