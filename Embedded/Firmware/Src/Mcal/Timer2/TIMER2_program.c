@@ -35,11 +35,16 @@ void Scheduler_Tick_ISR(void)
 void mTimer2_Init_CTC_10ms(void)
 {
     
-    // Reset counter
-    TCNT2_Reg = 0;    
+    // we set the timer 2 to CTC mode 
+    // then we seclet the prescaler to 1024 only
+    TCCR2_Reg |= (uint8_t)(Timer2_Mode_Select | Timer2_Prescaler_Select);
+    
 
     // Set compare value for 10ms tick 
     OCR2_Reg = _10ms_tick; 
+
+    // Reset counter
+    TCNT2_Reg = 0x00U;    
         
     // clear pending flag 
     SetBit(TIFR_Reg, OCF2); 
@@ -52,10 +57,6 @@ void mTimer2_Init_CTC_10ms(void)
     g_uptime_seconds = 0UL;
     g_subSecondTicks = 0U;
     g_timer2Callback = Null;
-    
-    // we set the timer 2 to CTC mode 
-    // then we seclet the prescaler to 1024 only
-    TCCR2_Reg |= (uint8_t)(Timer2_Mode_Select | Timer2_Prescaler_Select);
 }
 
 /**
@@ -104,9 +105,9 @@ uint32_t mTimer2_GetUptime_Seconds(void)
 void mTimer2_DelayMs(uint32_t Delay_ms)
 {
     uint32_t start_time = mTimer2_GetTick_ms();
-    
+    uint32_t current_time = mTimer2_GetTick_ms();
 
-    while ((mTimer2_GetTick_ms() - start_time) < Delay_ms)
+    while ((current_time - start_time) >= Delay_ms)
     {
         // Busy-wait loop until the specified delay has elapsed
         // This allows background ISRs to continue executing
@@ -143,7 +144,9 @@ void mTimer2_SetCallback(Timer2_TickHook_t CallbackPtr)
 // it triggers every 9.984ms
 ISR(TIMER2_COMP_vect)
 {
-    g_sysTick_ms += 10; // incremnt by 10ms
+    g_sysTick_ms += 10UL; // incremnt by 10ms
+
+    // g_subSecondTicks++;
 
     if ((g_sysTick_ms % 1000U) == 0U)
     {

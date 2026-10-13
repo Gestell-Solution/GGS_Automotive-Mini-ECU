@@ -32,11 +32,11 @@ typedef enum {
     Timer2_Prescaler_None = 0,  /* Timer stopped (No clock) */
     Timer2_Prescaler_1    = 1,  /* clk / 1 */
     Timer2_Prescaler_8    = 2,  /* clk / 8 */
-    // Timer2_Prescaler_32   = 3,  /* clk / 32 */
+    Timer2_Prescaler_32   = 3,  /* clk / 32 */
     Timer2_Prescaler_64   = 3,  /* clk / 64 */
-    // Timer2_Prescaler_128  = 5,  /* clk / 128 */
+    Timer2_Prescaler_128  = 5,  /* clk / 128 */
     Timer2_Prescaler_256  = 4,  /* clk / 256 */
-    Timer2_Prescaler_1024 = 5   /* clk / 1024 (Nominal for 10ms SysTick) */
+    Timer2_Prescaler_1024 = 7   /* clk / 1024 (Nominal for 10ms SysTick) */
 } Timer2_Prescaler_t;
 
 /**
