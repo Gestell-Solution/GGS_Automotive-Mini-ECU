@@ -11,6 +11,7 @@
 #include "../../Common/Config.h"
 #include "Usart0_Interface.h"
 #include "../Atmega128Register.h"
+#include <avr/interrupt.h>
 
 #if ModuleUsart0Enabled == Enable
 
@@ -80,7 +81,8 @@ USART0_Status_t mUSART0_SendByte(uint8_t data){
 
 //Save SREG & cli and Enter Critical Section
 uint8_t sreg = SREG_Reg;
-ClearBit(SREG_Reg,USART0_SREG_I);
+cli();
+// ClearBit(SREG_Reg,USART0_SREG_I);
 
 //Check TX ring buffer full then we restore SREG and return USART0 Status Full
 if(g_txRingBuf.count == USART0_RING_BUFFER_SIZE){
@@ -167,7 +169,8 @@ if(data_ptr == Null){
 
 //Enter critical section to save SREG and execute cli().
 uint8_t sreg = SREG_Reg;
-ClearBit(SREG_Reg,USART0_SREG_I);
+cli();
+// ClearBit(SREG_Reg,USART0_SREG_I);
 
 //Check g_rxRingBuf.count == 0 and If true (buffer empty) restore SREG and return USART0_STATUS_EMPTY.
 if(g_rxRingBuf.count == 0){
@@ -198,7 +201,8 @@ return USART0_STATUS_OK;
 uint8_t mUSART0_DataAvailable(void){
 //Save SREG and execute cli()
 uint8_t sreg = SREG_Reg;
-ClearBit(SREG_Reg,USART0_SREG_I);
+cli();
+// ClearBit(SREG_Reg,USART0_SREG_I);
 //Check if rx available or not
 uint8_t available;
 if(g_rxRingBuf.count > 0){
@@ -222,7 +226,8 @@ return available;
 uint8_t mUSART0_TxReady(void){
 //Save SREG and execute cli().
 uint8_t sreg = SREG_Reg;
-ClearBit(SREG_Reg,USART0_SREG_I);
+cli();
+// ClearBit(SREG_Reg,USART0_SREG_I);
 
 //Check ready = (g_txRingBuf.count < USART0_RING_BUFFER_SIZE) 
 uint8_t ready;
@@ -247,7 +252,8 @@ return ready;
 void mUSART0_FlushRX(void){
 //Save SREG and execute cli()
 uint8_t sreg = SREG_Reg;
-ClearBit(SREG_Reg,USART0_SREG_I);
+cli();
+// ClearBit(SREG_Reg,USART0_SREG_I);
 
 //Reset g_rxRingBuf.head , g_rxRingBuf.tail and  g_rxRingBuf.count 
 g_rxRingBuf.head  = 0;
