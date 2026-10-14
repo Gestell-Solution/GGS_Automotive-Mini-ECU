@@ -146,11 +146,6 @@ void mTimer2_DelayMs(uint32_t Delay_ms)
     uint32_t start_time = mTimer2_GetTick_ms();
     uint32_t current_time ;
 
-    // while ((current_time - start_time) < Delay_ms)
-    // {
-    //     /* Busy-wait loop until the specified delay has elapsed */
-    //     /* This allows background ISRs to continue executing */
-    // }
     do
     {
         current_time = mTimer2_GetTick_ms();
