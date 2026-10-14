@@ -23,10 +23,11 @@
  * ========================================================================= */
 
 /** @brief  Dereference a memory-mapped 8-bit register at the given address. */
-#define _SetAddress8Bit(Address) (*((volatile uint8_t *)(Address)))
+#define _SetAddress8Bit(Address)    (*((volatile uint8_t  *)(Address)))
 
 /** @brief  Dereference a memory-mapped 16-bit register at the given address. */
-#define _SetAddress16Bit(Address) (*((volatile uint16_t *)(Address)))
+#define _SetAddress16Bit(Address)   (*((volatile uint16_t *)(Address)))
+
 
 /* =========================================================================
  * SECTION 2 — CPU Core & Status Registers
@@ -36,22 +37,22 @@
  * ========================================================================= */
 
 /** @brief Status Register */
-#define SREG_Reg _SetAddress8Bit(0x5FU)
+#define SREG_Reg        _SetAddress8Bit(0x5FU)
 
 /** @brief Stack Pointer High byte */
-#define SPH_Reg _SetAddress8Bit(0x5EU)
+#define SPH_Reg         _SetAddress8Bit(0x5EU)
 
 /** @brief Stack Pointer Low byte */
-#define SPL_Reg _SetAddress8Bit(0x5DU)
+#define SPL_Reg         _SetAddress8Bit(0x5DU)
 
 /** @brief MCU Control Register */
-#define MCUCR_Reg _SetAddress8Bit(0x55U)
+#define MCUCR_Reg       _SetAddress8Bit(0x55U)
 
 /** @brief MCU Control and Status Register */
-#define MCUCSR_Reg _SetAddress8Bit(0x54U)
+#define MCUCSR_Reg      _SetAddress8Bit(0x54U)
 
 /** @brief Watchdog Timer Control Register */
-#define WDTCR_Reg _SetAddress8Bit(0x41U)
+#define WDTCR_Reg       _SetAddress8Bit(0x41U)
 /* =========================================================================
  * SECTION 3 — DIO Port Registers (A – G)
  * =========================================================================
@@ -67,39 +68,40 @@
  * ========================================================================= */
 
 /* --- Port A --- */
-#define PORTA_Reg _SetAddress8Bit(0x3BU) /**< Port A Data Register */
-#define DDRA_Reg _SetAddress8Bit(0x3AU)  /**< Port A Data Direction Register */
-#define PINA_Reg _SetAddress8Bit(0x39U)  /**< Port A Input Pins */
+#define PORTA_Reg       _SetAddress8Bit(0x3BU)  /**< Port A Data Register */
+#define DDRA_Reg        _SetAddress8Bit(0x3AU)  /**< Port A Data Direction Register */
+#define PINA_Reg        _SetAddress8Bit(0x39U)  /**< Port A Input Pins */
 
 /* --- Port B --- */
-#define PORTB_Reg _SetAddress8Bit(0x38U) /**< Port B Data Register */
-#define DDRB_Reg _SetAddress8Bit(0x37U)  /**< Port B Data Direction Register */
-#define PINB_Reg _SetAddress8Bit(0x36U)  /**< Port B Input Pins */
+#define PORTB_Reg       _SetAddress8Bit(0x38U)  /**< Port B Data Register */
+#define DDRB_Reg        _SetAddress8Bit(0x37U)  /**< Port B Data Direction Register */
+#define PINB_Reg        _SetAddress8Bit(0x36U)  /**< Port B Input Pins */
 
 /* --- Port C --- */
-#define PORTC_Reg _SetAddress8Bit(0x35U) /**< Port C Data Register */
-#define DDRC_Reg _SetAddress8Bit(0x34U)  /**< Port C Data Direction Register */
-#define PINC_Reg _SetAddress8Bit(0x33U)  /**< Port C Input Pins */
+#define PORTC_Reg       _SetAddress8Bit(0x35U)  /**< Port C Data Register */
+#define DDRC_Reg        _SetAddress8Bit(0x34U)  /**< Port C Data Direction Register */
+#define PINC_Reg        _SetAddress8Bit(0x33U)  /**< Port C Input Pins */
 
 /* --- Port D --- */
-#define PORTD_Reg _SetAddress8Bit(0x32U) /**< Port D Data Register */
-#define DDRD_Reg _SetAddress8Bit(0x31U)  /**< Port D Data Direction Register */
-#define PIND_Reg _SetAddress8Bit(0x30U)  /**< Port D Input Pins */
+#define PORTD_Reg       _SetAddress8Bit(0x32U)  /**< Port D Data Register */
+#define DDRD_Reg        _SetAddress8Bit(0x31U)  /**< Port D Data Direction Register */
+#define PIND_Reg        _SetAddress8Bit(0x30U)  /**< Port D Input Pins */
 
 /* --- Port E --- */
-#define PORTE_Reg _SetAddress8Bit(0x23U) /**< Port E Data Register */
-#define DDRE_Reg _SetAddress8Bit(0x22U)  /**< Port E Data Direction Register */
-#define PINE_Reg _SetAddress8Bit(0x21U)  /**< Port E Input Pins */
+#define PORTE_Reg       _SetAddress8Bit(0x23U)  /**< Port E Data Register */
+#define DDRE_Reg        _SetAddress8Bit(0x22U)  /**< Port E Data Direction Register */
+#define PINE_Reg        _SetAddress8Bit(0x21U)  /**< Port E Input Pins */
 
 /* --- Port F (Extended I/O) --- */
-#define PORTF_Reg _SetAddress8Bit(0x62U) /**< Port F Data Register */
-#define DDRF_Reg _SetAddress8Bit(0x61U)  /**< Port F Data Direction Register */
-#define PINF_Reg _SetAddress8Bit(0x20U)  /**< Port F Input Pins (Classic I/O space) */
+#define PORTF_Reg       _SetAddress8Bit(0x62U)  /**< Port F Data Register */
+#define DDRF_Reg        _SetAddress8Bit(0x61U)  /**< Port F Data Direction Register */
+#define PINF_Reg        _SetAddress8Bit(0x20U)  /**< Port F Input Pins (Classic I/O space) */
 
 /* --- Port G (Extended I/O) --- */
-#define PORTG_Reg _SetAddress8Bit(0x65U) /**< Port G Data Register */
-#define DDRG_Reg _SetAddress8Bit(0x64U)  /**< Port G Data Direction Register */
-#define PING_Reg _SetAddress8Bit(0x63U)  /**< Port G Input Pins */
+#define PORTG_Reg       _SetAddress8Bit(0x65U)  /**< Port G Data Register */
+#define DDRG_Reg        _SetAddress8Bit(0x64U)  /**< Port G Data Direction Register */
+#define PING_Reg        _SetAddress8Bit(0x63U)  /**< Port G Input Pins */
+
 
 /* =========================================================================
  * SECTION 4 — ADC Registers
@@ -110,22 +112,24 @@
  * ========================================================================= */
 
 /** @brief ADC Multiplexer Selection Register */
-#define ADMUX_Reg _SetAddress8Bit(0x27U)
+#define ADMUX_Reg       _SetAddress8Bit(0x27U)
 
 /** @brief ADC Control and Status Register A */
-#define ADCSRA_Reg _SetAddress8Bit(0x26U)
+#define ADCSRA_Reg      _SetAddress8Bit(0x26U)
 
 /** @brief ADC Data Register High byte */
-#define ADCH_Reg _SetAddress8Bit(0x25U)
+#define ADCH_Reg        _SetAddress8Bit(0x25U)
 
 /** @brief ADC Data Register Low byte */
-#define ADCL_Reg _SetAddress8Bit(0x24U)
+#define ADCL_Reg        _SetAddress8Bit(0x24U)
 
 /** @brief ADC Data Register (16-bit combined read — ADCL must be read first) */
-#define ADC_Reg _SetAddress16Bit(0x24U)
+#define ADC_Reg         _SetAddress16Bit(0x24U)
 
 /** @brief ADC Control and Status Register B (Extended I/O) */
-#define ADCSRB_Reg _SetAddress8Bit(0x7BU)
+#define ADCSRB_Reg      _SetAddress8Bit(0x7BU)
+
+
 
 /* =========================================================================
  * SECTION 5 — Timer0 Registers (8-bit — Fan PWM / OC0 on PB4)
@@ -134,19 +138,19 @@
  * ========================================================================= */
 
 /** @brief Timer/Counter0 Control Register */
-#define TCCR0_Reg _SetAddress8Bit(0x53U)
+#define TCCR0_Reg       _SetAddress8Bit(0x53U)
 
 /** @brief Timer/Counter0 Register */
-#define TCNT0_Reg _SetAddress8Bit(0x52U)
+#define TCNT0_Reg       _SetAddress8Bit(0x52U)
 
 /** @brief Output Compare Register 0 */
-#define OCR0_Reg _SetAddress8Bit(0x51U)
+#define OCR0_Reg        _SetAddress8Bit(0x51U)
 
 /** @brief Timer/Counter Interrupt Mask Register (shared T0/T1) */
-#define TIMSK_Reg _SetAddress8Bit(0x57U)
+#define TIMSK_Reg       _SetAddress8Bit(0x57U)
 
 /** @brief Timer/Counter Interrupt Flag Register (shared T0/T1) */
-#define TIFR_Reg _SetAddress8Bit(0x56U)
+#define TIFR_Reg        _SetAddress8Bit(0x56U)
 /* =========================================================================
  * SECTION 6 — Timer1 Registers (16-bit)
  * =========================================================================
@@ -159,58 +163,58 @@
  * ========================================================================= */
 
 /** @brief Timer/Counter1 Control Register A */
-#define TCCR1A_Reg _SetAddress8Bit(0x4FU)
+#define TCCR1A_Reg      _SetAddress8Bit(0x4FU)
 
 /** @brief Timer/Counter1 Control Register B */
-#define TCCR1B_Reg _SetAddress8Bit(0x4EU)
+#define TCCR1B_Reg      _SetAddress8Bit(0x4EU)
 
 /** @brief Timer/Counter1 Control Register C (Extended I/O) */
-#define TCCR1C_Reg _SetAddress8Bit(0x7AU)
+#define TCCR1C_Reg      _SetAddress8Bit(0x7AU)
 
 /** @brief Timer/Counter1 Register (16-bit) */
-#define TCNT1_Reg _SetAddress16Bit(0x4CU)
+#define TCNT1_Reg       _SetAddress16Bit(0x4CU)
 
 /** @brief Timer/Counter1 Register High byte */
-#define TCNT1H_Reg _SetAddress8Bit(0x4DU)
+#define TCNT1H_Reg      _SetAddress8Bit(0x4DU)
 
 /** @brief Timer/Counter1 Register Low byte */
-#define TCNT1L_Reg _SetAddress8Bit(0x4CU)
+#define TCNT1L_Reg      _SetAddress8Bit(0x4CU)
 
 /** @brief Output Compare Register 1A (16-bit) */
-#define OCR1A_Reg _SetAddress16Bit(0x4AU)
+#define OCR1A_Reg       _SetAddress16Bit(0x4AU)
 
 /** @brief Output Compare Register 1A High byte */
-#define OCR1AH_Reg _SetAddress8Bit(0x4BU)
+#define OCR1AH_Reg      _SetAddress8Bit(0x4BU)
 
 /** @brief Output Compare Register 1A Low byte */
-#define OCR1AL_Reg _SetAddress8Bit(0x4AU)
+#define OCR1AL_Reg      _SetAddress8Bit(0x4AU)
 
 /** @brief Output Compare Register 1B (16-bit) */
-#define OCR1B_Reg _SetAddress16Bit(0x48U)
+#define OCR1B_Reg       _SetAddress16Bit(0x48U)
 
 /** @brief Output Compare Register 1B High byte */
-#define OCR1BH_Reg _SetAddress8Bit(0x49U)
+#define OCR1BH_Reg      _SetAddress8Bit(0x49U)
 
 /** @brief Output Compare Register 1B Low byte */
-#define OCR1BL_Reg _SetAddress8Bit(0x48U)
+#define OCR1BL_Reg      _SetAddress8Bit(0x48U)
 
 /** @brief Output Compare Register 1C (16-bit, Extended I/O) */
-#define OCR1C_Reg _SetAddress16Bit(0x78U)
+#define OCR1C_Reg       _SetAddress16Bit(0x78U)
 
 /** @brief Output Compare Register 1C High byte */
-#define OCR1CH_Reg _SetAddress8Bit(0x79U)
+#define OCR1CH_Reg      _SetAddress8Bit(0x79U)
 
 /** @brief Output Compare Register 1C Low byte */
-#define OCR1CL_Reg _SetAddress8Bit(0x78U)
+#define OCR1CL_Reg      _SetAddress8Bit(0x78U)
 
 /** @brief Input Capture Register 1 (16-bit) */
-#define ICR1_Reg _SetAddress16Bit(0x46U)
+#define ICR1_Reg        _SetAddress16Bit(0x46U)
 
 /** @brief Input Capture Register 1 High byte */
-#define ICR1H_Reg _SetAddress8Bit(0x47U)
+#define ICR1H_Reg       _SetAddress8Bit(0x47U)
 
 /** @brief Input Capture Register 1 Low byte */
-#define ICR1L_Reg _SetAddress8Bit(0x46U)
+#define ICR1L_Reg       _SetAddress8Bit(0x46U)
 /* =========================================================================
  * SECTION 7 — Timer2 Registers (8-bit — SysTick / CTC mode)
  * =========================================================================
@@ -219,19 +223,19 @@
  * ========================================================================= */
 
 /** @brief Timer/Counter2 Control Register */
-#define TCCR2_Reg _SetAddress8Bit(0x45U)
+#define TCCR2_Reg       _SetAddress8Bit(0x45U)
 
 /** @brief Timer/Counter2 Register */
-#define TCNT2_Reg _SetAddress8Bit(0x44U)
+#define TCNT2_Reg       _SetAddress8Bit(0x44U)
 
 /** @brief Output Compare Register 2 */
-#define OCR2_Reg _SetAddress8Bit(0x43U)
+#define OCR2_Reg        _SetAddress8Bit(0x43U)
 
 /** @brief Extended Timer Interrupt Mask Register (Extended I/O) */
-#define ETIMSK_Reg _SetAddress8Bit(0x7DU)
+#define ETIMSK_Reg      _SetAddress8Bit(0x7DU)
 
 /** @brief Extended Timer Interrupt Flag Register (Extended I/O) */
-#define ETIFR_Reg _SetAddress8Bit(0x7CU)
+#define ETIFR_Reg       _SetAddress8Bit(0x7CU)
 /* =========================================================================
  * SECTION 8 — Timer3 Registers (16-bit, Extended I/O)
  * =========================================================================
@@ -244,58 +248,58 @@
  * ========================================================================= */
 
 /** @brief Timer/Counter3 Control Register A (Extended I/O) */
-#define TCCR3A_Reg _SetAddress8Bit(0x8BU)
+#define TCCR3A_Reg      _SetAddress8Bit(0x8BU)
 
 /** @brief Timer/Counter3 Control Register B (Extended I/O) */
-#define TCCR3B_Reg _SetAddress8Bit(0x8AU)
+#define TCCR3B_Reg      _SetAddress8Bit(0x8AU)
 
 /** @brief Timer/Counter3 Control Register C (Extended I/O) */
-#define TCCR3C_Reg _SetAddress8Bit(0x8CU)
+#define TCCR3C_Reg      _SetAddress8Bit(0x8CU)
 
 /** @brief Timer/Counter3 Register (16-bit, Extended I/O) */
-#define TCNT3_Reg _SetAddress16Bit(0x8EU)
+#define TCNT3_Reg       _SetAddress16Bit(0x8EU)
 
 /** @brief Timer/Counter3 Register High byte */
-#define TCNT3H_Reg _SetAddress8Bit(0x8DU)
+#define TCNT3H_Reg      _SetAddress8Bit(0x8DU)
 
 /** @brief Timer/Counter3 Register Low byte */
-#define TCNT3L_Reg _SetAddress8Bit(0x8EU)
+#define TCNT3L_Reg      _SetAddress8Bit(0x8EU)
 
 /** @brief Output Compare Register 3A (16-bit, Extended I/O) */
-#define OCR3A_Reg _SetAddress16Bit(0x86U)
+#define OCR3A_Reg       _SetAddress16Bit(0x86U)
 
 /** @brief Output Compare Register 3A High byte */
-#define OCR3AH_Reg _SetAddress8Bit(0x87U)
+#define OCR3AH_Reg      _SetAddress8Bit(0x87U)
 
 /** @brief Output Compare Register 3A Low byte */
-#define OCR3AL_Reg _SetAddress8Bit(0x86U)
+#define OCR3AL_Reg      _SetAddress8Bit(0x86U)
 
 /** @brief Output Compare Register 3B (16-bit, Extended I/O) */
-#define OCR3B_Reg _SetAddress16Bit(0x84U)
+#define OCR3B_Reg       _SetAddress16Bit(0x84U)
 
 /** @brief Output Compare Register 3B High byte */
-#define OCR3BH_Reg _SetAddress8Bit(0x85U)
+#define OCR3BH_Reg      _SetAddress8Bit(0x85U)
 
 /** @brief Output Compare Register 3B Low byte */
-#define OCR3BL_Reg _SetAddress8Bit(0x84U)
+#define OCR3BL_Reg      _SetAddress8Bit(0x84U)
 
 /** @brief Output Compare Register 3C (16-bit, Extended I/O) */
-#define OCR3C_Reg _SetAddress16Bit(0x82U)
+#define OCR3C_Reg       _SetAddress16Bit(0x82U)
 
 /** @brief Output Compare Register 3C High byte */
-#define OCR3CH_Reg _SetAddress8Bit(0x83U)
+#define OCR3CH_Reg      _SetAddress8Bit(0x83U)
 
 /** @brief Output Compare Register 3C Low byte */
-#define OCR3CL_Reg _SetAddress8Bit(0x82U)
+#define OCR3CL_Reg      _SetAddress8Bit(0x82U)
 
 /** @brief Input Capture Register 3 (16-bit, Extended I/O) */
-#define ICR3_Reg _SetAddress16Bit(0x80U)
+#define ICR3_Reg        _SetAddress16Bit(0x80U)
 
 /** @brief Input Capture Register 3 High byte */
-#define ICR3H_Reg _SetAddress8Bit(0x81U)
+#define ICR3H_Reg       _SetAddress8Bit(0x81U)
 
 /** @brief Input Capture Register 3 Low byte */
-#define ICR3L_Reg _SetAddress8Bit(0x80U)
+#define ICR3L_Reg       _SetAddress8Bit(0x80U)
 /* =========================================================================
  * SECTION 9 — External Interrupt Registers (EXTI)
  * =========================================================================
@@ -304,16 +308,16 @@
  * ========================================================================= */
 
 /** @brief External Interrupt Control Register A (Extended I/O) */
-#define EICRA_Reg _SetAddress8Bit(0x6AU)
+#define EICRA_Reg       _SetAddress8Bit(0x6AU)
 
 /** @brief External Interrupt Control Register B (Extended I/O) */
-#define EICRB_Reg _SetAddress8Bit(0x5AU)
+#define EICRB_Reg       _SetAddress8Bit(0x6BU)
 
 /** @brief External Interrupt Mask Register */
-#define EIMSK_Reg _SetAddress8Bit(0x59U)
+#define EIMSK_Reg       _SetAddress8Bit(0x59U)
 
 /** @brief External Interrupt Flag Register */
-#define EIFR_Reg _SetAddress8Bit(0x58U)
+#define EIFR_Reg        _SetAddress8Bit(0x58U)
 /* =========================================================================
  * SECTION 10 — USART0 Registers (Bluetooth HC-05, PE0/PE1)
  * =========================================================================
@@ -322,22 +326,22 @@
  * ========================================================================= */
 
 /** @brief USART0 Data Register */
-#define UDR0_Reg _SetAddress8Bit(0x2CU)
+#define UDR0_Reg        _SetAddress8Bit(0x2CU)
 
 /** @brief USART0 Control and Status Register A */
-#define UCSR0A_Reg _SetAddress8Bit(0x2BU)
+#define UCSR0A_Reg      _SetAddress8Bit(0x2BU)
 
 /** @brief USART0 Control and Status Register B */
-#define UCSR0B_Reg _SetAddress8Bit(0x2AU)
+#define UCSR0B_Reg      _SetAddress8Bit(0x2AU)
 
 /** @brief USART0 Control and Status Register C (Extended I/O) */
-#define UCSR0C_Reg _SetAddress8Bit(0x95U)
+#define UCSR0C_Reg      _SetAddress8Bit(0x95U)
 
 /** @brief USART0 Baud Rate Register Low byte */
-#define UBRR0L_Reg _SetAddress8Bit(0x29U)
+#define UBRR0L_Reg      _SetAddress8Bit(0x29U)
 
 /** @brief USART0 Baud Rate Register High byte (Extended I/O) */
-#define UBRR0H_Reg _SetAddress8Bit(0x90U)
+#define UBRR0H_Reg      _SetAddress8Bit(0x90U)
 /* =========================================================================
  * SECTION 11 — USART1 Registers (Wi-Fi ESP-01, PD2/PD3)
  * =========================================================================
@@ -346,22 +350,22 @@
  * ========================================================================= */
 
 /** @brief USART1 Data Register (Extended I/O) */
-#define UDR1_Reg _SetAddress8Bit(0x9CU)
+#define UDR1_Reg        _SetAddress8Bit(0x9CU)
 
 /** @brief USART1 Control and Status Register A (Extended I/O) */
-#define UCSR1A_Reg _SetAddress8Bit(0x9BU)
+#define UCSR1A_Reg      _SetAddress8Bit(0x9BU)
 
 /** @brief USART1 Control and Status Register B (Extended I/O) */
-#define UCSR1B_Reg _SetAddress8Bit(0x9AU)
+#define UCSR1B_Reg      _SetAddress8Bit(0x9AU)
 
 /** @brief USART1 Control and Status Register C (Extended I/O) */
-#define UCSR1C_Reg _SetAddress8Bit(0x9DU)
+#define UCSR1C_Reg      _SetAddress8Bit(0x9DU)
 
 /** @brief USART1 Baud Rate Register High byte (Extended I/O) */
-#define UBRR1H_Reg _SetAddress8Bit(0x98U)
+#define UBRR1H_Reg      _SetAddress8Bit(0x98U)
 
 /** @brief USART1 Baud Rate Register Low byte (Extended I/O) */
-#define UBRR1L_Reg _SetAddress8Bit(0x99U)
+#define UBRR1L_Reg      _SetAddress8Bit(0x99U)
 
 /* =========================================================================
  * SECTION 12 — SPI Registers
@@ -370,13 +374,13 @@
  * ========================================================================= */
 
 /** @brief SPI Control Register */
-#define SPCR_Reg _SetAddress8Bit(0x2DU)
+#define SPCR_Reg        _SetAddress8Bit(0x2DU)
 
 /** @brief SPI Status Register */
-#define SPSR_Reg _SetAddress8Bit(0x2EU)
+#define SPSR_Reg        _SetAddress8Bit(0x2EU)
 
 /** @brief SPI Data Register */
-#define SPDR_Reg _SetAddress8Bit(0x2FU)
+#define SPDR_Reg        _SetAddress8Bit(0x2FU)
 /* =========================================================================
  * SECTION 13 — TWI / I2C Registers
  * =========================================================================
@@ -386,22 +390,22 @@
  * ========================================================================= */
 
 /** @brief TWI Bit Rate Register (Extended I/O) */
-#define TWBR_Reg _SetAddress8Bit(0x70U)
+#define TWBR_Reg        _SetAddress8Bit(0x70U)
 
 /** @brief TWI Status Register (Extended I/O) */
-#define TWSR_Reg _SetAddress8Bit(0x71U)
+#define TWSR_Reg        _SetAddress8Bit(0x71U)
 
 /** @brief TWI (Slave) Address Register (Extended I/O) */
-#define TWAR_Reg _SetAddress8Bit(0x72U)
+#define TWAR_Reg        _SetAddress8Bit(0x72U)
 
 /** @brief TWI Data Register (Extended I/O) */
-#define TWDR_Reg _SetAddress8Bit(0x73U)
+#define TWDR_Reg        _SetAddress8Bit(0x73U)
 
 /** @brief TWI Control Register (Extended I/O) */
-#define TWCR_Reg _SetAddress8Bit(0x74U)
+#define TWCR_Reg        _SetAddress8Bit(0x74U)
 
 /** @brief TWI (Slave) Address Mask Register (Extended I/O) */
-#define TWAMR_Reg _SetAddress8Bit(0x75U)
+#define TWAMR_Reg       _SetAddress8Bit(0x75U)
 
 /* =========================================================================
  * SECTION 14 — EEPROM Registers
@@ -411,15 +415,15 @@
  * ========================================================================= */
 
 /** @brief EEPROM Address Register High byte */
-#define EEARH_Reg _SetAddress8Bit(0x42U)
+#define EEARH_Reg       _SetAddress8Bit(0x42U)
 
 /** @brief EEPROM Address Register Low byte */
-#define EEARL_Reg _SetAddress8Bit(0x41U)
+#define EEARL_Reg       _SetAddress8Bit(0x41U)
 
 /** @brief EEPROM Data Register */
-#define EEDR_Reg _SetAddress8Bit(0x40U)
+#define EEDR_Reg        _SetAddress8Bit(0x40U)
 
 /** @brief EEPROM Control Register */
-#define EECR_Reg _SetAddress8Bit(0x3FU)
+#define EECR_Reg        _SetAddress8Bit(0x3FU)
 
 #endif /* _EMBEDDED_FIRMWARE_SRC_MCAL_ATMEGA128REGISTER_H */
