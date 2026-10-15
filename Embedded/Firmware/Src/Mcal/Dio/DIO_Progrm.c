@@ -154,26 +154,26 @@ uint8_t mDIO_ReadPin(uint8_t GroupName, uint8_t PinNo){
      switch (GroupName)
         {
         case GroupA:
-            return ReadBit(PINA_Reg,PinNo);
+            return GetBit(PINA_Reg,PinNo);
             break;
         case GroupB:
-            return ReadBit(PINB_Reg,PinNo);
+            return GetBit(PINB_Reg,PinNo);
             break;
         case GroupC:
-            return ReadBit(PINC_Reg,PinNo);
+            return GetBit(PINC_Reg,PinNo);
             break;
         case GroupD:
-            return ReadBit(PIND_Reg,PinNo);
+            return GetBit(PIND_Reg,PinNo);
             break;
         case GroupE:
-            return ReadBit(PINE_Reg,PinNo);
+            return GetBit(PINE_Reg,PinNo);
             break;
         case GroupF:
-            return ReadBit(PINF_Reg,PinNo);
+            return GetBit(PINF_Reg,PinNo);
             break;
         case GroupG:
          if(PinNo<=Pin4){
-            return ReadBit(PING_Reg,PinNo);
+            return GetBit(PING_Reg,PinNo);
          }
             break;            
         }
