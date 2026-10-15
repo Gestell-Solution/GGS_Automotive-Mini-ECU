@@ -26,6 +26,12 @@
  * @param BitNo The bit position to clear (0-31).
  */
 #define ClearBit(Reg, BitNo)     ((Reg) &= ~(1UL << (BitNo)))
+/**
+ * @brief 
+ * @param Reg The register or variable to modify.
+ * @param BitNo The bit that will be read either{1,0} 
+ */
+#define ReadBit(Reg, BitNo)      ((Reg >> BitNo) & 0x01)
 
 /**
  * @brief Toggles a specific bit in a given register/variable.
