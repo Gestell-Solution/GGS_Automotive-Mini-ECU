@@ -121,4 +121,4 @@ typedef enum
  */
 #define ExtiSenseMask(Line) (((Line) == (uint8_t)ExtiLineFirst) ? (uint8_t)ExtiInt4SenseMask : (uint8_t)ExtiInt5SenseMask)
 
-#endif // _EMBEDDED_FIRMWARE_SRC_MCAL_EXTI_EXTI_PRIVATE_H
+#endif /* _EMBEDDED_FIRMWARE_SRC_MCAL_EXTI_EXTI_PRIVATE_H */

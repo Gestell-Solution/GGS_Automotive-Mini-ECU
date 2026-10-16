@@ -26,8 +26,9 @@
 #include "Definition.h"
 
 /**
- * @brief Compile-time options of the EXTI driver.
- * 
+ * @defgroup ExtiConfig EXTI Configuration Options
+ * @brief    Compile-time options of the EXTI driver.
+ * @{
  */
 
 /**
@@ -63,4 +64,4 @@
 
 /** @} */
 
-#endif // _EMBEDDED_FIRMWARE_SRC_MCAL_EXTI_EXTI_CONFIG_H
+#endif /* _EMBEDDED_FIRMWARE_SRC_MCAL_EXTI_EXTI_CONFIG_H */

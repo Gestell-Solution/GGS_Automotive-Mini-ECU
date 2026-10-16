@@ -198,4 +198,4 @@ void __vector_5(void) ExtiIsrAttribute;
  */
 void __vector_6(void) ExtiIsrAttribute;
 
-#endif // _EMBEDDED_FIRMWARE_SRC_MCAL_EXTI_EXTI_INTERFACE_H
+#endif /* _EMBEDDED_FIRMWARE_SRC_MCAL_EXTI_EXTI_INTERFACE_H */
