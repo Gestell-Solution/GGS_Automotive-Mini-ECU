@@ -131,7 +131,6 @@ if (mUSART0_SendByte((uint8_t)(*str)) == USART0_STATUS_FULL)
 }
 //Advance pointer str++.
 str++;
-
 }
 }
 
