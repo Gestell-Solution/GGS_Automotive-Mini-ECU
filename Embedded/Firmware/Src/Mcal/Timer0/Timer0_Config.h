@@ -4,7 +4,7 @@
  * @details Defines compile-time configuration options for Timer0 operational modes and prescalers.
  * @version 1.0.0
  * @author  Rouaa Ayman <Rouaaayman2602@gmail.com>
- * @date    2026-10-13
+ * @date    2026-10-15
  * @copyright Copyright (c) 2026 Gestell. All rights reserved.
  */
 

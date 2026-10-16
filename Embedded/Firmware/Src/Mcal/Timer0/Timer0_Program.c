@@ -4,13 +4,15 @@
  * @details Configures Timer0 registers for 8-bit Fast PWM operation,
  *          controls the OC0 output and PWM duty cycle, and provides
  *          timer start/stop functionality. Timer0 interrupts remain disabled.
- * @version 1.0.0
+ * @version 1.0.1
  * @author  Rouaa Ayman <Rouaaayman2602@gmail.com>
  * @date    2026-10-13
  * @copyright Copyright (c) 2026 Gestell. All rights reserved.
  */
 
 #include "Timer0_Interface.h"
+#include "Timer0_Private.h"
+#include "Timer0_Config.h"
 #include "Atmega128Register.h"
 #include "MacroFunction.h"
 
