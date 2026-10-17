@@ -1,67 +1,55 @@
-#ifndef _EMBEDDED_FIRMWARE_SRC_MCAL_EXTI_EXTI_CONFIG_H
-#define _EMBEDDED_FIRMWARE_SRC_MCAL_EXTI_EXTI_CONFIG_H
-
 /**
  * @file
- *      EXTI_Config.h
+ *    EXTI_Config.h
  * @brief
- *      Compile-time configuration of the External Interrupt (EXTI) driver.
+ *    EXTI driver Spre-compile configuration parameters.
  * @details
- *      Selects the trigger mode of INT4 (Ignition push-button on PE4) and INT5
- *      (Fault Reset push-button on PE5), which lines are armed during
- *      mEXTI_Init(), and whether ISR callbacks are compiled in.
- *      Sense modes are values of EXTI_SenseControl_t (EXTI_Sense_LowLevel,
- *      EXTI_Sense_FallingEdge, EXTI_Sense_RisingEdge). Options read by the
- *      preprocessor (#if) stay as macros because an #if cannot read an enum.
+ *    Contains the trigger mode of INT4 / INT5 and the ISR callback switch.
  * @version
- *      1.0.0
+ *    1.0.0
  * @author
- *      Yasseen Ahmed EL-Sayed <yasseen.ahmed2005@gmail.com>
+ *    Developer: Yasseen Ahmed EL-Sayed <yasseen.ahmed2005@gmail.com>
+ * @author
+ *    Reviewer: Beshoy Esmat
  * @date
- *      2026-10-13
+ *    2026-10-17
  * @copyright
- *      Copyright (c) 2026 Gestell. All rights reserved.
+ *    Copyright (c) 2026 Gestell. All rights reserved.
  */
 
-#include "Definition.h"
+#ifndef EXTI_CONFIG_H
+#define EXTI_CONFIG_H
+
+#include "../../Common/Definition.h"
+#include "EXTI_Private.h"
 
 /**
- * @defgroup ExtiConfig EXTI Configuration Options
- * @brief    Compile-time options of the EXTI driver.
- * @{
+ * @def EXTI_INT4_SENSE
+ * @brief Trigger mode of INT4 (Ignition Push-Button) applied by mEXTI_Init().
+ *
+ * @details Available values:
+ *          EXTI_Sense_LowLevel
+ *          EXTI_Sense_FallingEdge
+ *          EXTI_Sense_RisingEdge
  */
+#define EXTI_INT4_SENSE        EXTI_Sense_FallingEdge
 
 /**
- * @def ExtiIgnitionSenseMode
- * @brief Trigger mode of INT4 (Ignition button). Default: falling edge.
+ * @def EXTI_INT5_SENSE
+ * @brief Trigger mode of INT5 (Fault Reset Push-Button) applied by mEXTI_Init().
+ *
+ * @details Available values: same as EXTI_INT4_SENSE.
  */
-#define ExtiIgnitionSenseMode EXTI_Sense_FallingEdge
+#define EXTI_INT5_SENSE        EXTI_Sense_FallingEdge
 
 /**
- * @def ExtiResetSenseMode
- * @brief Trigger mode of INT5 (Fault Reset button). Default: falling edge.
+ * @def EXTI_CALLBACK_ENABLE
+ * @brief Compiles ISR callback support (Enable / Disable).
+ *
+ * @note Disable gives the shortest ISR: calling a function pointer forces
+ *       the compiler to save all call-clobbered registers on ISR entry.
  */
-#define ExtiResetSenseMode EXTI_Sense_FallingEdge
+#define EXTI_CALLBACK_ENABLE   Enable
 
-/**
- * @def ExtiIgnitionEnableOnInit
- * @brief Arms INT4 inside mEXTI_Init() when set to Enable.
- */
-#define ExtiIgnitionEnableOnInit Enable
 
-/**
- * @def ExtiResetEnableOnInit
- * @brief Arms INT5 inside mEXTI_Init() when set to Enable.
- */
-#define ExtiResetEnableOnInit Enable
-
-/**
- * @def ExtiCallbackEnabled
- * @brief Compiles ISR callback support when set to Enable.
- * @note  Set to Disable to obtain the shortest possible ISR execution time.
- */
-#define ExtiCallbackEnabled Enable
-
-/** @} */
-
-#endif /* _EMBEDDED_FIRMWARE_SRC_MCAL_EXTI_EXTI_CONFIG_H */
+#endif /* EXTI_CONFIG_H */

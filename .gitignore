@@ -7,7 +7,9 @@ AgileManagment/*
 Thumbs.db
 *.swp
 *.swo
-.vscode/
+.vscode/*
+!.vscode/
+!.vscode/c_cpp_properties.json
 .env
 
 # Dashboard (web application)

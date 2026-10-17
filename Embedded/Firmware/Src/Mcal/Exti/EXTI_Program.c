@@ -4,197 +4,199 @@
  * @brief
  *      Implementation of the External Interrupt (EXTI) MCAL driver.
  * @details
- *      INT4 (Ignition) and INT5 (Fault Reset) are edge-triggered. Each ISR
- *      sets a volatile flag, optionally calls a callback and returns. No
- *      debounce, delay or state machine logic exists in this driver.
+ *    Contains the EXTI APIs and the INT4 / INT5 interrupt service routines.
  * @version
  *      1.0.0
  * @author
- *      Yasseen Ahmed EL-Sayed <yasseen.ahmed2005@gmail.com>
+ *     Developer: Yasseen Ahmed EL-Sayed <yasseen.ahmed2005@gmail.com>
+ * @author
+ *     Reviewer:  Beshoy Esmat
  * @date
- *      2026-10-14
+ *      2026-10-17
  * @copyright
  *      Copyright (c) 2026 Gestell. All rights reserved.
  */
-
-#include "Definition.h"
-#include "MacroFunction.h"
-#include "Atmega128Register.h"
-#include "EXTI_Config.h"
-#include "EXTI_Private.h"
+#include "../../Common/Config.h"
+#include "../../Common/MacroFunction.h"
 #include "EXTI_Interface.h"
+#include "EXTI_Private.h"
+#include "../Atmega128Register.h"
+#include <avr/interrupt.h>
 
-/** @brief Ignition button event flag, set by the INT4 ISR. */
+#if ModuleExtiEnabled == Enable
+
+/**
+ * @brief Event flags latched by the ISRs, cleared by the OS scheduler.
+ */
 static volatile bool g_ignitionEventPending = false;
+static volatile bool g_resetEventPending    = false;
 
-/** @brief Fault Reset button event flag, set by the INT5 ISR. */
-static volatile bool g_resetEventPending = false;
-
-#if (ExtiCallbackEnabled == Enable)
-/** @brief Registered ISR callbacks, indexed by ExtiLineIndex(Line). */
-static volatile EXTI_Callback_t g_extiCallbacks[ExtiLineCount];
+#if EXTI_CALLBACK_ENABLE == Enable
+/**
+ * @brief Registered ISR callbacks, indexed by EXTI_Index(Line).
+ */
+static volatile EXTI_Callback_t g_extiCallbacks[EXTI_LineCount];
 #endif
 
-/*API's*/
+
+/**
+ * @brief Initializes INT4 and INT5 with the configured trigger mode.
+ */
 void mEXTI_Init(void)
 {
-#if (ExtiCallbackEnabled == Enable)
-    uint8_t Local_u8Index;
-#endif
-
-    /* 1- Reset software state before any line is armed */
+    /* Reset software state before any line is armed */
     g_ignitionEventPending = false;
-    g_resetEventPending = false;
+    g_resetEventPending    = false;
 
-#if (ExtiCallbackEnabled == Enable)
-    for (Local_u8Index = 0U; Local_u8Index < (uint8_t)ExtiLineCount; Local_u8Index++)
-    {
-        g_extiCallbacks[Local_u8Index] = Null;
-    }
+#if EXTI_CALLBACK_ENABLE == Enable
+    g_extiCallbacks[EXTI_Index((uint8_t)EXTI_Line_INT4)] = Null;
+    g_extiCallbacks[EXTI_Index((uint8_t)EXTI_Line_INT5)] = Null;
 #endif
 
-    /* 2- Configure the trigger mode of each line in EICRB */
-    mEXTI_SetSenseControl((uint8_t)EXTI_Line_INT4, (uint8_t)ExtiIgnitionSenseMode);
-    mEXTI_SetSenseControl((uint8_t)EXTI_Line_INT5, (uint8_t)ExtiResetSenseMode);
+    /* Configure trigger mode in EICRB */
+    mEXTI_SetSenseControl((uint8_t)EXTI_Line_INT4, (uint8_t)EXTI_INT4_SENSE);
+    mEXTI_SetSenseControl((uint8_t)EXTI_Line_INT5, (uint8_t)EXTI_INT5_SENSE);
 
-    /* 3- Flush stale flags (write 1 to clear) BEFORE unmasking */
-    EIFR_Reg = (uint8_t)((1U << (uint8_t)EIFR_INTF4) | (1U << (uint8_t)EIFR_INTF5));
+    /* Flush stale flags (write 1 to clear) before unmasking */
+    EIFR_Reg = (uint8_t)((1U << INTF4_Bit) | (1U << INTF5_Bit));
 
-    /* 4- Unmask the lines selected in EXTI_Config.h */
-#if (ExtiIgnitionEnableOnInit == Enable)
-    SetBit(EIMSK_Reg, (uint8_t)EIMSK_INT4);
-#endif
-#if (ExtiResetEnableOnInit == Enable)
-    SetBit(EIMSK_Reg, (uint8_t)EIMSK_INT5);
-#endif
+    /* Unmask INT4 and INT5 */
+    SetBit(EIMSK_Reg, INT4_Bit);
+    SetBit(EIMSK_Reg, INT5_Bit);
 }
 
+/**
+ * @brief Enables the interrupt request of a line.
+ * @param Line Interrupt line (EXTI_Line_INT4 or EXTI_Line_INT5).
+ */
 void mEXTI_EnableLine(uint8_t Line)
 {
-    if (ExtiIsValidLine(Line))
+    if ((Line == (uint8_t)EXTI_Line_INT4) ||
+        (Line == (uint8_t)EXTI_Line_INT5))
     {
-        /* 1- Flush the stale flag first (write 1 to clear) */
-        EIFR_Reg = (uint8_t)(1U << Line);
-        /* 2- Unmask the line */
+        EIFR_Reg = (uint8_t)(1U << Line);   /* Write 1 to clear this flag only */
         SetBit(EIMSK_Reg, Line);
     }
-    else
-    {
-        /* Invalid line: no action */
-    }
 }
 
+/**
+ * @brief Disables the interrupt request of a line.
+ * @param Line Interrupt line (EXTI_Line_INT4 or EXTI_Line_INT5).
+ */
 void mEXTI_DisableLine(uint8_t Line)
 {
-    if (ExtiIsValidLine(Line))
+    if ((Line == (uint8_t)EXTI_Line_INT4) ||
+        (Line == (uint8_t)EXTI_Line_INT5))
     {
         ClearBit(EIMSK_Reg, Line);
-    }
-    else
-    {
-        /* Invalid line: no action */
     }
 }
 
+/**
+ * @brief Configures the trigger mode of a line in EICRB.
+ * @param Line      Interrupt line (EXTI_Line_INT4 or EXTI_Line_INT5).
+ * @param SenseMode Trigger mode (EXTI_SenseControl_t).
+ */
 void mEXTI_SetSenseControl(uint8_t Line, uint8_t SenseMode)
 {
-    uint8_t Local_u8Shift;
-    uint8_t Local_u8WasEnabled;
+    bool isLineValid = ((Line == (uint8_t)EXTI_Line_INT4) ||
+                        (Line == (uint8_t)EXTI_Line_INT5));
+    bool isSenseValid = ((SenseMode == (uint8_t)EXTI_Sense_LowLevel) ||
+                         (SenseMode == (uint8_t)EXTI_Sense_FallingEdge) ||
+                         (SenseMode == (uint8_t)EXTI_Sense_RisingEdge));
 
-    /* 1- Validate the line and the sense mode */
-    if (ExtiIsValidLine(Line) && ExtiIsValidSense(SenseMode))
+    if (isLineValid && isSenseValid)
     {
-        Local_u8Shift = (uint8_t)ExtiSenseShift(Line);
-        Local_u8WasEnabled = (uint8_t)GetBit(EIMSK_Reg, Line);
+        uint8_t shift = ISC50_Bit;
+        if (Line == (uint8_t)EXTI_Line_INT4)
+        {
+            shift = ISC40_Bit;
+        }
 
-        /* 2- Datasheet rule: mask the line while its sense bits change */
+        /* Mask the line while its sense bits change (datasheet rule) */
+        uint8_t wasEnabled = (uint8_t)GetBit(EIMSK_Reg, Line);
         ClearBit(EIMSK_Reg, Line);
 
-        /* 3- Reg = (Reg & ~Mask) | Value (the other line is preserved) */
-        WriteReg(EICRB_Reg,
-                 (uint8_t)ExtiSenseMask(Line),
-                 (uint8_t)(SenseMode << Local_u8Shift));
+        /* Read-modify-write: the other line is preserved */
+        uint8_t temp = EICRB_Reg;
+        temp &= (uint8_t)~(EICRB_SenseMask << shift);
+        temp |= (uint8_t)(SenseMode << shift);
+        EICRB_Reg = temp;
 
-        /* 4- Clear a flag that the change itself may have set */
+        /* Clear a flag the change itself may have set */
         EIFR_Reg = (uint8_t)(1U << Line);
 
-        /* 5- Restore the previous mask state */
-        if (Local_u8WasEnabled != 0U)
+        /* Restore the previous mask state */
+        if (wasEnabled != 0U)
         {
             SetBit(EIMSK_Reg, Line);
         }
-        else
-        {
-            /* Line was masked before: leave it masked */
-        }
-    }
-    else
-    {
-        /* Invalid line or sense mode: no action */
     }
 }
 
+/**
+ * @brief Clears the hardware interrupt flag of a line in EIFR.
+ * @param Line Interrupt line (EXTI_Line_INT4 or EXTI_Line_INT5).
+ */
 void mEXTI_ClearPendingFlag(uint8_t Line)
 {
-    if (ExtiIsValidLine(Line))
+    if ((Line == (uint8_t)EXTI_Line_INT4) ||
+        (Line == (uint8_t)EXTI_Line_INT5))
     {
-        /* '=' on purpose: writing 1 clears the flag, '|=' would clear the other flag too */
-        EIFR_Reg = (uint8_t)(1U << Line);
-    }
-    else
-    {
-        /* Invalid line: no action */
+        EIFR_Reg = (uint8_t)(1U << Line);   /* '=' on purpose: '|=' clears all flags */
     }
 }
 
+/**
+ * @brief Reads the Ignition event flag latched by the INT4 ISR.
+ * @return true if an event is pending, false otherwise.
+ */
 bool mEXTI_GetIgnitionFlag(void)
 {
     return g_ignitionEventPending;
 }
 
+/**
+ * @brief Clears the Ignition event flag.
+ */
 void mEXTI_ClearIgnitionFlag(void)
 {
     g_ignitionEventPending = false;
 }
 
+/**
+ * @brief Reads the Fault Reset event flag latched by the INT5 ISR.
+ * @return true if an event is pending, false otherwise.
+ */
 bool mEXTI_GetResetFlag(void)
 {
     return g_resetEventPending;
 }
 
+/**
+ * @brief Clears the Fault Reset event flag.
+ */
 void mEXTI_ClearResetFlag(void)
 {
     g_resetEventPending = false;
 }
 
-/*Call-Back-Function*/
+/**
+ * @brief Registers a callback executed inside the ISR of a line.
+ * @param Line        Interrupt line (EXTI_Line_INT4 or EXTI_Line_INT5).
+ * @param CallbackPtr Pointer to a void(void) function, or Null to remove it.
+ */
 void mEXTI_SetCallback(uint8_t Line, EXTI_Callback_t CallbackPtr)
 {
-#if (ExtiCallbackEnabled == Enable)
-    uint8_t Local_u8WasEnabled;
-
-    if (ExtiIsValidLine(Line))
+#if EXTI_CALLBACK_ENABLE == Enable
+    if ((Line == (uint8_t)EXTI_Line_INT4) ||
+        (Line == (uint8_t)EXTI_Line_INT5))
     {
-        /* 1- Mask the line: the 16-bit pointer write must not be interrupted */
-        Local_u8WasEnabled = (uint8_t)GetBit(EIMSK_Reg, Line);
-        ClearBit(EIMSK_Reg, Line);
-
-        /* 2- Store the callback (Null removes it) */
-        g_extiCallbacks[ExtiLineIndex(Line)] = CallbackPtr;
-
-        /* 3- Restore the previous mask state */
-        if (Local_u8WasEnabled != 0U)
-        {
-            SetBit(EIMSK_Reg, Line);
-        }
-        else
-        {
-            /* Line was masked before: leave it masked */
-        }
-    }
-    else
-    {
-        /* Invalid line: no action */
+        /* 16-bit pointer write must not be interrupted by the ISR */
+        uint8_t sreg = SREG_Reg;
+        cli();
+        g_extiCallbacks[EXTI_Index(Line)] = CallbackPtr;
+        SREG_Reg = sreg;
     }
 #else
     (void)Line;
@@ -202,50 +204,40 @@ void mEXTI_SetCallback(uint8_t Line, EXTI_Callback_t CallbackPtr)
 #endif
 }
 
-/*ISR*/
 
-/*INT4: Ignition button*/
-void __vector_5(void)
+/**
+ * @brief Interrupt Service Routine for INT4 (Ignition Push-Button).
+ *        Latches the event flag and calls the registered callback.
+ */
+ISR(INT4_vect)
 {
-    /* 1- Latch the event */
     g_ignitionEventPending = true;
 
-#if (ExtiCallbackEnabled == Enable)
-    /* 2- Call the registered callback, if any */
+#if EXTI_CALLBACK_ENABLE == Enable
+    EXTI_Callback_t callback = g_extiCallbacks[EXTI_Index((uint8_t)EXTI_Line_INT4)];
+    if (callback != Null)
     {
-        EXTI_Callback_t Local_pvCallback = g_extiCallbacks[ExtiIndexInt4];
-
-        if (Local_pvCallback != Null)
-        {
-            Local_pvCallback();
-        }
-        else
-        {
-            /* No callback registered: nothing to do */
-        }
+        callback();
     }
 #endif
 }
 
-/*INT5: Fault Reset button*/
-void __vector_6(void)
+/**
+ * @brief Interrupt Service Routine for INT5 (Fault Reset Push-Button).
+ *        Latches the event flag and calls the registered callback.
+ */
+ISR(INT5_vect)
 {
-    /* 1- Latch the event */
     g_resetEventPending = true;
 
-#if (ExtiCallbackEnabled == Enable)
-    /* 2- Call the registered callback, if any */
+#if EXTI_CALLBACK_ENABLE == Enable
+    EXTI_Callback_t callback = g_extiCallbacks[EXTI_Index((uint8_t)EXTI_Line_INT5)];
+    if (callback != Null)
     {
-        EXTI_Callback_t Local_pvCallback = g_extiCallbacks[ExtiIndexInt5];
-
-        if (Local_pvCallback != Null)
-        {
-            Local_pvCallback();
-        }
-        else
-        {
-            /* No callback registered: nothing to do */
-        }
+        callback();
     }
 #endif
 }
+
+
+#endif
