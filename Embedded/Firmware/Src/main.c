@@ -19,17 +19,6 @@
 #include "MCAL/Atmega128Register.h"
 #include "MCAL/Usart0/Usart0_Interface.h"
 
-/* Link AVR hardware interrupt vectors to driver ISR functions */
-ISR(USART0_RX_vect)
-{
-    ISR_USART0_RXC();
-}
-
-ISR(USART0_UDRE_vect)
-{
-    ISR_USART0_UDRE();
-}
-
 /* Static buffer for incoming frames (AC-7: Static allocation in .bss) */
 static char g_rxBuffer[USART0_RING_BUFFER_SIZE];
 static uint8_t g_rxIndex = 0;
