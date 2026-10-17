@@ -13,6 +13,7 @@
 #include <stdint.h>
 #include "Usart0_Private.h"
 #include "Usart0_Config.h"
+#include <avr/interrupt.h>
 #include "../../Common/Config.h"
 #include "../../Common/Definition.h"
 #include "../../Common/MacroFunction.h"
@@ -76,17 +77,17 @@ uint8_t mUSART0_TxReady(void);
 void mUSART0_FlushRX(void);
 
 /**
- * @fn    void ISR_USART0_RXC(void)
+ * @fn    ISR(USART0_RX_vect)
  * @brief Interrupt Service Routine for USART0 Receive Complete.
  *        Captures byte from UDR0 into g_rxRingBuf.
  */
-void ISR_USART0_RXC(void);
+ISR(USART0_RX_vect);
 
 /**
- * @fn    void ISR_USART0_UDRE(void)
+ * @fn    ISR(USART0_UDRE_vect)
  * @brief Interrupt Service Routine for USART0 Data Register Empty.
  *        Pops byte from g_txRingBuf into UDR0; disables UDRIE0 when empty.
  */
-void ISR_USART0_UDRE(void);
+ISR(USART0_UDRE_vect);
 
 #endif

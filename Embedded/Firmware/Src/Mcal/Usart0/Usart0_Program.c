@@ -277,7 +277,7 @@ void mUSART0_FlushRX(void)
  * @brief Interrupt Service Routine for USART0 Receive Complete.
  *        Captures byte from UDR0 into g_rxRingBuf.
  */
-void ISR_USART0_RXC(void)
+ISR(USART0_RX_vect)
 {
     // Read status register UCSR0A to check for error flags (FE0, DOR0, UPE0)
     uint8_t status = UCSR0A_Reg;
@@ -308,7 +308,7 @@ void ISR_USART0_RXC(void)
  * @brief Interrupt Service Routine for USART0 Data Register Empty.
  *        Pops byte from g_txRingBuf into UDR0; disables UDRIE0 when empty.
  */
-void ISR_USART0_UDRE(void)
+ISR(USART0_UDRE_vect)
 {
     // we checkvfirst if g_txRingBuf.count empty or equal zero
     if (g_txRingBuf.count == 0)
