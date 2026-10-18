@@ -21,7 +21,7 @@
 #include "EXTI_Interface.h"
 #include "EXTI_Private.h"
 #include "../Atmega128Register.h"
-#include <avr/interrupt.h>
+#include "../Gie/GIE_Interface.h"
 
 #if ModuleExtiEnabled == Enable
 
@@ -194,7 +194,7 @@ void mEXTI_SetCallback(uint8_t Line, EXTI_Callback_t CallbackPtr)
     {
         /* 16-bit pointer write must not be interrupted by the ISR */
         uint8_t sreg = SREG_Reg;
-        cli();
+        GIE_Disable();
         g_extiCallbacks[EXTI_Index(Line)] = CallbackPtr;
         SREG_Reg = sreg;
     }
@@ -209,7 +209,7 @@ void mEXTI_SetCallback(uint8_t Line, EXTI_Callback_t CallbackPtr)
  * @brief Interrupt Service Routine for INT4 (Ignition Push-Button).
  *        Latches the event flag and calls the registered callback.
  */
-ISR(INT4_vect)
+EXTI_ISR(INT4_vector)
 {
     g_ignitionEventPending = true;
 
@@ -226,7 +226,7 @@ ISR(INT4_vect)
  * @brief Interrupt Service Routine for INT5 (Fault Reset Push-Button).
  *        Latches the event flag and calls the registered callback.
  */
-ISR(INT5_vect)
+EXTI_ISR(INT5_vector)
 {
     g_resetEventPending = true;
 
