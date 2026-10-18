@@ -34,9 +34,9 @@ typedef enum
     Timer0_Prescaler_None   = 0, /**< Timer clock stopped */
     Timer0_Prescaler_1      = 1, /**< Clock divided by 1 */
     Timer0_Prescaler_8      = 2, /**< Clock divided by 8 */
-    Timer0_Prescaler_32     = 3, /**< Clock divided by 32 (not supported by Timer0 hardware) */
+    Timer0_Prescaler_32     = 3, /**< Clock divided by 32 */
     Timer0_Prescaler_64     = 4, /**< Clock divided by 64 */
-    Timer0_Prescaler_128    = 5, /**< Clock divided by 128 (not supported by Timer0 hardware) */
+    Timer0_Prescaler_128    = 5, /**< Clock divided by 128  */
     Timer0_Prescaler_256    = 6, /**< Clock divided by 256 */
     Timer0_Prescaler_1024   = 7  /**< Clock divided by 1024 */
 } Timer0_Prescaler_t;
