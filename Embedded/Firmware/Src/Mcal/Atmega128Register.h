@@ -310,8 +310,11 @@
 /** @brief External Interrupt Control Register A (Extended I/O) */
 #define EICRA_Reg       _SetAddress8Bit(0x6AU)
 
-/** @brief External Interrupt Control Register B (Extended I/O) */
-#define EICRB_Reg       _SetAddress8Bit(0x6BU)
+/**
+ * @brief External Interrupt Control Register B (Extended I/O)
+ * @attention The ATmega128 datasheet Register Summary lists EICRB at $3A ($5A); ($6B) is Reserved. Use the data-space address 0x5A.
+ */
+#define EICRB_Reg _SetAddress8Bit(0x5AU) /* fix(embedded): Correct EICRB address from 0x6B to 0x5A */ 
 
 /** @brief External Interrupt Mask Register */
 #define EIMSK_Reg       _SetAddress8Bit(0x59U)
