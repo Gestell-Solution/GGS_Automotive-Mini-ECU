@@ -29,7 +29,7 @@ jobs:
             fi
             
             # 3. Regex validation for team members
-            REGEX="^(feature|Feat|bug|Bug|test|Test)/[0-9]+-(em|da|mo)-[a-zA-Z0-9\-]+$|^(hotfix|Hotfix)/[0-9]+-[a-zA-Z0-9\-]+$"
+            REGEX="^(Feature|feature|Feat|bug|Bug|test|Test)/[0-9]+-(em|da|mo)-[a-zA-Z0-9\-]+$|^(hotfix|Hotfix)/[0-9]+-[a-zA-Z0-9\-]+$"
             
             if [[ ! "$BRANCH_NAME" =~ $REGEX ]]; then
               echo "❌ Push Rejected by GitHub Server!"
