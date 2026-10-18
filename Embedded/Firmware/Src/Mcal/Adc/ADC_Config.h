@@ -13,7 +13,7 @@
  #ifndef _ADC_CONFIG_H_
  #define _ADC_CONFIG_H_
 
-#include "Embedded\Firmware\Src\Mcal\ADC\ADC_Private.h"
+#include "ADC_Private.h"
 
 /**
  * @def ADC_REFERENCE
