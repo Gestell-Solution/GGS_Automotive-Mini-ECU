@@ -4,7 +4,7 @@
  * @brief
  *    EXTI driver Spre-compile configuration parameters.
  * @details
- *    Contains the trigger mode of INT4 / INT5 and the ISR callback switch.
+ *    Contains the trigger mode of INT4..INT7 and the ISR callback switch.
  * @version
  *    1.0.0
  * @author
@@ -25,7 +25,7 @@
 
 /**
  * @def EXTI_INT4_SENSE
- * @brief Trigger mode of INT4 (Ignition Push-Button) applied by mEXTI_Init().
+ * @brief Trigger mode of INT4 (PE4) applied by mEXTI_Init().
  *
  * @details Available values:
  *          EXTI_Sense_LowLevel
@@ -36,11 +36,27 @@
 
 /**
  * @def EXTI_INT5_SENSE
- * @brief Trigger mode of INT5 (Fault Reset Push-Button) applied by mEXTI_Init().
+ * @brief Trigger mode of INT5 (PE5) applied by mEXTI_Init().
  *
  * @details Available values: same as EXTI_INT4_SENSE.
  */
 #define EXTI_INT5_SENSE        EXTI_Sense_FallingEdge
+
+/**
+ * @def EXTI_INT6_SENSE
+ * @brief Trigger mode of INT6 (PE6: Ignition Push-Button on Proteus) applied by mEXTI_Init().
+ *
+ * @details Available values: same as EXTI_INT4_SENSE.
+ */
+#define EXTI_INT6_SENSE        EXTI_Sense_FallingEdge
+
+/**
+ * @def EXTI_INT7_SENSE
+ * @brief Trigger mode of INT7 (PE7) applied by mEXTI_Init().
+ *
+ * @details Available values: same as EXTI_INT4_SENSE.
+ */
+#define EXTI_INT7_SENSE        EXTI_Sense_FallingEdge
 
 /**
  * @def EXTI_CALLBACK_ENABLE
