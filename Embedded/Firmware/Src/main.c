@@ -12,11 +12,11 @@
  *
  * Expected: each INT4 press toggles PA0, each INT5 press toggles PA1.
  */
-#include <avr/interrupt.h>
 #include "Common/Config.h"
 #include "Common/MacroFunction.h"
 #include "Mcal/Atmega128Register.h"
 #include "Mcal/Exti/EXTI_Interface.h"
+#include "Mcal/Gie/GIE_Interface.h"
 
 #define TEST_LED_CALLBACK_BIT   0U   /* PA0 */
 #define TEST_LED_FLAG_BIT       1U   /* PA1 */
@@ -46,7 +46,7 @@ int main(void)
     mEXTI_Init();
     mEXTI_SetCallback((uint8_t)EXTI_Line_INT4, Test_Int4Callback);
 
-    sei();
+    GIE_Enable();
 
     while (1)
     {
