@@ -86,5 +86,26 @@ typedef enum {
  */
 typedef void (*EXTI_Callback_t)(void);
 
+/* ============================================================
+ * Interrupt Vectors (ATmega128 datasheet, Interrupt Vectors table)
+ * ============================================================
+ * The GCC-AVR linker names vector slot N as __vector_(N-1)
+ * (datasheet counts the Reset vector as number 1).
+ */
+
+/** @brief INT4 vector: datasheet vector no. 6, address 0x000A */
+#define INT4_vector           __vector_5
+
+/** @brief INT5 vector: datasheet vector no. 7, address 0x000C */
+#define INT5_vector           __vector_6
+
+/**
+ * @brief Defines an Interrupt Service Routine for a vector symbol.
+ * @param Vector Vector symbol (INT4_vector or INT5_vector).
+ */
+#define EXTI_ISR(Vector) \
+    void Vector(void) __attribute__((signal, used)); \
+    void Vector(void)
+
 
 #endif /* EXTI_PRIVATE_H */
