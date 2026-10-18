@@ -9,12 +9,13 @@
  * @copyright Copyright (c) 2026 Gestell. All rights reserved.
  */
 
-#include "Embedded\Firmware\Src\Common\Config.h" 
-#include "Embedded\Firmware\Src\Common\MacroFunction.h"
+#include "../../Common/Config.h" 
+#include "../../Common/MacroFunction.h"
 #include "ADC_Interface.h"
-#include "Embedded\Firmware\Src\Mcal\Atmega128Register.h"
+#include "../Atmega128Register.h"
 
 #include <stdint.h>
+#include <util/delay.h>
 #if ModuleAdcEnabled
 
 /** 
@@ -48,6 +49,7 @@ ADC_Status_t     mADC_Init(void) {
     
     mADC_SetChannel((uint8_t)ADC_CHANNEL);
 
+
     ADCSRA_Reg &= ADCSRA_PrescalerMask;
     ADCSRA_Reg |= ADC_PRESCALER;
     _delay_us(5);
@@ -62,6 +64,11 @@ ADC_Status_t     mADC_Init(void) {
         Conversion_state = GetBit(ADCSRA_Reg, ADSC_Bit);
         counter++;
     }
+    if (Conversion_state == 1)
+    {
+        return ADC_Status_Timeout; 
+    }
+    (void)mADC_GetResult();  //Review note
     return ADC_Status_Ok;
 };
 
