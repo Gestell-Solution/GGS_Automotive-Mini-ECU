@@ -53,9 +53,9 @@ typedef enum {
 
 /**
  * @brief Preserves ADMUX register bits while clearing MUX2:0.
- * @note  ADMUX & 0xF8 preserves bits 7, 6, 5, 4, and 3.
+ * @note  ADMUX & 0xE0 preserves bits 7, 6, and 5. 
  */
-#define ADMUX_ChannelMask 0xF8    /* 0b 1111 1000 */
+#define ADMUX_ChannelMask 0xE0    /* 0b 1110 0000 */       //Edited after reviewing 
 
 /**
  * @enum ADC_Reference_t
@@ -104,3 +104,4 @@ typedef enum {
 
 
  #endif
+ 
