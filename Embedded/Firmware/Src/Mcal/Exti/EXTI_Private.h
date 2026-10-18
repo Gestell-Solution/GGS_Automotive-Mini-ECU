@@ -27,14 +27,22 @@
 #define ISC41_Bit   1   /* INT4 sense control bit 1 */
 #define ISC50_Bit   2   /* INT5 sense control bit 0 */
 #define ISC51_Bit   3   /* INT5 sense control bit 1 */
+#define ISC60_Bit   4   /* INT6 sense control bit 0 */
+#define ISC61_Bit   5   /* INT6 sense control bit 1 */
+#define ISC70_Bit   6   /* INT7 sense control bit 0 */
+#define ISC71_Bit   7   /* INT7 sense control bit 1 */
 
 /* EIMSK Register Bits */
 #define INT4_Bit    4   /* INT4 interrupt enable */
 #define INT5_Bit    5   /* INT5 interrupt enable */
+#define INT6_Bit    6   /* INT6 interrupt enable */
+#define INT7_Bit    7   /* INT7 interrupt enable */
 
 /* EIFR Register Bits */
 #define INTF4_Bit   4   /* INT4 interrupt flag (write 1 to clear) */
 #define INTF5_Bit   5   /* INT5 interrupt flag (write 1 to clear) */
+#define INTF6_Bit   6   /* INT6 interrupt flag (write 1 to clear) */
+#define INTF7_Bit   7   /* INT7 interrupt flag (write 1 to clear) */
 
 /**
  * @brief Two-bit sense control field (ISCn1:ISCn0) before shifting.
@@ -42,27 +50,29 @@
 #define EICRB_SenseMask   0x03U   /* 0b 0000 0011 */
 
 /**
- * @brief Number of lines handled by the driver (INT4, INT5).
+ * @brief Number of EICRB lines handled by the driver (INT4..INT7).
  */
-#define EXTI_LineCount    2U
+#define EXTI_LineCount    4U
 
 /**
- * @brief Converts a line (INT4 / INT5) to its callback array index (0 / 1).
+ * @brief Converts a line (INT4..INT7) to its callback array index (0..3).
  */
 #define EXTI_Index(Line)  ((uint8_t)(Line) - (uint8_t)EXTI_Line_INT4)
 
 /**
  * @enum EXTI_Line_t
- * @brief External interrupt lines used by the ECU (value = EIMSK / EIFR bit).
+ * @brief External interrupt lines controlled by EICRB (value = EIMSK / EIFR bit).
  */
 typedef enum {
-    EXTI_Line_INT4 = 4,  /* PE4: Cockpit Ignition Push-Button */
-    EXTI_Line_INT5 = 5   /* PE5: Cockpit Fault Reset Push-Button */
+    EXTI_Line_INT4 = 4,  /* PE4: Encoder Feedback ChA / Cockpit Ignition */
+    EXTI_Line_INT5 = 5,  /* PE5: Encoder Feedback ChB / Cockpit Fault Reset */
+    EXTI_Line_INT6 = 6,  /* PE6: Cockpit Ignition Push-Button (Proteus Hardware) */
+    EXTI_Line_INT7 = 7   /* PE7: External Interrupt 7 */
 } EXTI_Line_t;
 
 /**
  * @enum EXTI_SenseControl_t
- * @brief Interrupt sense control modes (EICRB bits ISC4x / ISC5x).
+ * @brief Interrupt sense control modes (EICRB bits ISC4x..ISC7x).
  */
 typedef enum {
     EXTI_Sense_LowLevel    = 0x00,  /* Low level generates an interrupt */
@@ -99,9 +109,15 @@ typedef void (*EXTI_Callback_t)(void);
 /** @brief INT5 vector: datasheet vector no. 7, address 0x000C */
 #define INT5_vector           __vector_6
 
+/** @brief INT6 vector: datasheet vector no. 8, address 0x000E */
+#define INT6_vector           __vector_7
+
+/** @brief INT7 vector: datasheet vector no. 9, address 0x0010 */
+#define INT7_vector           __vector_8
+
 /**
  * @brief Defines an Interrupt Service Routine for a vector symbol.
- * @param Vector Vector symbol (INT4_vector or INT5_vector).
+ * @param Vector Vector symbol (INT4_vector .. INT7_vector).
  */
 #define EXTI_ISR(Vector) \
     void Vector(void) __attribute__((signal, used)); \
