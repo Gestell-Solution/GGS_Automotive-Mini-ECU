@@ -15,15 +15,17 @@
 
 #include "LED_Interface.h"
 
-/*
-typedef enum {
-    LED_POWER_GREEN    = 0U,  /**< Green Heartbeat LED on GroupD Pin4 */
-    LED_STATUS_BLUE    = 1U,  /**< Blue Engine/Status LED on GroupD Pin5 */
-    LED_WARNING_YELLOW = 2U,  /**< Yellow Warning LED on GroupD Pin6 */
-    LED_COUNT          = 3U   /**< Total number of LEDs */
-} LedId_t;
-*/
 
-#define LED_POWER_GREEN    Pin4
+/** @brief Green Heartbeat / Power LED (Physical PD4) */
+#define LED_GREEN_PORT      GroupD
+#define LED_GREEN_PIN       Pin4
+
+/** @brief Blue Engine / Telemetry Status LED (Physical PD5) */
+#define LED_BLUE_PORT       GroupD
+#define LED_BLUE_PIN        Pin5
+
+/** @brief Yellow Warning / Diagnostic Fault LED (Physical PD6) */
+#define LED_YELLOW_PORT     GroupD
+#define LED_YELLOW_PIN      Pin6
 
 #endif /* LED_CONFIG_H */
