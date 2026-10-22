@@ -39,7 +39,7 @@ static void LCD_WriteNibble(uint8_t nibble)
 static void LCD_SendByte(uint8_t byte, uint8_t isData)
 {
     // set RW pin Low
-    mDIO_WritePin(Lcd_RWGroup, Lcd_RWPin, Low);
+    mDIO_WritePin(Lcd_RWGroup, Lcd_RWPin, Dio_Low);
     // define RS with id data depend on which function we use
     mDIO_WritePin(Lcd_RSGroup, Lcd_RSPin, isData);
     // define High_Nibble
@@ -274,7 +274,7 @@ void hLCD_SetDirty(uint8_t row)
  * @param row Row index (0 to 3).
  * @return bool true if dirty, false if unchanged.
  */
-bool hLCD_IsDirty(uint8_t row)
+uint8_t hLCD_IsDirty(uint8_t row)
 {
     if (row >= LCD_ROWS)
     {

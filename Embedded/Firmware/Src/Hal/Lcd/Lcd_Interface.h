@@ -17,7 +17,6 @@
 #include "../../MCAL/Atmega128Register.h"
 #include <util/delay.h>
 #include "Lcd_Config.h"
-#include <stdbool.h>
 #include "Lcd_Config.h"
 
 /**
@@ -88,7 +87,7 @@ void hLCD_SetDirty(uint8_t row);
  * @param row Row index (0 to 3).
  * @return bool true if dirty, false if unchanged.
  */
-bool hLCD_IsDirty(uint8_t row);
+uint8_t hLCD_IsDirty(uint8_t row);
 
 /**
  * @fn    void hLCD_CreateCustomChar(uint8_t patternIndex, const uint8_t charMap[8])
