@@ -9,10 +9,10 @@
 * @date       19/10/2026
 * @copyright  Copyright (c) 2026, Gestell Company
 */
-
-#if ModuleLedEnabled == Enable 
-
+#include "../../../Common/Definition.h"
 #include "../../../Common/Config.h"
+
+#if (ModuleLedEnabled == Enable) 
 
 #include "LED_Interface.h"
 
@@ -35,11 +35,11 @@ void hLED_Init(void)
     g_ledControl[LED_POWER_GREEN].group = LED_GREEN_PORT;
     g_ledControl[LED_POWER_GREEN].pin   = LED_GREEN_PIN;
 
-    g_ledControl[LED_POWER_GREEN].group = LED_BLUE_PORT;
-    g_ledControl[LED_POWER_GREEN].pin   = LED_BLUE_PIN;
+    g_ledControl[LED_STATUS_BLUE].group = LED_BLUE_PORT;
+    g_ledControl[LED_STATUS_BLUE].pin   = LED_BLUE_PIN;
 
-    g_ledControl[LED_POWER_GREEN].group = LED_YELLOW_PORT;
-    g_ledControl[LED_POWER_GREEN].pin   = LED_YELLOW_PIN;
+    g_ledControl[LED_WARNING_YELLOW].group = LED_YELLOW_PORT;
+    g_ledControl[LED_WARNING_YELLOW].pin   = LED_YELLOW_PIN;
 
 
     for (count = 0U ; count < LED_COUNT ; count++ )
@@ -69,7 +69,7 @@ void hLED_Init(void)
 Std_ReturnType hLED_SetState(LedId_t ledId, LedState_t state)
 {
     /* check if the ledid we gave is more than the number of acutal leds*/
-    if (ledId > LED_COUNT)
+    if (ledId >= LED_COUNT)
     {
         return ENotOk ;
     }
@@ -169,6 +169,9 @@ Std_ReturnType hLED_StopBlink(LedId_t ledId)
     g_ledControl[ledId].halfPeriod_ms  = 0U;
     g_ledControl[ledId].tickCounter_ms = 0U;
     g_ledControl[ledId].physicalState  = LED_STATE_OFF;
+
+    /* stop the blinking by writing zero */
+    mDIO_WritePin(g_ledControl[ledId].group, g_ledControl[ledId].pin, Dio_Low);
 
     return EOk;
 }
