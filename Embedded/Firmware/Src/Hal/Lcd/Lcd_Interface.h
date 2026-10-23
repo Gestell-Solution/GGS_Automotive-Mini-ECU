@@ -10,12 +10,21 @@
  */
 #ifndef LCD_INTERFACE_H
 #define LCD_INTERFACE_H
+
 #include<stdint.h>
+#include<util/delay.h>
+
 #include "../../MCAL/Dio/DIO_Interface.h"
+#include "../../MCAL/Atmega128Register.h"
+
+
 #include "Lcd_Private.h"
 #include "Lcd_Config.h"
-#include "../../MCAL/Atmega128Register.h"
-#include<util/delay.h>
+
+
+#include "../../Common/Config.h"
+#include "../../Common/Definition.h"
+#include "../../Common/MacroFunction.h"
 
 /**
  * @fn    void hLCD_Init(void)
