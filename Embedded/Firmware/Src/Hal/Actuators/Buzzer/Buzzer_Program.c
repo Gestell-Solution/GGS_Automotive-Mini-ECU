@@ -12,6 +12,10 @@
  * @copyright Copyright (c) 2026 GESTELL
  */
 #include"Buzzer_Interface.h"
+
+#if ModuleBuzzerEnabled == Enable
+
+
  /**
   * @brief driver maintains a single static control block
   */
@@ -116,3 +120,5 @@ void hBUZZER_UpdatePeriodic(uint16_t step_ms){
     }
     return;
 }
+
+#endif
