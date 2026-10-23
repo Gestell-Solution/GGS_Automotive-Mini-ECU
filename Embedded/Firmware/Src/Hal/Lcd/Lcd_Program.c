@@ -8,8 +8,11 @@
  * @date      25/10/2026
  * @copyright Copyright (c) 2026, Gestell Company
  */
+#include "../../Common/Config.h"
+#include "../../Common/Definition.h"
+
 #if ModuleLcdEnabled == Enable
-#include <stdint.h>
+
 #include "Lcd_Interface.h"
 
 /**
@@ -39,7 +42,7 @@ static void LCD_WriteNibble(uint8_t nibble)
 static void LCD_SendByte(uint8_t byte, uint8_t isData)
 {
     // set RW pin Low
-    mDIO_WritePin(Lcd_RWGroup, Lcd_RWPin, Dio_Low);
+    // mDIO_WritePin(Lcd_RWGroup, Lcd_RWPin, Dio_Low);
     // define RS with id data depend on which function we use
     mDIO_WritePin(Lcd_RSGroup, Lcd_RSPin, isData);
     // define High_Nibble
@@ -100,7 +103,7 @@ void hLCD_Init(void)
     // set RS output
     mDIO_InitPin(Lcd_RSGroup, Lcd_RSPin, DIO_Output);
     // set RW Output
-    mDIO_InitPin(Lcd_RWGroup, Lcd_RWPin, DIO_Output);
+    // mDIO_InitPin(Lcd_RWGroup, Lcd_RWPin, DIO_Output);
     // set EN Output
     mDIO_InitPin(Lcd_EGroup, Lcd_EPin, DIO_Output);
     // set PC4 Output
@@ -115,7 +118,7 @@ void hLCD_Init(void)
     // Set RS = 0
     mDIO_WritePin(Lcd_RSGroup, Lcd_RSPin, Dio_Low);
     // Set RW = 0
-    mDIO_WritePin(Lcd_RWGroup, Lcd_RWPin, Dio_Low);
+    // mDIO_WritePin(Lcd_RWGroup, Lcd_RWPin, Dio_Low);
     // Set EN = 0
     mDIO_WritePin(Lcd_EGroup, Lcd_EPin, Dio_Low);
     // Delay

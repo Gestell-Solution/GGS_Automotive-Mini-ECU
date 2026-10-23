@@ -30,16 +30,16 @@
  */
 #define Lcd_RSGroup GroupC
 #define Lcd_RSPin Pin0
-/**
- * @brief Read/Write control (Driven LOW for Write-Only)
- */
-#define Lcd_RWGroup GroupC
-#define Lcd_RWPin Pin1
+// /**
+//  * @brief Read/Write control (Driven LOW for Write-Only)
+//  */
+// #define Lcd_RWGroup GroupC
+// #define Lcd_RWPin Pin1
 /**
  * @brief Enable strobe (Falling-edge data latch)
  */
 #define Lcd_EGroup GroupC
-#define Lcd_EPin Pin2
+#define Lcd_EPin Pin1
 
 /**
  * @authors Define LCD Data Group
