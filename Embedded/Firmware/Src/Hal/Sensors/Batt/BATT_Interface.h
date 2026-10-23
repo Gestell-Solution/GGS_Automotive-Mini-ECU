@@ -28,7 +28,7 @@
 #include "BATT_Config.h" 
 
 /* calling lower level layers APIs*/
-#include "../../../MCAL/ADC/ADC_Interface.h"
+#include "../../../Mcal/Adc/ADC_Interface.h"
 
 
 /* =========================================================================
