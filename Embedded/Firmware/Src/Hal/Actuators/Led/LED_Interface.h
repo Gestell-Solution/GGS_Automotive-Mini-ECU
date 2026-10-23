@@ -22,8 +22,8 @@
 #include "../../../Common/MacroFunction.h"
 
 /* led library */
-#include "LED_private.h"
-#include "LED_config.h" 
+#include "LED_Private.h"
+#include "LED_Config.h" 
 
 /* other dependencies */
 #include "../../../Mcal/Dio/DIO_Interface.h"
