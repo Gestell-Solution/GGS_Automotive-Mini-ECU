@@ -12,11 +12,11 @@
 #define LCD_INTERFACE_H
 #include <stdint.h>
 #include <Definition.h>
+#include <Config.h>
 #include "DIO_Interface.h"
 #include "Lcd_Private.h"
 #include "../../MCAL/Atmega128Register.h"
 #include <util/delay.h>
-#include "Lcd_Config.h"
 #include "Lcd_Config.h"
 
 /**
