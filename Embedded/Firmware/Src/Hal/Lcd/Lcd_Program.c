@@ -23,16 +23,26 @@ static uint8_t g_lcdDirtyFlags = 0U;
 
 static void LCD_PulseEnable(void)
 {
-    // set Enable pin high E=1
+    /**
+     * @brief  Generates a short pulse on the LCD Enable (E) pin.
+     * @note   E is driven high, held for ~1 µs, then driven low. The LCD
+     *         latches the data on the falling edge of E.
+     * @return None
+     */
     mDIO_SetPinHigh(Lcd_EGroup, Lcd_EPin);
-    // Delay 50 ms
     _delay_us(1);
-    // Set Enable pin low E=0
     mDIO_SetPinLow(Lcd_EGroup, Lcd_EPin);
 }
 
 static void LCD_WriteNibble(uint8_t nibble)
 {
+    /**
+     * @brief  Writes a 4-bit nibble to the LCD data pins (D4–D7).
+     * @param  nibble The 4-bit value to output (only the lower 4 bits are used).
+     * @note   Bit 0 maps to D4 and bit 3 maps to D7. The Enable pulse is not
+     *         generated here; the caller must toggle E to latch the data.
+     * @return None
+     */
     mDIO_WritePin(Lcd_D4Group, Lcd_D4Pin, GetBit(nibble, 0));
     mDIO_WritePin(Lcd_D5Group, Lcd_D5Pin, GetBit(nibble, 1));
     mDIO_WritePin(Lcd_D6Group, Lcd_D6Pin, GetBit(nibble, 2));
@@ -41,11 +51,13 @@ static void LCD_WriteNibble(uint8_t nibble)
 
 static void LCD_SendByte(uint8_t byte, uint8_t isData)
 {
-    // set RW pin Low
-    // mDIO_WritePin(Lcd_RWGroup, Lcd_RWPin, Dio_Low);
-    // define RS with id data depend on which function we use
+    /**
+     * @brief define RS with id data depend on which function we use
+     */
     mDIO_WritePin(Lcd_RSGroup, Lcd_RSPin, isData);
-    // define High_Nibble
+    /**
+     * @brief define High_Nibble
+     */
     uint8_t high_Nibble = ((byte >> 4) & 0x0F);
     LCD_WriteNibble(high_Nibble);
     // Write the High byte Bit(7 6 5 4) on the Data Pin (D7 D6 D5 D4)
@@ -53,9 +65,13 @@ static void LCD_SendByte(uint8_t byte, uint8_t isData)
     // mDIO_WritePin(Lcd_D5Group, Lcd_D5Pin, GetBit(byte, 5));
     // mDIO_WritePin(Lcd_D6Group, Lcd_D6Pin, GetBit(byte, 6));
     // mDIO_WritePin(Lcd_D7Group, Lcd_D7Pin, GetBit(byte, 7));
-    // Call Pulse Enable
+    /**
+     * @brief Call Pulse Enable
+     */
     LCD_PulseEnable();
-    // define Low Nibble
+    /**
+     * @brief define Low Nibble
+     */
     uint8_t Low_Nibble = (byte & 0x0F);
     LCD_WriteNibble(Low_Nibble);
     // Update the Low byte Bit(3 2 1 0) on the Data Pin (D7 D6 D5 D4)
@@ -63,9 +79,13 @@ static void LCD_SendByte(uint8_t byte, uint8_t isData)
     // mDIO_WritePin(Lcd_D5Group, Lcd_D5Pin, GetBit(byte, 1));
     // mDIO_WritePin(Lcd_D6Group, Lcd_D6Pin, GetBit(byte, 2));
     // mDIO_WritePin(Lcd_D7Group, Lcd_D7Pin, GetBit(byte, 3));
-    // Call Pulse Enable
+    /**
+     * @brief Call Pulse Enable
+     */
     LCD_PulseEnable();
-    // Execution delay wait 50μs or 2ms if the command is clear display or return home
+    /**
+     * Execution delay wait 50μs or 2ms if the command is clear display or return home
+     */
     if ((isData == 0U) && ((byte == LCD_CMD_CLEAR_DISPLAY) || (byte == LCD_CMD_RETURN_HOME)))
     {
         _delay_ms(2);
@@ -82,6 +102,9 @@ static void LCD_SendByte(uint8_t byte, uint8_t isData)
  */
 void hLCD_WriteCommand(uint8_t cmd)
 {
+    /**
+     * @brief Write RS=0 So we send command to only LCD
+     */
     LCD_SendByte(cmd, Lcd_cmd);
 }
 
@@ -91,6 +114,9 @@ void hLCD_WriteCommand(uint8_t cmd)
  */
 void hLCD_WriteData(uint8_t data)
 {
+    /**
+     * @brief Write RS=1 So we send data to be showen at LCD itself
+     */
     LCD_SendByte(data, Lcd_data);
 }
 
@@ -100,31 +126,29 @@ void hLCD_WriteData(uint8_t data)
  */
 void hLCD_Init(void)
 {
-    // set RS output
+    /**
+     * @brief  Initializes the LCD in 4-bit mode.
+     * @note   Configures the RS, E, and D4–D7 pins as outputs, then runs the
+     *         HD44780 4-bit initialization sequence (function set, display
+     *         control, clear display, entry mode).
+     */
     mDIO_InitPin(Lcd_RSGroup, Lcd_RSPin, DIO_Output);
-    // set RW Output
-    // mDIO_InitPin(Lcd_RWGroup, Lcd_RWPin, DIO_Output);
-    // set EN Output
     mDIO_InitPin(Lcd_EGroup, Lcd_EPin, DIO_Output);
-    // set PC4 Output
     mDIO_InitPin(Lcd_D4Group, Lcd_D4Pin, DIO_Output);
-    // set PC5 Output
     mDIO_InitPin(Lcd_D5Group, Lcd_D5Pin, DIO_Output);
-    // set PC6 Output
     mDIO_InitPin(Lcd_D6Group, Lcd_D6Pin, DIO_Output);
-    // set PC7 Output
     mDIO_InitPin(Lcd_D7Group, Lcd_D7Pin, DIO_Output);
 
-    // Set RS = 0
+    /**
+     * @brief Set the RS & EN =0 and delay to Initialization and power up the LCD
+     */
     mDIO_WritePin(Lcd_RSGroup, Lcd_RSPin, Dio_Low);
-    // Set RW = 0
-    // mDIO_WritePin(Lcd_RWGroup, Lcd_RWPin, Dio_Low);
-    // Set EN = 0
     mDIO_WritePin(Lcd_EGroup, Lcd_EPin, Dio_Low);
-    // Delay
     _delay_ms(50);
 
-    // Issue 8-bit wake-up sequence using raw nibbles
+    /**
+     * @brief Issue 8-bit wake-up sequence using raw nibbles
+     */
     LCD_WriteNibble(Lcd_Wake_up);
     LCD_PulseEnable();
     _delay_ms(5);
@@ -138,13 +162,17 @@ void hLCD_Init(void)
     LCD_PulseEnable();
     _delay_us(200);
 
-    // Issue standard 4-bit configuration commands
+    /**
+     * @brief Issue standard 4-bit configuration commands
+     */
     hLCD_WriteCommand(LCD_CMD_4BIT_2LINE);
     hLCD_WriteCommand(LCD_CMD_DISPLAY_ON);
     hLCD_WriteCommand(LCD_CMD_CLEAR_DISPLAY);
     hLCD_WriteCommand(LCD_CMD_ENTRY_MODE);
 
-    // Initialize g_lcdShadow array fill all 4 lines with spaces
+    /**
+     * @brief Initialize g_lcdShadow array fill all 4 lines with spaces
+     */
     for (uint8_t row = 0U; row < LCD_ROWS; row++)
     {
         for (uint8_t column = 0U; column < LCD_COLS; column++)
@@ -165,12 +193,10 @@ void hLCD_Init(void)
 Std_ReturnType hLCD_SetCursor(uint8_t row, uint8_t col)
 {
     uint8_t rowAddress = 0;
-    // check that rows and columns not pass bounders
     if (row >= LCD_ROWS || col >= LCD_COLS)
     {
         return ENotOk;
     }
-    // look up rowstart address
     switch (row)
     {
     case FirstLine:
