@@ -22,7 +22,7 @@ static BuzzerControlBlock_t g_buzzerControl;
  * @brief Initializes GroupD Pin7 as a digital output and sets initial silent state.
  */
 void hBUZZER_Init(void){
-    g_buzzerControl={
+    g_buzzerControl=(BuzzerControlBlock_t){
         .group=Buzzer_GroupD,
         .pin=Buzzer_Pin7,
         .state =BUZZER_STATE_OFF,
@@ -43,7 +43,7 @@ Std_ReturnType hBUZZER_SetState(BuzzerState_t state){
     if((state!= BUZZER_STATE_OFF)&&(state!=BUZZER_STATE_ON)){
         return ENotOk;
     }
-    g_buzzerControl={
+    g_buzzerControl=(BuzzerControlBlock_t){
         .state=state,
         .mode=BUZZER_MODE_CONTINUOUS,
         .tickCounter_ms =Low,
@@ -83,7 +83,7 @@ Std_ReturnType hBUZZER_SetBeep(uint8_t beepFreq_hz){
         return ENotOk;
     }
     uint16_t halfperiod=1000/(2*beepFreq_hz);
-    g_buzzerControl={
+    g_buzzerControl=(BuzzerControlBlock_t){
         .beepPeriod_ms=halfperiod,
         .tickCounter_ms=Low,
         .mode = BUZZER_MODE_BEEP,
