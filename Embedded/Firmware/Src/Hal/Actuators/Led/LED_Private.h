@@ -15,7 +15,7 @@
 
 #include <stdint.h>
 
-#include "../../../Mcal/Dio/DIO_private.h"
+#include "../../../Mcal/Dio/DIO_Private.h"
 
 /* =========================================================================
    TYPE DEFINITIONS & ENUMERATIONS
