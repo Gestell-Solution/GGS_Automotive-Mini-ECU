@@ -27,7 +27,7 @@ static BattSensor_ControlBlock_t g_battControl;
 void     hBATT_Init(void)
 {
     uint8_t count_samp = 0 ;
-    uint32_t raw = 0;
+    uint16_t raw = 0;
     uint16_t init_mV = 0 ;
     /* we call the init for adc*/
     mADC_Init();
@@ -36,7 +36,7 @@ void     hBATT_Init(void)
     /* cause the Vadc = Vbatt * (R2/R1+R2) */
     /* so its Vbatt * 1/3 */
     /* or Vbatt = 3 * Vadc*/
-    raw = mADC_ReadChannel(BATT_ADC_CHANNEL);
+    raw = mADC_ReadChannel((uint8_t)BATT_ADC_CHANNEL);
     init_mV = (uint16_t)(((uint32_t)raw * BATT_SCALING_NUMERATOR) / BATT_SCALING_DENOMINATOR);
 
     /* we store the last result of raw */
@@ -66,12 +66,12 @@ void     hBATT_Init(void)
 uint16_t hBATT_ReadVoltage_mV(void)
 {
     uint8_t count_samp = 0 ;
-    uint32_t raw = 0;
+    uint16_t raw = 0;
     uint16_t sample_mV = 0 ;
     uint32_t sum = 0UL;
     uint16_t avg_mV = 0 ;
     /* we read the raw value first */
-    raw = mADC_ReadChannel(BATT_ADC_CHANNEL);
+    raw = mADC_ReadChannel((uint8_t)BATT_ADC_CHANNEL);
   
     /* we store the last raw value */
     g_battControl.lastRawADC = raw ;
