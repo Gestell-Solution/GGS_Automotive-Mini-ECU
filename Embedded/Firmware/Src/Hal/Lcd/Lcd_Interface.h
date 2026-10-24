@@ -14,8 +14,8 @@
 #include<stdint.h>
 #include<util/delay.h>
 
-#include "../../MCAL/Dio/DIO_Interface.h"
-#include "../../MCAL/Atmega128Register.h"
+#include "../../Mcal/Dio/DIO_Interface.h"
+#include "../../Mcal/Atmega128Register.h"
 
 
 #include "Lcd_Private.h"
