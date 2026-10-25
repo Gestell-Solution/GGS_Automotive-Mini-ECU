@@ -37,7 +37,7 @@ void     hBATT_Init(void)
     /* so its Vbatt * 1/3 */
     /* or Vbatt = 3 * Vadc*/
     raw = mADC_ReadChannel((uint8_t)BATT_ADC_CHANNEL);
-    init_mV = (uint16_t)(((uint32_t)raw * BATT_SCALING_NUMERATOR) / BATT_SCALING_DENOMINATOR);
+    init_mV = (uint16_t)(((uint32_t)raw * 625UL) >> 5);
 
     /* we store the last result of raw */
 
@@ -77,7 +77,8 @@ uint16_t hBATT_ReadVoltage_mV(void)
     g_battControl.lastRawADC = raw ;
     
     /* we get 1 sample of that raw value */
-    sample_mV = (uint16_t)(((uint32_t)raw * BATT_SCALING_NUMERATOR) / BATT_SCALING_DENOMINATOR);
+    // sample_mV = (uint16_t)(((uint32_t)raw * 625UL) >> 5);
+    sample_mV = (uint16_t)(((uint32_t)raw * 625UL) >> 5);
     
     /* we store the sample buffer of the first index (0) we store in it the sample of mv*/
     g_battControl.sampleBuffer[g_battControl.sampleIndex] = sample_mV;
