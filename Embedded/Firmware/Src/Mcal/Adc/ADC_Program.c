@@ -22,7 +22,7 @@
  * @fn      mADC_Init
  * @brief   Implementation of mADC_Init.
  **/
-ADC_Status_t     mADC_Init(void) {
+void     mADC_Init(void) {
     uint16_t counter = 0;
 
     // if ((ADC_REFERENCE != ADC_Ref_AREF) &&

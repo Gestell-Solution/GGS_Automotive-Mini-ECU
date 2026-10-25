@@ -22,7 +22,7 @@
  *        Executes a dummy conversion to prime the internal analog circuitry.
  * @return    ADC_Status_t Returns ADC_Status_Ok on success, or ADC_Status_Error / ADC_Status_Timeout on failure.
  */
-ADC_Status_t     mADC_Init(void);
+void     mADC_Init(void);
 
 /**
  * @brief Configures the voltage reference source in ADMUX (REFS1:0).
