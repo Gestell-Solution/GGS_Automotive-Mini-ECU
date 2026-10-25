@@ -25,23 +25,23 @@
 ADC_Status_t     mADC_Init(void) {
     uint16_t counter = 0;
 
-    if ((ADC_REFERENCE != ADC_Ref_AREF) &&
-        (ADC_REFERENCE != ADC_Ref_AVCC) &&
-        (ADC_REFERENCE != ADC_Ref_Internal))
-    {
-        return ADC_Status_Error;
-    }
+    // if ((ADC_REFERENCE != ADC_Ref_AREF) &&
+    //     (ADC_REFERENCE != ADC_Ref_AVCC) &&
+    //     (ADC_REFERENCE != ADC_Ref_Internal))
+    // {
+    //     return ADC_Status_Error;
+    // }
 
-    if (((uint8_t)ADC_PRESCALER < 1) ||
-        ((uint8_t)ADC_PRESCALER > 7))
-    {
-        return ADC_Status_Error;
-    }
+    // if (((uint8_t)ADC_PRESCALER < 1) ||
+    //     ((uint8_t)ADC_PRESCALER > 7))
+    // {
+    //     return ADC_Status_Error;
+    // }
 
-    if ((uint8_t)ADC_CHANNEL > 7)
-    {
-        return ADC_Status_Error;
-    }
+    // if ((uint8_t)ADC_CHANNEL > 7)
+    // {
+    //     return ADC_Status_Error;
+    // }
 
     SetBit(ADCSRA_Reg, ADEN_Bit);
     
@@ -57,21 +57,21 @@ ADC_Status_t     mADC_Init(void) {
     mADC_StartConversion();    /* Start the dummy conversion. */
 
     
-    uint8_t Conversion_state = 1;
+    // uint8_t Conversion_state = 1;
 
     while ((counter < ADC_TIMEOUT_LIMIT) && (Conversion_state == 1))
     {
-        Conversion_state = GetBit(ADCSRA_Reg, ADSC_Bit);
+        //Conversion_state = GetBit(ADCSRA_Reg, ADSC_Bit);
         counter++;
     }
-    if (Conversion_state == 1)
-    {
-        return ADC_Status_Timeout; 
-    }
-    uint16_t dummy_result = mADC_GetResult();
-    (void)dummy_result;
-    
-    return ADC_Status_Ok;
+    // if (Conversion_state == 1)
+    // {
+    //     return ADC_Status_Timeout; 
+    // }
+    // uint16_t dummy_result = mADC_GetResult();
+    // (void)dummy_result;
+
+    //return ADC_Status_Ok;
 }
 
 /**
