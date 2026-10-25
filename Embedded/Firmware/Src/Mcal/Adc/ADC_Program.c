@@ -68,7 +68,9 @@ ADC_Status_t     mADC_Init(void) {
     {
         return ADC_Status_Timeout; 
     }
-    (void)mADC_GetResult();  //Review note
+    uint16_t dummy_result = mADC_GetResult();
+    (void)dummy_result;
+    
     return ADC_Status_Ok;
 }
 
