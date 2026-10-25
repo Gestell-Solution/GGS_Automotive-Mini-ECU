@@ -10,15 +10,15 @@
  */
 
 #include "../../../Common/Config.h"
+
+#if ModuleLm35Enabled
+
 #include "../../../Common/Definition.h"
 #include "LM35_Interface.h"
 #include "LM35_Private.h"
 #include "../../../Mcal/ADC/ADC_Interface.h"
 #include <stdint.h>
 #include <stdbool.h>
-
-#if ModuleLm35Enabled
-
 
 static LM35_ControlBlock_t g_lm35Control;
 
