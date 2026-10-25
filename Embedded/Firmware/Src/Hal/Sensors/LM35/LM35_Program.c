@@ -16,7 +16,7 @@
 #include "../../../Common/Definition.h"
 #include "LM35_Interface.h"
 #include "LM35_Private.h"
-#include "../../../Mcal/ADC/ADC_Interface.h"
+#include "../../../Mcal/Adc/ADC_Interface.h"
 #include <stdint.h>
 #include <stdbool.h>
 
