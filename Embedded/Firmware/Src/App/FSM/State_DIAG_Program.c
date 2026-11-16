@@ -1,0 +1,114 @@
+/**
+ * @file      State_DIAG_Program.c
+ * @author    (Developer: Abdulrahman Ali)
+ * @author    (Reviewer:Beshoy Esmat)
+ * @brief     Implementation For Public interface for the Fsm State Diagnostic.
+ * @details   Rolling history management, diagnostic report compilation, auto-exit logic.
+ * @version   1.0.0
+ * @date      22/11/2026
+ * @copyright Copyright (c) 2026, Gestell Company
+ */
+#include "../../Common/Config.h"
+#include "../../Common/Definition.h"
+
+#if ModuleFsmEnabled == Enable
+#include "State_DIAG_Interface.h"
+static DiagSessionData_t g_diagSession;
+
+/**
+ * @brief Initializes the diagnostic state upon entry and resets session data.
+ */
+void State_DIAG_OnEntry(void)
+{
+    /**
+     * Initializes the diagnostic state upon entry and resets session data.
+     */
+    FSM_Transition(STATE_DIAGNOSTIC); // Transition to diagnostic state
+    g_diagSession.sessionStartTime_ms = Scheduler_GetUptime_ms();
+    g_diagSession.reportTransmitted = false;
+
+    /**
+     * Initializes the Lcd display for the diagnostic session for Mode and serv
+     */
+    hLCD_WriteString(FirstLine, 0, "MODE:DIAG | SERV:ON");
+
+    // /**
+    //  * Retrieve stored DTCs via
+    //  */
+    // DTC_GetAll();
+    //  /*
+    //  * Fetch 5-sample histories from tempHistory and battHistory
+    //  */
+    // for (uint8_t i = 0; i < DIAG_HISTORY_SAMPLES; i++)
+    // {
+    //     g_diagSession.tempHistory[i] = hLM35_GetLastTemp_C();
+    //     g_diagSession.battHistory[i] = hBATT_GetLastVoltage_V();
+    // }
+    /**
+     * Dispatch payload to serial transmit buffers
+     */
+    // Tele_BuildDiagReport();
+    // Tele_BroadcastBothChannels();
+}
+/**
+ * @brief Executes the periodic tasks and state logic during the diagnostic state.
+ */
+void State_DIAG_OnRun(void)
+{
+    /**
+     * Calculate elapsed session duration
+     */
+    uint32_t elapsed = Scheduler_GetUptime_ms() - g_diagSession.sessionStartTime_ms;
+    /**
+     * Check if the session has exceeded the timeout duration
+     */
+    if (g_diagSession.reportTransmitted || elapsed >= DIAG_SESSION_TIMEOUT_MS)
+    {
+        FSM_Transition(STATE_RUN); // Transition to idle state
+    }
+}
+/**
+ * @brief Performs cleanup operations before transitioning out of the diagnostic state.
+ */
+void State_DIAG_OnExit(void)
+{
+}
+
+/**
+ * @brief Logs a new temperature and battery voltage sample into the diagnostic history buffers.
+ */
+void State_DIAG_LogSensorSample(float temp_C, float batt_V)
+{
+  /**
+   * Logs a new temperature and battery voltage sample into the diagnostic history buffers when its empty
+   */
+    if (g_diagSession.historyCount < DIAG_HISTORY_SAMPLES)
+    {
+        g_diagSession.tempHistory[g_diagSession.historyCount] = temp_C;
+        g_diagSession.battHistory[g_diagSession.historyCount] = batt_V;
+        g_diagSession.historyCount++;
+    }
+    /**
+     * If the history buffers are full, shift the oldest sample out and add the new sample to the end
+     */
+    else
+    {
+        for (uint8_t i = 0; i < DIAG_HISTORY_SAMPLES - 1; i++)
+        {
+            g_diagSession.tempHistory[i] = g_diagSession.tempHistory[i+1];
+            g_diagSession.battHistory[i] = g_diagSession.battHistory[i+1];
+        }
+        g_diagSession.tempHistory[DIAG_HISTORY_SAMPLES - 1] = temp_C;
+        g_diagSession.battHistory[DIAG_HISTORY_SAMPLES - 1] = batt_V;
+    }
+}
+
+/**
+ * @brief Checks whether the diagnostic report transmission has been completed.
+ */
+uint8_t State_DIAG_IsReportComplete(void)
+{
+    return g_diagSession.reportTransmitted;
+}
+
+#endif

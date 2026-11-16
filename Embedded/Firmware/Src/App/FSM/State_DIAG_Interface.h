@@ -1,0 +1,77 @@
+/**
+ * @file      State_DIAG_Interface.h
+ * @author    (Developer: Abdulrahman Ali)
+ * @author    (Reviewer:Beshoy Esmat)
+ * @brief     Public interface for the Fsm State Diagnostic.
+ * @details   This header file declares the Diagnostic session prototypes, history constants, data structures.
+ * @version   1.0.0
+ * @date      22/11/2026
+ * @copyright Copyright (c) 2026, Gestell Company
+ */
+#ifndef STATE_DIAG_INTERFACE_H
+#define STATE_DIAG_INTERFACE_H
+
+#include <stdint.h>
+#include "../../Common/Config.h"
+#include "../../Common/Definition.h"
+#include "../../Common/MacroFunction.h"
+#include "Embedded\Firmware\Src\Hal\Lcd\Lcd_Interface.h"
+#include "Embedded\Firmware\Src\Mcal\Usart0\Usart0_Interface.h"
+#include "Embedded\Firmware\Src\Hal\Sensors\Batt\BATT_Interface.h"
+#include "Embedded\Firmware\Src\Hal\Sensors\LM35\LM35_Interface.h"
+
+
+
+/**
+ * @brief   Structure holding diagnostic session runtime data and sensor history.
+ * @details Stores historical temperature and battery voltage readings along with
+ *          sample count, session start timestamp, and report transmission status.
+ */
+typedef struct
+{
+    float tempHistory[DIAG_HISTORY_SAMPLES];
+    float battHistory[DIAG_HISTORY_SAMPLES];
+    uint8_t historyCount;
+    uint32_t sessionStartTime_ms;
+    uint8_t reportTransmitted;
+} DiagSessionData_t;
+
+/**
+ * @brief Defines the number of historical samples to retain for temperature and battery voltage readings.
+ */
+#define DIAG_HISTORY_SAMPLES 5U
+/**
+ * @brief Defines the timeout duration in milliseconds for the diagnostic session before auto-exit is triggered.
+ */
+#define DIAG_SESSION_TIMEOUT_MS 5000U
+
+/**
+ * @fn    void State_DIAG_OnEntry(void)
+ * @brief Initializes the diagnostic state upon entry and resets session data.
+ */
+void State_DIAG_OnEntry(void);
+
+/**
+ * @fn    void State_DIAG_OnRun(void)
+ * @brief Executes the periodic tasks and state logic during the diagnostic state.
+ */
+void State_DIAG_OnRun(void);
+/**
+ * @fn    void State_DIAG_OnExit(void)
+ * @brief Performs cleanup operations before transitioning out of the diagnostic state.
+ */
+void State_DIAG_OnExit(void);
+
+/**
+ * @fn    void State_DIAG_LogSensorSample(float temp_C, float batt_V)
+ * @brief Logs a new temperature and battery voltage sample into the diagnostic history buffers.
+ */
+void State_DIAG_LogSensorSample(float temp_C, float batt_V);
+
+/**
+ * @fn    uint8_t State_DIAG_IsReportComplete(void)
+ * @brief Checks whether the diagnostic report transmission has been completed.
+ */
+uint8_t State_DIAG_IsReportComplete(void);
+
+#endif /* STATE_DIAG_INTERFACE_H */
