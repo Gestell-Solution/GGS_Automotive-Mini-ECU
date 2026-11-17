@@ -127,18 +127,6 @@ void LCD_Cockpit_RenderTask_200ms(void)
     g_cockpit.totalFramesRendered++;
 }
 
-void LCD_Cockpit_RenderLiveScreen(void)
-{
-    const ECUData_t* p = FSM_GetECUData()
-
-    char tempStr[8];
-    char battStr[8];
-
-    LCD_Cockpit_FormatFloat1dp(tempStr, (uint8_t)sizeof(tempStr), tempVal);
-    LCD_Cockpit_FormatFloat1dp(battStr, (uint8_t)sizeof(battStr), battVal);
-
-
-}
 
 void LCD_Cockpit_FormatFloat1dp(char* outBuf, uint8_t maxLen, float value)
 {
@@ -166,12 +154,31 @@ void LCD_Cockpit_FormatFloat1dp(char* outBuf, uint8_t maxLen, float value)
     }
 }
 
+void LCD_Cockpit_RenderLiveScreen(void)
+{
+    const ECUData_t* p = FSM_GetECUData()
+
+    char tempStr[8];
+    char battStr[8];
+
+    LCD_Cockpit_FormatFloat1dp(tempStr, (uint8_t)sizeof(tempStr), tempVal);
+    LCD_Cockpit_FormatFloat1dp(battStr, (uint8_t)sizeof(battStr), battVal);
+
+
+}
+
+
 void LCD_Cockpit_RenderSafeModeScreen(void)
 {
 
 }
 
 void LCD_Cockpit_PadField(char* dest, uint8_t startCol, uint8_t width, const char* content)
+{
+
+}
+
+void LCD_Cockpit_RenderStandbyScreen(void)
 {
 
 }
@@ -224,18 +231,6 @@ LCD_ScreenMode_t LCD_Cockpit_GetScreenMode(void)
     return g_cockpit.currentScreenMode;
 }
 
-void LCD_Cockpit_RenderStandbyScreen(void)
-{
-    const ECUData_t* p = FSM_GetECUData();
-    bool ign = (p != Null) ? p->ignitionActive : false;
 
-    char line1[LCD_COCKPIT_COLS + 1U];
-    (void)snprintf(line1, sizeof(line1), "MODE: OFF   IGN: %-3s", ign ? "ON " : "OFF");
-    LCD_Cockpit_PadField(g_cockpit.stagedBuffers[0], 0U, LCD_COCKPIT_COLS, line1);
-
-    LCD_Cockpit_PadField(g_cockpit.stagedBuffers[1], 0U, LCD_COCKPIT_COLS, "STANDBY V1.0-OFFLINE");
-    LCD_Cockpit_PadField(g_cockpit.stagedBuffers[2], 0U, LCD_COCKPIT_COLS, "ACTUATORS: SILENCED ");
-    LCD_Cockpit_PadField(g_cockpit.stagedBuffers[3], 0U, LCD_COCKPIT_COLS, "PRESS START TO CRANK");
-}
 
 #endif
