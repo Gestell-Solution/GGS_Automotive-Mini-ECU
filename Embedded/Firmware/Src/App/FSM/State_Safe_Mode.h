@@ -16,6 +16,10 @@
 #include "../../Common/Definition.h"
 #include "../../Common/MacroFunction.h"
 
+#include "Embedded\Firmware\Src\Hal\Lcd\Lcd_Interface.h"
+#include "Embedded\Firmware\Src\Hal\Actuators\Buzzer\Buzzer_Interface.h"
+#include "Embedded\Firmware\Src\Hal\Actuators\Fan\FAN_Interface.h"
+
 /**
  * @details Engine temperature must drop to or below 75.0°C before exiting
  *          STATE_SAFE_MODE is permitted.
