@@ -12,15 +12,22 @@
 #define STATE_DIAG_INTERFACE_H
 
 #include <stdint.h>
+#include <stdbool.h>
 #include "../../Common/Config.h"
 #include "../../Common/Definition.h"
 #include "../../Common/MacroFunction.h"
-#include "Embedded\Firmware\Src\Hal\Lcd\Lcd_Interface.h"
-#include "Embedded\Firmware\Src\Mcal\Usart0\Usart0_Interface.h"
-#include "Embedded\Firmware\Src\Hal\Sensors\Batt\BATT_Interface.h"
-#include "Embedded\Firmware\Src\Hal\Sensors\LM35\LM35_Interface.h"
+#include "../../Hal/Lcd/Lcd_Interface.h"
 
 
+
+/**
+ * @brief Defines the number of historical samples to retain for temperature and battery voltage readings.
+ */
+#define DIAG_HISTORY_SAMPLES 5U
+/**
+ * @brief Defines the timeout duration in milliseconds for the diagnostic session before auto-exit is triggered.
+ */
+#define DIAG_SESSION_TIMEOUT_MS 5000U
 
 /**
  * @brief   Structure holding diagnostic session runtime data and sensor history.
@@ -36,14 +43,6 @@ typedef struct
     uint8_t reportTransmitted;
 } DiagSessionData_t;
 
-/**
- * @brief Defines the number of historical samples to retain for temperature and battery voltage readings.
- */
-#define DIAG_HISTORY_SAMPLES 5U
-/**
- * @brief Defines the timeout duration in milliseconds for the diagnostic session before auto-exit is triggered.
- */
-#define DIAG_SESSION_TIMEOUT_MS 5000U
 
 /**
  * @fn    void State_DIAG_OnEntry(void)

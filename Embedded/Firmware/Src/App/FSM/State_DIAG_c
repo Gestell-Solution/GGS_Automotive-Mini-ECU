@@ -12,7 +12,9 @@
 #include "../../Common/Definition.h"
 
 #if ModuleFsmEnabled == Enable
-#include "State_DIAG_Interface.h"
+
+#include "State_DIAG_h"
+
 static DiagSessionData_t g_diagSession;
 
 /**
@@ -23,7 +25,6 @@ void State_DIAG_OnEntry(void)
     /**
      * Initializes the diagnostic state upon entry and resets session data.
      */
-    FSM_Transition(STATE_DIAGNOSTIC); // Transition to diagnostic state
     g_diagSession.sessionStartTime_ms = Scheduler_GetUptime_ms();
     g_diagSession.reportTransmitted = false;
 
@@ -57,7 +58,7 @@ void State_DIAG_OnRun(void)
      */
     if (g_diagSession.reportTransmitted || elapsed >= DIAG_SESSION_TIMEOUT_MS)
     {
-        FSM_Transition(STATE_RUN); // Transition to idle state
+        FSM_Transition(STATE_RUN); 
     }
 }
 /**
