@@ -14,14 +14,15 @@
  #define _FSM_PRIVATE_H_
 
  #include <stdint.h>
- 
+ #include <stdbool.h> 
+
  typedef enum {
      STATE_OFF         = 0U,
      STATE_START       = 1U,
      STATE_RUN         = 2U,
      STATE_DIAGNOSTIC  = 3U,
-    STATE_FAULT       = 4U,
-    STATE_SAFE_MODE   = 5U
+    STATE_FAULT        = 4U,
+    STATE_SAFE_MODE    = 5U
 } ECU_State_t;
 
 typedef enum {

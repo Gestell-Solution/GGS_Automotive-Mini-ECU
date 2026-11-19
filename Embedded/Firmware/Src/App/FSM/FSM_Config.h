@@ -10,11 +10,11 @@
  */
 
 
- #ifndef _FSM_CONFIG_H_
- #define _FSM_CONFIG_H_
+#ifndef _FSM_CONFIG_H_
+#define _FSM_CONFIG_H_
  
- #define FSM_NUM_STATES              6U
- #define FSM_MAX_DTC_HISTORY         8U
+#define FSM_NUM_STATES              6U
+#define FSM_MAX_DTC_HISTORY         8U
  
  
- #endif
+#endif

@@ -15,7 +15,8 @@
 
  #include "FSM_Private.h"
  #include "FSM_Config.h"
- 
+ #include "../../Common/Definition.h" 
+#include <stdbool.h> 
  void              FSM_Init(void);
  void              FSM_Run(void);
  Std_ReturnType    FSM_Transition(ECU_State_t targetState);
