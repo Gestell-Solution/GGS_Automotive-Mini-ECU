@@ -32,23 +32,16 @@ void State_DIAG_OnEntry(void)
      */
     hLCD_WriteString(FirstLine, 0, "MODE:DIAG | SERV:ON");
 
-    // /**
-    //  * Retrieve stored DTCs via
-    //  */
-    // DTC_GetAll();
-    //  /*
-    //  * Fetch 5-sample histories from tempHistory and battHistory
-    //  */
-    // for (uint8_t i = 0; i < DIAG_HISTORY_SAMPLES; i++)
-    // {
-    //     g_diagSession.tempHistory[i] = hLM35_GetLastTemp_C();
-    //     g_diagSession.battHistory[i] = hBATT_GetLastVoltage_V();
-    // }
     /**
-     * Dispatch payload to serial transmit buffers
+     * @brief todo  Retrieve stored DTCs via
      */
-    // Tele_BuildDiagReport();
-    // Tele_BroadcastBothChannels();
+    DTC_GetAll();
+   
+    /**
+     * @brief todo Dispatch payload to serial transmit buffers
+     */
+    Tele_BuildDiagReport();
+    Tele_BroadcastBothChannels();
 }
 /**
  * @brief Executes the periodic tasks and state logic during the diagnostic state.
@@ -72,6 +65,10 @@ void State_DIAG_OnRun(void)
  */
 void State_DIAG_OnExit(void)
 {
+    /**
+     * Perform cleanup operations before transitioning out of the diagnostic state.
+     */
+    g_diagSession.reportTransmitted = false;
 }
 
 /**
@@ -79,9 +76,9 @@ void State_DIAG_OnExit(void)
  */
 void State_DIAG_LogSensorSample(float temp_C, float batt_V)
 {
-  /**
-   * Logs a new temperature and battery voltage sample into the diagnostic history buffers when its empty
-   */
+    /**
+     * Logs a new temperature and battery voltage sample into the diagnostic history buffers when its empty
+     */
     if (g_diagSession.historyCount < DIAG_HISTORY_SAMPLES)
     {
         g_diagSession.tempHistory[g_diagSession.historyCount] = temp_C;
@@ -95,8 +92,8 @@ void State_DIAG_LogSensorSample(float temp_C, float batt_V)
     {
         for (uint8_t i = 0; i < DIAG_HISTORY_SAMPLES - 1; i++)
         {
-            g_diagSession.tempHistory[i] = g_diagSession.tempHistory[i+1];
-            g_diagSession.battHistory[i] = g_diagSession.battHistory[i+1];
+            g_diagSession.tempHistory[i] = g_diagSession.tempHistory[i + 1];
+            g_diagSession.battHistory[i] = g_diagSession.battHistory[i + 1];
         }
         g_diagSession.tempHistory[DIAG_HISTORY_SAMPLES - 1] = temp_C;
         g_diagSession.battHistory[DIAG_HISTORY_SAMPLES - 1] = batt_V;
