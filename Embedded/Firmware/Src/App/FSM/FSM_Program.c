@@ -53,7 +53,7 @@ Std_ReturnType FSM_Transition(ECU_State_t targetState)
     {
         return ENotOk;
     }
-    else if (g_ecuData.currentState == STATE_START && (targetState != STATE_RUN || targetState != STATE_FAULT))
+    else if (g_ecuData.currentState == STATE_START && targetState != STATE_RUN && targetState != STATE_FAULT)
     {
         return ENotOk;
     }
