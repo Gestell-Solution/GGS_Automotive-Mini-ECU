@@ -86,7 +86,7 @@ void State_SAFE_MODE_OnEntry(void)
     hBUZZER_SetMode(BUZZER_MODE_BEEP);
     hLED_Set(LED_STATUS_BLUE, LED_OFF);
     /**
-     * Update LCD cockpit display
+     * TODO: Update LCD cockpit display
      */
     hLCD_WriteString(FirstLine, 0, "MODE: SAFE | ALARM!");
     hLCD_WriteString(SecondLine, 0, "COOLING AT 100%");
