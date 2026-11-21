@@ -83,7 +83,7 @@ void State_DIAG_OnExit(void)
     /**
      * Perform cleanup operations before transitioning out of the diagnostic state.
      */
-    g_diagSession.sessionStartTime_ms = 0;
+    g_diagSession.sessionStartTime_ms = 0U;
     g_diagSession.reportTransmitted = false;
 
     /**
