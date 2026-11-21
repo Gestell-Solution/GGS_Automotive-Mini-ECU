@@ -54,7 +54,7 @@ COLOR_RED    = \033[31;1m
 CFLAGS := \
     -mmcu=$(MCU)        \
     -DF_CPU=$(F_CPU)    \
-    -O2                 \
+    -Os                 \
     -Wall               \
     -Wextra             \
     -std=gnu99          \

@@ -70,7 +70,7 @@ ADC_Status_t     mADC_Init(void) {
     }
     (void)mADC_GetResult();  //Review note
     return ADC_Status_Ok;
-};
+}
 
 /**
  * @brief Configures the voltage reference source in ADMUX (REFS1:0).
