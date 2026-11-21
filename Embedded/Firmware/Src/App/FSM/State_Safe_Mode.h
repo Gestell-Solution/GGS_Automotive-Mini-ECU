@@ -23,6 +23,8 @@
 #include "../../Hal/Lcd/Lcd_Interface.h"
 #include "../../Hal/Actuators/Buzzer/Buzzer_Interface.h"
 #include "../../Hal/Actuators/Fan/FAN_Interface.h"
+#include "../../Hal/Actuators/Led/Led_Interface.h"
+
 
 /**
  * @details Engine temperature must drop to or below 75.0°C before exiting

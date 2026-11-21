@@ -11,12 +11,12 @@
  */
 #include "../../Common/Config.h"
 #include "../../Common/Definition.h"
+#include "State_Safe_Mode.h"
 
 #if ModuleFsmEnabled == Enable
 
 static SafeModeControlBlock_t g_safeModeControl;
 
-#include "State_Safe_Mode.h"
 
 /**
  * @brief   Entry handler for STATE_FAULT.
@@ -41,7 +41,7 @@ void State_FAULT_OnEntry(void)
      * Turning on the buzzer and red warning LED to alert the user of the fault condition.
      */
     hBUZZER_SetState(BUZZER_STATE_ON);
-    hLED_Set(LED_WARNING_RED, LED_ON);
+    hLED_SetState(LED_WARNING_YELLOW, LED_STATE_ON);
     
 }
 
@@ -55,7 +55,7 @@ void State_FAULT_OnRun(void)
     /**
      * The system Auto transitions to STATE_SAFE_MODE after a 5-second stabilization period in STATE_FAULT.
      */
-    FSM_Transition(STATE_SAFE_MODE);
+    FSM_Transition(StateSafeMode);
     
 }
 
@@ -82,9 +82,9 @@ void State_SAFE_MODE_OnEntry(void)
     /**
      * Enforce warning indication
      */
-    hLED_Blink(LED_WARNING_RED, 250U);
-    hBUZZER_SetMode(BUZZER_MODE_BEEP);
-    hLED_Set(LED_STATUS_BLUE, LED_OFF);
+    hLED_Blink(LED_WARNING_YELLOW, 250U);
+    hBUZZER_SetBeep(BUZZER_MODE_BEEP);
+    hLED_SetState(LED_STATUS_BLUE, LED_STATE_OFF);
     /**
      * TODO: Update LCD cockpit display
      */
@@ -109,7 +109,7 @@ void State_SAFE_MODE_OnRun(void){
     /**
      * Check Barrier 1 (Physical Parameter Recovery with Hysteresis)
      */
-    if(lockedDTC == DTC_F001_OVER_TEMP){
+    if(lockedDTC == DtcF001OverTemp){
         if(g_ecuData.engineTemp_C < SAFE_MODE_TEMP_RECOVERY_C){
             g_safeModeControl.recoveryConditionsMet = true;
         }
@@ -121,7 +121,7 @@ void State_SAFE_MODE_OnRun(void){
     /**
      * check on BATT Voltage Recovery with Hysteresis
      */
-    if(lockedDTC == DTC_F002_BATT_VOLT){
+    if(lockedDTC == DtcF002BatteryFault){
         if(g_ecuData.batteryVoltage_V >= 12.0f && g_ecuData.batteryVoltage_V <= 14.0f){
             g_safeModeControl.recoveryConditionsMet = true;
         }
@@ -142,7 +142,7 @@ void State_SAFE_MODE_OnRun(void){
      */
     if(g_safeModeControl.recoveryConditionsMet == true && g_safeModeControl.resetSignalReceived == true){
         DTC_Clear(g_safeModeControl.lockedDTC);
-        FSM_Transition(STATE_OFF);
+        FSM_Transition(StateOff);
     }
 }
 
@@ -156,7 +156,7 @@ void State_SAFE_MODE_OnExit(void){
      * Silence emergency alarms
      */
     hBUZZER_SetState(BUZZER_STATE_OFF);
-    hLED_Set(LED_WARNING_RED, LED_OFF);
+    hLED_SetState(LED_WARNING_YELLOW, LED_STATE_OFF);
     /**
      * Return cooling fan control from failsafe to normal mode
      */
@@ -164,7 +164,7 @@ void State_SAFE_MODE_OnExit(void){
     /**
      * Clear internal control block
      */
-    g_safeModeControl.lockedDTC = DTC_NONE;
+    g_safeModeControl.lockedDTC = DtcNone;
 }
 
 /**
@@ -178,13 +178,13 @@ uint8_t State_SAFE_MODE_IsRecoveryAllowed(void){
      * Check if both recovery conditions are met: physical parameter recovery and reset signal received
      * Returns 1 (true) if both conditions are satisfied, otherwise returns 0 (false).
      */
-    if ((g_safeModeControl.recoveryConditionsMet == 1) && (g_safeModeControl.resetSignalReceived == 1)) 
+    if ((g_safeModeControl.recoveryConditionsMet == True) && (g_safeModeControl.resetSignalReceived == True)) 
     {
-        return 1;
+        return True;
     }
     else
     {
-    return 0;
+    return False;
     }
 }
 
