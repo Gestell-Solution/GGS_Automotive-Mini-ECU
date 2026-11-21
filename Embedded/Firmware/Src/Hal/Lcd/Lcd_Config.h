@@ -50,21 +50,21 @@
  * @brief Data Bit 4 (High nibble bit 0 / Low nibble bit 0)
  */
 #define Lcd_D4Group GroupC
-#define Lcd_D4Pin Pin4
+#define Lcd_D4Pin Pin2
 /**
  * @brief Data Bit 5
  */
 #define Lcd_D5Group GroupC
-#define Lcd_D5Pin Pin5
+#define Lcd_D5Pin Pin3
 /**
  * @brief Data Bit 6
  */
 #define Lcd_D6Group GroupC
-#define Lcd_D6Pin Pin6
+#define Lcd_D6Pin Pin4
 /**
  * @brief Data Bit 7 (Most Significant Bit)
  */
 #define Lcd_D7Group GroupC
-#define Lcd_D7Pin Pin7
+#define Lcd_D7Pin Pin5
 
 #endif
