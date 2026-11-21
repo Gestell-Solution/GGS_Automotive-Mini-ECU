@@ -1,0 +1,1847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gestell Mini-ECU Telemetry Suite — Enterprise V3</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #060913;
+  --p: #0D1527;
+  --card: #131F38;
+  --bd: #1E293B;
+  --bd-focus: #334155;
+  --cy: #00E5FF;
+  --cy-glow: rgba(0, 229, 255, 0.25);
+  --gr: #00E676;
+  --gr-glow: rgba(0, 230, 118, 0.25);
+  --am: #FFB300;
+  --am-glow: rgba(255, 179, 0, 0.25);
+  --rd: #FF1744;
+  --rd-glow: rgba(255, 23, 68, 0.25);
+  --bl: #2979FF;
+  --tx: #F1F5F9;
+  --mu: #94A3B8;
+  --mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+}
+* { box-sizing: border-box; }
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+body {
+  margin: 0;
+  font: 14px/1.45 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--tx);
+  background: radial-gradient(1000px 600px at 20% -10%, #0d2342 0%, transparent 70%),
+              radial-gradient(900px 500px at 85% 100%, #00e5ff12 0%, transparent 60%),
+              var(--bg);
+  min-height: 100vh;
+}
+.mono { font-family: var(--mono); }
+.mu { color: var(--mu); }
+
+/* Master Header */
+header {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 24px;
+  background: rgba(13, 21, 39, 0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--bd);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+.brand img {
+  height: 38px;
+  filter: drop-shadow(0 0 8px var(--cy-glow));
+}
+.brand .title {
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: #fff;
+  line-height: 1.1;
+}
+.brand .sub {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--cy);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+nav {
+  display: flex;
+  gap: 4px;
+  margin: 0 auto;
+}
+nav a {
+  padding: 10px 16px;
+  color: var(--mu);
+  font-weight: 600;
+  font-size: 13px;
+  text-decoration: none;
+  border-radius: 8px;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+nav a:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.04);
+}
+nav a.on {
+  color: #fff;
+  border-color: var(--cy);
+  background: linear-gradient(180deg, rgba(0, 229, 255, 0.12) 0%, transparent 100%);
+  text-shadow: 0 0 12px var(--cy-glow);
+}
+
+.hdr-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+}
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 9999px;
+  background: #0F172A;
+  border: 1px solid var(--bd);
+  font: 600 12px var(--mono);
+  white-space: nowrap;
+}
+.pill.g { background: rgba(0, 230, 118, 0.15); color: var(--gr); border-color: rgba(0, 230, 118, 0.4); }
+.pill.c { background: rgba(0, 229, 255, 0.15); color: var(--cy); border-color: rgba(0, 229, 255, 0.4); }
+.pill.r { background: rgba(255, 23, 68, 0.15); color: var(--rd); border-color: rgba(255, 23, 68, 0.4); }
+.pill.am { background: rgba(255, 179, 0, 0.15); color: var(--am); border-color: rgba(255, 179, 0, 0.4); }
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gr);
+  box-shadow: 0 0 8px currentColor;
+  color: var(--gr);
+  animation: pulse 1.6s infinite ease-in-out;
+}
+@keyframes pulse { 50% { opacity: 0.35; transform: scale(0.85); } }
+
+.btn-estop {
+  border: 1px solid var(--rd);
+  color: var(--rd);
+  background: rgba(255, 23, 68, 0.1);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font: 700 12px var(--mono);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+.btn-estop:hover, .btn-estop.active {
+  background: var(--rd);
+  color: #fff;
+  box-shadow: 0 0 14px var(--rd-glow);
+}
+
+/* Persistent HUD Bar */
+.hud-strip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 24px;
+  background: #090F1E;
+  border-bottom: 1px solid var(--bd);
+  overflow-x: auto;
+  font-size: 12px;
+}
+.hud-strip .mcu-clock {
+  margin-left: auto;
+  color: var(--mu);
+}
+
+.estop-banner {
+  background: linear-gradient(90deg, #b91c1c, #dc2626, #b91c1c);
+  color: #fff;
+  font-weight: 700;
+  padding: 10px 24px;
+  text-align: center;
+  font-size: 13px;
+  display: none;
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+}
+.estop-banner.show { display: block; }
+
+/* Main Layout */
+main {
+  padding: 20px 24px;
+  max-width: 1540px;
+  margin: 0 auto;
+}
+.page { display: none; }
+.page.on { display: block; }
+
+.grid-3 { display: grid; grid-template-columns: 38fr 37fr 25fr; gap: 16px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid-65 { display: grid; grid-template-columns: 65fr 35fr; gap: 16px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+.grid-3e { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+@media (max-width: 1080px) {
+  .grid-3, .grid-2, .grid-65, .grid-3e, .grid-4 { grid-template-columns: 1fr; }
+}
+
+/* Card Containers */
+.card {
+  background: var(--card);
+  border: 1px solid var(--bd);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
+  position: relative;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.card.glow-cyan {
+  border-color: rgba(0, 229, 255, 0.35);
+  box-shadow: 0 0 24px rgba(0, 229, 255, 0.08);
+}
+.card.glow-amber {
+  border-color: rgba(255, 179, 0, 0.45);
+  box-shadow: 0 0 22px rgba(255, 179, 0, 0.1);
+}
+.card-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.card-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tag-hw {
+  font: 600 11px var(--mono);
+  color: var(--cy);
+  background: rgba(0, 229, 255, 0.1);
+  border: 1px solid rgba(0, 229, 255, 0.3);
+  border-radius: 6px;
+  padding: 2px 7px;
+}
+
+/* Buttons */
+.btn {
+  background: #1E293B;
+  color: var(--tx);
+  border: 1px solid var(--bd-focus);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font: 600 13px 'Inter', sans-serif;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+.btn:hover { border-color: var(--cy); color: #fff; }
+.btn.cy { background: var(--cy); color: #02171c; border-color: var(--cy); font-weight: 700; }
+.btn.cy:hover { box-shadow: 0 0 14px var(--cy-glow); color: #000; }
+.btn.o { background: transparent; border-color: var(--cy); color: var(--cy); }
+.btn.o:hover { background: rgba(0, 229, 255, 0.12); }
+.btn.rd { background: var(--rd); border-color: var(--rd); color: #fff; }
+.btn.rd:hover { box-shadow: 0 0 14px var(--rd-glow); }
+.btn.am { background: var(--am); border-color: var(--am); color: #231800; font-weight: 700; }
+.btn.am:hover { box-shadow: 0 0 14px var(--am-glow); }
+.btn.sm { padding: 4px 10px; font-size: 12px; }
+.btn.w-full { width: 100%; }
+
+/* Switch Controls */
+.sw {
+  appearance: none;
+  width: 44px;
+  height: 24px;
+  border-radius: 99px;
+  background: #334155;
+  position: relative;
+  cursor: pointer;
+  margin: 0;
+  transition: 0.2s;
+  border: 0;
+}
+.sw:before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #cbd5e1;
+  transition: 0.2s;
+}
+.sw:checked { background: #065f46; box-shadow: 0 0 12px var(--gr-glow); }
+.sw:checked:before { left: 23px; background: var(--gr); }
+
+/* Rotating Fan Animation */
+.fan-spin {
+  animation: spin 1s linear infinite;
+  transform-origin: 50% 50%;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.blink { animation: blk 1s steps(2) infinite; }
+@keyframes blk { 50% { opacity: 0.2; } }
+
+/* Oscilloscope Canvas */
+canvas.chart-cv {
+  width: 100%;
+  height: 155px;
+  display: block;
+}
+.chart-footer {
+  display: flex;
+  justify-content: space-between;
+  font: 11.5px var(--mono);
+  color: var(--mu);
+  margin-top: 8px;
+}
+
+/* Tables */
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { color: var(--mu); text-align: left; font-weight: 600; padding: 10px 8px; border-bottom: 1px solid var(--bd); }
+td { padding: 11px 8px; border-bottom: 1px solid var(--bd); }
+tr.clickable { cursor: pointer; }
+tr.clickable:hover { background: rgba(255, 255, 255, 0.03); }
+tr.freeze-frame td {
+  background: #090F1E;
+  font: 12px/1.8 var(--mono);
+  color: #CBD5E1;
+  padding: 12px 14px;
+  border-left: 3px solid var(--am);
+}
+
+/* Console Terminal */
+.term-window {
+  background: #030712;
+  border: 1px solid var(--bd);
+  border-radius: 12px;
+  height: 380px;
+  overflow-y: auto;
+  padding: 12px;
+  font: 12px/1.7 var(--mono);
+  word-break: break-all;
+}
+.term-row { display: flex; gap: 8px; padding: 2px 0; }
+.tx-line { color: var(--cy); }
+.rx-line { color: var(--gr); }
+.warn-line { color: var(--am); }
+.crit-line { color: #FFA4B2; background: rgba(255, 23, 68, 0.15); padding: 2px 6px; border-radius: 4px; }
+
+/* Settings Layout */
+.settings-wrap {
+  display: grid;
+  grid-template-columns: 210px 1fr;
+  gap: 18px;
+}
+@media (max-width: 900px) { .settings-wrap { grid-template-columns: 1fr; } }
+.settings-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.settings-menu button {
+  background: none;
+  border: 0;
+  text-align: left;
+  padding: 11px 16px;
+  border-radius: 9px;
+  color: var(--mu);
+  font: 600 13px 'Inter', sans-serif;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.2s;
+  border-left: 3px solid transparent;
+}
+.settings-menu button:hover { color: #fff; background: rgba(255, 255, 255, 0.04); }
+.settings-menu button.active {
+  color: var(--cy);
+  background: #0F172A;
+  border-color: var(--cy);
+}
+.settings-content { display: none; }
+.settings-content.active { display: block; }
+
+/* Segmented Buttons */
+.seg-group {
+  display: inline-flex;
+  border: 1px solid var(--bd-focus);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.seg-group button {
+  background: none;
+  border: 0;
+  color: var(--mu);
+  padding: 6px 12px;
+  font: 600 12px 'Inter', sans-serif;
+  cursor: pointer;
+  transition: 0.15s;
+}
+.seg-group button.on {
+  background: var(--cy);
+  color: #00151a;
+  font-weight: 700;
+}
+
+/* Modals & Toasts */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: none;
+  place-items: center;
+  z-index: 100;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.show { display: grid; }
+.modal-box {
+  background: var(--p);
+  border: 1px solid var(--rd);
+  border-radius: 14px;
+  padding: 24px;
+  max-width: 380px;
+  width: 90%;
+  box-shadow: 0 0 30px rgba(255, 23, 68, 0.25);
+}
+
+#toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  background: #0F172A;
+  border: 1px solid var(--cy);
+  box-shadow: 0 0 16px var(--cy-glow);
+  padding: 10px 20px;
+  border-radius: 10px;
+  font: 600 13px 'Inter', sans-serif;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s, transform 0.25s;
+  z-index: 200;
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(-6px); }
+
+/* Input fields */
+input[type=text], input[type=password], select {
+  width: 100%;
+  padding: 9px 12px;
+  background: #090F1E;
+  border: 1px solid var(--bd);
+  border-radius: 8px;
+  color: var(--tx);
+  font: 13px var(--mono);
+}
+input:focus, select:focus {
+  outline: 2px solid var(--cy);
+  outline-offset: 1px;
+}
+input[type=range] { accent-color: var(--am); }
+label.field-row {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 14px;
+  color: var(--mu);
+  font-size: 12px;
+}
+.kv-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--bd);
+  font: 12px var(--mono);
+}
+.kv-row span { color: var(--mu); }
+.kv-row b { color: #fff; }
+</style>
+</head>
+<body>
+
+<!-- Master Global Header -->
+<header>
+  <a class="brand" href="#overview">
+    <img src="data:image/png;base64,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" alt="Gestell">
+    <div>
+      <div class="title">GESTELL</div>
+      <div class="sub">ECU Dashboard V3</div>
+    </div>
+  </a>
+
+  <nav id="master-nav">
+    <a href="#overview" data-target="p-overview" class="on">Overview</a>
+    <a href="#dtc" data-target="p-dtc">DTC Manager</a>
+    <a href="#faults" data-target="p-faults">Fault Injection (HIL)</a>
+    <a href="#console" data-target="p-console">Live Console</a>
+    <a href="#settings" data-target="p-settings">Settings</a>
+  </nav>
+
+  <div class="hdr-right">
+    <span class="pill">GESTELL_ECU_01 <span style="color:var(--cy)">📶</span> <small id="ping-txt">14ms</small></span>
+    <span class="pill" id="uptime-pill">⏱ 00:00:00.000</span>
+    <button class="btn-estop" id="btn-estop" onclick="toggleEstop()" title="Hardware Emergency Stop">⏻ E-STOP</button>
+  </div>
+</header>
+
+<!-- Telemetry HUD Strip -->
+<div class="hud-strip">
+  <span class="pill g" id="hud-mode">🟢 MODE: RUN</span>
+  <span class="pill c" id="hud-ign">⚡ IGN: ON</span>
+  <span class="pill"><span class="dot"></span>ONLINE</span>
+  <span class="pill">ᛒ BT: CONNECTED (9600)</span>
+  <span class="pill">🌐 WiFi: 192.168.1.100:8080</span>
+  <span class="pill mcu-clock">ATmega128 @ 16.000 MHz XTAL</span>
+  <span class="pill">SysTick 10ms | CPU: <span id="hud-cpu" style="color:var(--cy)">24%</span></span>
+  <span class="mono mu" id="hud-session">00:23:43</span>
+</div>
+
+<div id="estop-alert" class="estop-banner">
+  🛑 EMERGENCY STOP LATCHED: All actuator outputs disabled (Fan 0%, Ignition OFF). Press E-STOP again to release safety lock.
+</div>
+
+<!-- Main Application Workspace -->
+<main>
+
+  <!-- PAGE 1: TELEMETRY OVERVIEW -->
+  <section class="page on" id="p-overview">
+    <div class="grid-3">
+      
+      <!-- Col 1: Live Rolling Splines -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <!-- Engine Temp Card -->
+        <div class="card">
+          <div class="card-hdr">
+            <h3 class="card-title">🌡️ Engine Temperature</h3>
+            <span class="tag-hw">ADC0 / LM35 (PF0)</span>
+          </div>
+          <canvas id="cv-temp" class="chart-cv"></canvas>
+          <div class="chart-footer">
+            <span id="temp-stat-minmax">Min: 23.1°C | Max: 44.8°C | Avg: 42.1°C</span>
+            <span>Rate: 100ms</span>
+          </div>
+        </div>
+
+        <!-- Battery Rail Card -->
+        <div class="card">
+          <div class="card-hdr">
+            <h3 class="card-title">🔋 Battery Rail Monitor</h3>
+            <span class="tag-hw">ADC1 / Divider ×3 (PF1)</span>
+          </div>
+          <canvas id="cv-volt" class="chart-cv"></canvas>
+          <div class="chart-footer">
+            <span id="volt-stat-val" style="color:var(--gr);font-weight:700">12.42 V</span>
+            <span>Ripple: 14mV RMS (100 Hz)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Col 2: Speedometer & Controls -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <!-- Dual Arc Thermal Dial -->
+        <div class="card glow-cyan">
+          <div class="card-hdr">
+            <h3 class="card-title">🎛️ Dual-Arc Thermal Dial</h3>
+            <span class="pill sm" id="demand-pill" style="color:var(--gr)">DEMAND: NORMAL</span>
+          </div>
+          <svg viewBox="0 0 220 160" style="width:100%;max-width:320px;display:block;margin:0 auto">
+            <defs>
+              <linearGradient id="arc-grad" x1="20" x2="200" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#00E676"/>
+                <stop offset="60%" stop-color="#FFB300"/>
+                <stop offset="100%" stop-color="#FF1744"/>
+              </linearGradient>
+            </defs>
+            <!-- Background Outer Track -->
+            <path d="M 30 140 A 80 80 0 1 1 190 140" fill="none" stroke="#1E293B" stroke-width="12" stroke-linecap="round"/>
+            <!-- Active Outer Heat Arc -->
+            <path id="dial-temp-arc" d="M 30 140 A 80 80 0 1 1 190 140" fill="none" stroke="url(#arc-grad)" stroke-width="12" stroke-linecap="round" stroke-dasharray="280" stroke-dashoffset="180" style="filter:drop-shadow(0 0 6px var(--cy-glow))"/>
+            <!-- Inner Concentric Fan Arc -->
+            <path d="M 50 140 A 60 60 0 1 1 170 140" fill="none" stroke="#1E293B" stroke-width="6" stroke-linecap="round"/>
+            <path id="dial-fan-arc" d="M 50 140 A 60 60 0 1 1 170 140" fill="none" stroke="#00E5FF" stroke-width="6" stroke-linecap="round" stroke-dasharray="210" stroke-dashoffset="52"/>
+            <!-- Pointer Needle -->
+            <g id="dial-needle" transform="rotate(-40 110 140)">
+              <line x1="110" y1="140" x2="110" y2="72" stroke="#fff" stroke-width="3" stroke-linecap="round" style="filter:drop-shadow(0 0 4px var(--cy))"/>
+              <circle cx="110" cy="140" r="7" fill="#fff"/>
+            </g>
+          </svg>
+          <div style="text-align:center;margin-top:-28px">
+            <div class="mono" style="font-size:42px;font-weight:700;color:#fff" id="dial-temp-val">42.5<small style="font-size:18px;color:var(--mu)">°C</small></div>
+            <div class="mu" style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase" id="dial-fan-subtitle">COOLING FAN PWM: 75%</div>
+          </div>
+        </div>
+
+        <!-- Split: Cooling Fan & Remote Ignition -->
+        <div class="grid-2">
+          <!-- Fan Widget -->
+          <div class="card" style="text-align:center">
+            <h3 class="card-title" style="justify-content:center;margin-bottom:8px">🌀 COOLING FAN</h3>
+            <div style="display:flex;align-items:center;justify-content:center;gap:12px">
+              <svg viewBox="0 0 100 100" width="80" height="80">
+                <circle cx="50" cy="50" r="40" fill="none" stroke="#1E293B" stroke-width="8"/>
+                <circle id="fan-ring-progress" cx="50" cy="50" r="40" fill="none" stroke="#00E5FF" stroke-width="8" stroke-linecap="round" stroke-dasharray="251" stroke-dashoffset="62" transform="rotate(-90 50 50)" style="filter:drop-shadow(0 0 4px var(--cy-glow))"/>
+                <g id="fan-blades-group" class="fan-spin">
+                  <path d="M50 50 L50 24 Q60 30 50 50 M50 50 L76 50 Q70 60 50 50 M50 50 L50 76 Q40 70 50 50 M50 50 L24 50 Q30 40 50 50" fill="#00E5FF"/>
+                </g>
+              </svg>
+              <div class="mono" style="text-align:left;line-height:1.6;font-size:11.5px">
+                <b style="font-size:22px;color:#fff" id="fan-pct-txt">75%</b><br>
+                <span>f: 977 Hz</span><br>
+                <span>OCR0: <b id="fan-ocr-txt" style="color:var(--cy)">191</b>/255</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ignition Widget -->
+          <div class="card" style="display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px">
+            <h3 class="card-title">🔑 REMOTE IGNITION</h3>
+            <input type="checkbox" class="sw" id="sw-ignition" checked aria-label="Remote Ignition">
+            <div style="display:flex;gap:8px">
+              <button class="btn sm" id="btn-ign-start" onclick="setIgnition(true)">START</button>
+              <button class="btn sm rd" id="btn-ign-stop" onclick="setIgnition(false)">STOP</button>
+            </div>
+            <span class="mono" style="font-size:11px;color:var(--gr)" id="txt-interlock">Interlock: ARMED</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Col 3: Diagnostic Health & I/O Pins -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <!-- Health Shield Card -->
+        <div class="card" style="text-align:center;padding:20px 14px">
+          <svg id="svg-shield" viewBox="0 0 64 64" width="80" style="color:var(--gr);filter:drop-shadow(0 0 10px rgba(0, 230, 118, 0.4))">
+            <path d="M32 4 L8 13 v17 c0 15 10 26 24 30 c14 -4 24 -15 24 -30 V13 Z" fill="none" stroke="currentColor" stroke-width="3"/>
+            <path id="svg-shield-icon" d="m21 32 l8 8 l15 -16" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <div id="shield-title" style="font-weight:700;font-size:18px;margin-top:10px;color:var(--gr)">No Active Faults</div>
+          <button class="btn cy w-full" style="margin-top:12px" onclick="triggerQuickScan(this)">⚡ RUN QUICK SCAN</button>
+        </div>
+
+        <!-- Hardware I/O LED Replica -->
+        <div class="card">
+          <div class="card-hdr">
+            <h3 class="card-title">🚦 Hardware I/O Replica</h3>
+            <span class="tag-hw">PORTD LEDS</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;font-family:var(--mono)">
+            <div style="display:flex;align-items:center;gap:10px">
+              <span id="led-pwr" style="width:12px;height:12px;border-radius:50%;background:var(--gr);box-shadow:0 0 8px var(--gr)" class="blink"></span>
+              <span>Power LED (PD4) · 1 Hz Heartbeat</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span id="led-run" style="width:12px;height:12px;border-radius:50%;background:var(--bl);box-shadow:0 0 8px var(--bl)"></span>
+              <span>Status LED (PD5) · RUN Active</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span id="led-warn" style="width:12px;height:12px;border-radius:50%;background:#334155"></span>
+              <span>Warning LED (PD6) · OFF</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span id="led-buzzer" style="width:12px;height:12px;border-radius:50%;background:#334155"></span>
+              <span>Buzzer Alarm (PD7) · 2 kHz</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Network Info -->
+        <div class="card">
+          <h3 class="card-title" style="margin-bottom:8px">📡 Comms Throughput</h3>
+          <div class="kv-row"><span>ESP-01 WiFi (USART1)</span><b>2.1 kB/s (500ms)</b></div>
+          <div class="kv-row"><span>HC-05 BT (USART0)</span><b>120 B/s ($TELE)</b></div>
+          <div class="kv-row"><span>Target Server</span><b>192.168.1.100:8080</b></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- PAGE 2: DTC MANAGER -->
+  <section class="page" id="p-dtc">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <h2 style="margin:0;font-size:22px">📋 DIAGNOSTIC TROUBLE CODES (DTC MANAGER)</h2>
+        <span class="pill r" id="dtc-pill-active">Active: 0</span>
+        <span class="pill" id="dtc-pill-stored">Stored: 3</span>
+        <span class="pill" id="dtc-pill-mil">MIL Lamp: OFF</span>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn rd" onclick="openClearModal()">🗑️ CLEAR ALL CODES</button>
+        <button class="btn o" onclick="copyDtcLog()">📥 EXPORT LOG (CSV)</button>
+        <button class="btn" onclick="refreshDtcList()">🔄 REFRESH</button>
+      </div>
+    </div>
+
+    <!-- Active DTC Table -->
+    <div style="margin-bottom:20px">
+      <div style="font-weight:700;color:var(--mu);margin-bottom:8px;font-size:12px;letter-spacing:0.1em">ACTIVE FAULT CODES (CLICK TO EXPAND FREEZE FRAME)</div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <table>
+          <thead>
+            <tr>
+              <th style="padding-left:14px">Code</th>
+              <th>Severity</th>
+              <th>Fault Name</th>
+              <th>Module</th>
+              <th>Threshold</th>
+              <th>Detected</th>
+              <th style="text-align:right;padding-right:14px">Action</th>
+            </tr>
+          </thead>
+          <tbody id="dtc-active-body">
+            <tr><td colspan="7" style="padding:16px;color:var(--mu);text-align:center">No active faults detected. System healthy.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Stored DTC Table -->
+    <div>
+      <div style="font-weight:700;color:var(--mu);margin-bottom:8px;font-size:12px;letter-spacing:0.1em">STORED / HISTORY FAULT CODES (EEPROM PERSISTENCE)</div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <table>
+          <thead>
+            <tr>
+              <th style="padding-left:14px">Code</th>
+              <th>Fault Name</th>
+              <th>Description</th>
+              <th>Detected</th>
+              <th>Cleared</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="dtc-stored-body">
+            <!-- Rendered by JS -->
+          </tbody>
+        </table>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:10px;font-size:12px;color:var(--mu)" class="mono">
+        <span id="dtc-total-counter">Total Stored DTCs: 3</span>
+        <span>EEPROM Memory: 3/16 Slots Used (100k Endurance Cycles)</span>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- PAGE 3: FAULT INJECTION (HIL LAB) -->
+  <section class="page" id="p-faults">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px">
+      <div>
+        <h2 style="margin:0;font-size:22px">🧪 HARDWARE-IN-THE-LOOP (HIL) FAULT INJECTION LAB</h2>
+        <div class="mu" style="font-size:12px">Remotely trigger physical sensor errors & test ECU fail-safe reaction latency (&lt; 50ms)</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="pill g" id="hil-state-pill">ECU State: RUN OK</span>
+        <button class="btn cy" id="btn-suite" onclick="runComplianceSuite(this)">⚡ RUN 5-STAGE COMPLIANCE SUITE</button>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <!-- F001 Workstation -->
+      <div class="card glow-amber">
+        <div class="card-hdr">
+          <span style="font:700 28px var(--mono);color:#fff">F001</span>
+          <span class="pill r">FAULT → SAFE MODE</span>
+        </div>
+        <b style="color:var(--am);font-size:16px">Engine Over-Temperature Injection</b>
+        <p class="mu" style="font-size:12px;margin:8px 0">Simulates LM35 engine temperature exceeding safety threshold (90.0°C). ECU cuts Fan PWM to 0%, activates 2kHz buzzer alarm, and locks into SAFE MODE.</p>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin:8px 0">
+          <label style="font-size:12px;color:var(--mu)">Target Injected Temp:</label>
+          <b class="mono" id="hil-f001-val" style="color:#fff">95.0°C</b>
+        </div>
+        <input type="range" min="30" max="120" step="0.5" value="95" style="width:100%" oninput="document.getElementById('hil-f001-val').textContent=(+this.value).toFixed(1)+'°C'">
+        <button class="btn am w-full" style="margin-top:14px" onclick="injectFault('F001', +document.getElementById('hil-f001-val').textContent.replace('°C',''))">INJECT THERMAL FAULT (F001)</button>
+      </div>
+
+      <!-- F002 Workstation -->
+      <div class="card glow-amber">
+        <div class="card-hdr">
+          <span style="font:700 28px var(--mono);color:#fff">F002</span>
+          <span class="pill am">ELECTRICAL RAIL</span>
+        </div>
+        <b style="color:var(--am);font-size:16px">Battery Voltage Anomaly Injection</b>
+        <p class="mu" style="font-size:12px;margin:8px 0">Simulates battery rail dropping below 10.5V or surging above 16.0V. Tests actuator preservation and voltage failure logging.</p>
+        <div style="display:flex;gap:8px;margin:12px 0">
+          <button class="btn sm" onclick="injectFault('F002', 9.2)">Brownout (9.2V)</button>
+          <button class="btn sm" onclick="injectFault('F002', 16.8)">Overvoltage (16.8V)</button>
+        </div>
+        <button class="btn am w-full" style="margin-top:14px" onclick="injectFault('F002', 9.2)">INJECT VOLTAGE FAULT (F002)</button>
+      </div>
+
+      <!-- F003 Workstation -->
+      <div class="card glow-amber">
+        <div class="card-hdr">
+          <span style="font:700 28px var(--mono);color:#fff">F003</span>
+          <span class="pill am">ANALOG SENSOR</span>
+        </div>
+        <b style="color:var(--am);font-size:16px">Sensor Disconnection (ADC Saturation)</b>
+        <p class="mu" style="font-size:12px;margin:8px 0">Simulates ADC pin saturation (0 or 1023 LSB for 3 consecutive 10ms samples), indicating wire cut or short to 5V.</p>
+        <div style="display:flex;gap:12px;margin:8px 0;font-size:12px">
+          <label><input type="radio" name="hil-f003-target" checked style="width:auto"> LM35 (ADC0)</label>
+          <label><input type="radio" name="hil-f003-target" style="width:auto"> Battery (ADC1)</label>
+        </div>
+        <select id="hil-f003-mode" style="margin-bottom:12px">
+          <option>Saturated LOW (0 LSB — Open Circuit)</option>
+          <option>Saturated HIGH (1023 LSB — Short to 5V)</option>
+        </select>
+        <button class="btn am w-full" onclick="injectFault('F003')">INJECT SENSOR FAILURE (F003)</button>
+      </div>
+
+      <!-- F004 Workstation -->
+      <div class="card glow-amber">
+        <div class="card-hdr">
+          <span style="font:700 28px var(--mono);color:#fff">F004</span>
+          <span class="pill am">COMMS WATCHDOG</span>
+        </div>
+        <b style="color:var(--am);font-size:16px">Wireless Telemetry Blackout</b>
+        <p class="mu" style="font-size:12px;margin:8px 0">Simulates loss of Bluetooth (USART0) or Wi-Fi (USART1) packets for &gt; 10 seconds. Verifies ECU autonomous local operation without reset.</p>
+        <div class="seg-group" style="margin-bottom:8px">
+          <button class="on" onclick="setSeg(this)">HC-05</button>
+          <button onclick="setSeg(this)">ESP-01</button>
+          <button onclick="setSeg(this)">Both</button>
+        </div>
+        <button class="btn am w-full" style="margin-top:14px" onclick="injectFault('F004')">INJECT PACKET DROP (F004)</button>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:center;gap:14px;margin-top:24px">
+      <button class="btn rd" style="padding:12px 24px" onclick="resetAllFaults()">🛑 RESET ALL FAULTS &amp; RESTORE NOMINAL</button>
+      <button class="btn o" style="padding:12px 24px" onclick="sendSerialCmd('$CLEAR_DTC')">✉️ SEND $CLEAR_DTC</button>
+    </div>
+  </section>
+
+
+  <!-- PAGE 4: LIVE SERIAL CONSOLE (PROTOCOL ANALYZER) -->
+  <section class="page" id="p-console">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px">
+      <div>
+        <h2 style="margin:0;font-size:22px">📟 LIVE SERIAL PROTOCOL ANALYZER (UART1)</h2>
+        <span class="mono mu" style="font-size:12px">Baud: 115200 8N1 · TCP Port: 8080 · Interrupt Circular Ring Buffer (128B)</span>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn" id="btn-pause-log" onclick="togglePauseLog()">⏸ Pause</button>
+        <button class="btn" onclick="clearConsoleLog()">Clear</button>
+        <button class="btn o" onclick="copyConsoleLog()">Export CSV</button>
+      </div>
+    </div>
+
+    <!-- Packet Stat Counters -->
+    <div class="grid-4">
+      <div class="card"><small class="mu">RX Packets</small><div class="mono" style="font-size:24px;font-weight:700" id="stat-rx-count">1,042</div></div>
+      <div class="card"><small class="mu">TX Packets</small><div class="mono" style="font-size:24px;font-weight:700" id="stat-tx-count">350</div></div>
+      <div class="card"><small class="mu">Packet Loss</small><div class="mono" style="font-size:24px;font-weight:700;color:var(--gr)">0.0%</div></div>
+      <div class="card"><small class="mu">Jitter Latency</small><div class="mono" style="font-size:24px;font-weight:700">1.8 ms</div></div>
+    </div>
+
+    <!-- Split Grid: Table & Inspector -->
+    <div class="grid-65">
+      <!-- Left: Packet Stream -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:10px 14px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center">
+          <div id="filter-chips" style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="btn sm cy" onclick="toggleFilter(this, 'ALL')">ALL</button>
+            <button class="btn sm" onclick="toggleFilter(this, 'TELEMETRY')">TELEMETRY</button>
+            <button class="btn sm" onclick="toggleFilter(this, 'CMD')">CMD</button>
+            <button class="btn sm" onclick="toggleFilter(this, 'DTC')">DTC</button>
+            <button class="btn sm" onclick="toggleFilter(this, 'WARN')">WARN</button>
+          </div>
+          <input type="text" id="console-search" placeholder="Search frame..." style="width:160px;padding:5px 8px;font-size:11px" oninput="filterConsoleSearch(this.value)">
+        </div>
+
+        <div class="term-window" id="term-box">
+          <table style="font-size:11.5px">
+            <thead>
+              <tr style="position:sticky;top:0;background:#030712;z-index:2">
+                <th style="width:36px">#</th>
+                <th style="width:90px">Time</th>
+                <th style="width:60px">Dir</th>
+                <th style="width:75px">Type</th>
+                <th>Payload Frame</th>
+                <th style="width:40px">Len</th>
+              </tr>
+            </thead>
+            <tbody id="term-tbody">
+              <!-- Dynamically populated rows -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Command Input Line -->
+        <div style="padding:10px 14px;border-top:1px solid var(--bd);display:flex;gap:8px">
+          <input type="text" id="cmd-input" placeholder="Type ASCII command (e.g. $IGN_START) or JSON payload..." onkeydown="if(event.key==='Enter')sendFromInput()">
+          <button class="btn cy" onclick="sendFromInput()">Transmit</button>
+        </div>
+
+        <!-- Quick snippets -->
+        <div style="padding:8px 14px 12px;display:flex;gap:6px;align-items:center;font-size:11.5px;color:var(--mu);flex-wrap:wrap">
+          <span>Quick:</span>
+          <button class="btn sm" onclick="sendSerialCmd('$IGN_START')">IGN_START</button>
+          <button class="btn sm" onclick="sendSerialCmd('READ_DTC')">READ_DTC</button>
+          <button class="btn sm" onclick="sendSerialCmd('CLEAR_ALL')">CLEAR_ALL</button>
+          <button class="btn sm" onclick="sendSerialCmd('PING')">PING</button>
+          <label style="margin-left:auto;display:flex;align-items:center;gap:6px">
+            Auto-scroll <input type="checkbox" id="chk-autoscroll" checked style="width:auto">
+          </label>
+        </div>
+      </div>
+
+      <!-- Right: Packet Inspector -->
+      <div class="card" id="packet-inspector-card">
+        <h3 class="card-title" style="margin-bottom:12px">🔍 Packet Inspector</h3>
+        <div id="inspector-body" style="font-size:12px;color:var(--mu)">
+          Click any packet row in the stream to inspect parsed JSON keys, raw hexadecimal bytes, and XOR checksum integrity.
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- PAGE 5: SETTINGS SUITE -->
+  <section class="page" id="p-settings">
+    <div class="settings-wrap">
+      <!-- Settings Left Subnav -->
+      <div class="settings-menu" id="settings-menu">
+        <button class="active" data-tab="set-conn">📡 Connection</button>
+        <button data-tab="set-disp">🖥️ Display &amp; HMI</button>
+        <button data-tab="set-tele">⏱️ Telemetry &amp; OS</button>
+        <button data-tab="set-firm">🧠 Firmware &amp; MCU</button>
+        <button data-tab="set-about">ℹ️ About &amp; Team</button>
+      </div>
+
+      <!-- Settings Content Panels -->
+      <div>
+        
+        <!-- Tab 1: Connection -->
+        <div class="settings-content active" id="set-conn">
+          <h2 style="margin:0 0 16px;font-size:20px">CONNECTION &amp; WIRELESS BRIDGES</h2>
+          <div class="grid-2">
+            <div class="card">
+              <h3 class="card-title" style="margin-bottom:14px">Wi-Fi TCP / WebSocket (ESP-01)</h3>
+              <label class="field-row">Network SSID<input type="text" value="Gestell_Network"></label>
+              <label class="field-row">Password
+                <span style="display:flex;gap:6px">
+                  <input type="password" id="inp-pwd" value="engineering2026">
+                  <button class="btn sm" onclick="togglePwdVisibility('inp-pwd')">👁</button>
+                </span>
+              </label>
+              <label class="field-row">Target IP Address<input type="text" value="192.168.1.100"></label>
+              <label class="field-row">TCP / WebSocket Port<input type="text" value="8080"></label>
+              <button class="btn cy" onclick="showToast('Wi-Fi network configuration saved')">Save Network Settings</button>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <div class="card">
+                <h3 class="card-title" style="margin-bottom:14px">Bluetooth SPP (HC-05)</h3>
+                <label class="field-row">Paired Module
+                  <select><option>HC-05-GESTELL [00:14:03:05:5B:22]</option></select>
+                </label>
+                <label class="field-row">USART0 Baud Rate
+                  <select><option>9600 bps</option><option>38400 bps</option><option>115200 bps</option></select>
+                </label>
+                <div class="kv-row"><span>XOR Checksum Verification</span><input type="checkbox" checked class="sw"></div>
+              </div>
+
+              <div class="card">
+                <h3 class="card-title">Link Quality Benchmark</h3>
+                <div style="text-align:center;padding:10px 0">
+                  <div class="mono" style="font-size:36px;font-weight:700;color:var(--gr)">12 ms</div>
+                  <div class="mu" style="font-size:11px;letter-spacing:0.1em">ROUND-TRIP LATENCY (EXCELLENT)</div>
+                </div>
+                <button class="btn o w-full" onclick="showToast('Ping test: 12ms RTT, 0% packet drop')">⚡ Run Link Benchmark</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2: Display & HMI -->
+        <div class="settings-content" id="set-disp">
+          <h2 style="margin:0 0 16px;font-size:20px">DISPLAY &amp; HMI PREFERENCES</h2>
+          <div class="grid-2">
+            <div class="card">
+              <h3 class="card-title" style="margin-bottom:14px">Units &amp; Precision</h3>
+              <div class="kv-row">
+                <span>Temperature Unit</span>
+                <div class="seg-group"><button class="on" onclick="setSeg(this)">°C</button><button onclick="setSeg(this)">°F</button><button onclick="setSeg(this)">K</button></div>
+              </div>
+              <div class="kv-row">
+                <span>Voltage Decimal Precision</span>
+                <div class="seg-group"><button onclick="setSeg(this)">12.4V</button><button class="on" onclick="setSeg(this)">12.42V</button><button onclick="setSeg(this)">Raw ADC</button></div>
+              </div>
+              <div class="kv-row">
+                <span>Cooling Fan Unit</span>
+                <div class="seg-group"><button class="on" onclick="setSeg(this)">0–100%</button><button onclick="setSeg(this)">OCR0 (0–255)</button></div>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3 class="card-title" style="margin-bottom:14px">Charts &amp; Sound Alerts</h3>
+              <div class="kv-row">
+                <span>Rolling Graph Window</span>
+                <div class="seg-group"><button onclick="setSeg(this)">30s</button><button class="on" onclick="setSeg(this)">60s</button><button onclick="setSeg(this)">120s</button></div>
+              </div>
+              <div class="kv-row">
+                <span>Audio Alert (PD7 Buzzer Replica)</span>
+                <input type="checkbox" id="chk-audio-buzzer" checked class="sw">
+              </div>
+              <div style="margin-top:14px">
+                <button class="btn o w-full" onclick="playBuzzerBeep()">🔊 Test 2 kHz Hardware Buzzer Tone</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 3: Telemetry & Scheduler -->
+        <div class="settings-content" id="set-tele">
+          <h2 style="margin:0 0 16px;font-size:20px">SYS TICK SCHEDULER &amp; TELEMETRY CONFIGURATION</h2>
+          <div class="grid-2">
+            <div class="card">
+              <h3 class="card-title" style="margin-bottom:14px">Cooperative OS Task Rates</h3>
+              <div class="kv-row"><span>ADC Sensor Sampling Period</span><b>100 ms (10 Hz)</b></div>
+              <div class="kv-row"><span>HD44780 LCD Refresh Period</span><b>200 ms (5 Hz)</b></div>
+              <div class="kv-row"><span>Wireless JSON Broadcast</span><b>500 ms (2 Hz)</b></div>
+              <div class="kv-row"><span>FDIR Fault Evaluation Loop</span><b>20 ms (2 ticks)</b></div>
+              <div class="kv-row"><span>Comms Watchdog Timeout</span><b>10 Seconds</b></div>
+            </div>
+
+            <div class="card">
+              <h3 class="card-title" style="margin-bottom:14px">Data Logging &amp; Storage</h3>
+              <div class="kv-row"><span>IndexedDB In-Browser Cache</span><input type="checkbox" checked class="sw"></div>
+              <div class="kv-row"><span>Auto-Export CSV on SAFE_MODE</span><input type="checkbox" checked class="sw"></div>
+              <div class="kv-row"><span>Current Stored Frames</span><b>1,842 frames</b></div>
+              <div style="margin-top:16px">
+                <button class="btn w-full" onclick="showToast('Local telemetry cache cleared')">🧹 Purge Local Cache</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 4: Firmware & Silicon -->
+        <div class="settings-content" id="set-firm">
+          <h2 style="margin:0 0 16px;font-size:20px">ATmega128 SILICON &amp; FIRMWARE MONITOR</h2>
+          <div class="grid-2">
+            <div class="card">
+              <h3 class="card-title" style="margin-bottom:14px">Memory Utilization (16 MHz AVR)</h3>
+              <div style="margin-bottom:12px">
+                <div class="kv-row"><span>Flash Program Memory</span><b>42.6 KB / 128 KB (33.2%)</b></div>
+                <div style="height:8px;background:#1E293B;border-radius:4px;overflow:hidden"><div style="width:33.2%;height:100%;background:var(--gr)"></div></div>
+              </div>
+              <div style="margin-bottom:12px">
+                <div class="kv-row"><span>SRAM Data Memory</span><b>1.84 KB / 4 KB (46.0%)</b></div>
+                <div style="height:8px;background:#1E293B;border-radius:4px;overflow:hidden"><div style="width:46%;height:100%;background:var(--cy)"></div></div>
+              </div>
+              <div style="margin-bottom:12px">
+                <div class="kv-row"><span>EEPROM DTC Diagnostics</span><b>48 Bytes / 4 KB (1.2%)</b></div>
+                <div style="height:8px;background:#1E293B;border-radius:4px;overflow:hidden"><div style="width:1.2%;height:100%;background:var(--mu)"></div></div>
+              </div>
+              <div class="mu mono" style="font-size:11px;margin-top:14px">
+                Hardware Registers: ADMUX=0x40 (AVCC) · ADCSRA=0x87 (÷128) · TCCR0=0x6B (Fast PWM)
+              </div>
+            </div>
+
+            <div class="card">
+              <h3 class="card-title" style="margin-bottom:14px">OTA Firmware Flashing (UART1)</h3>
+              <div style="display:flex;gap:6px;margin-bottom:10px">
+                <span class="pill sm">AUTOSAR 4-Layer</span>
+                <span class="pill sm">MISRA-C:2012</span>
+              </div>
+              <div style="border:2px dashed var(--bd-focus);border-radius:10px;padding:24px;text-align:center;color:var(--mu);margin-bottom:14px">
+                Drag and drop compiled firmware <b>.hex</b> file here
+              </div>
+              <div style="display:flex;gap:8px">
+                <button class="btn cy" style="flex:1" onclick="showToast('OTA bootloader ready for upload')">🚀 Flash Firmware</button>
+                <button class="btn am" onclick="showToast('Software reset triggered via WDT')">🔄 Soft Reset</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 5: About -->
+        <div class="settings-content" id="set-about">
+          <h2 style="margin:0 0 16px;font-size:20px">ABOUT &amp; ENGINEERING DOSSIER</h2>
+          <div class="grid-3e">
+            <div class="card">
+              <h3 class="card-title" style="margin-bottom:12px">Project Information</h3>
+              <div class="kv-row"><span>System</span><b>Gestell Mini-ECU</b></div>
+              <div class="kv-row"><span>MCU</span><b>ATmega128 @ 16 MHz</b></div>
+              <div class="kv-row"><span>Architecture</span><b>AUTOSAR 4-Layer</b></div>
+              <div class="kv-row"><span>Cockpit Display</span><b>LCD 20×4 HD44780</b></div>
+              <div class="kv-row"><span>Comms Dual</span><b>HC-05 + ESP-01</b></div>
+              <div class="kv-row"><span>Version</span><b>v1.0.0 Release</b></div>
+              <div class="kv-row"><span>License</span><b>MIT Open Source</b></div>
+            </div>
+
+            <div class="card glow-cyan">
+              <div class="card-hdr" style="margin-bottom:10px">
+                <h3 class="card-title">👥 EMBEDDED ENGINEERING TEAM (6 ENGINEERS)</h3>
+                <span class="tag-hw">AUTOSAR 4-LAYER SQUAD</span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;align-items:center;gap:10px;background:#090F1E;padding:6px 10px;border-radius:9px;border:1px solid var(--bd)">
+                  <div style="width:32px;height:32px;border-radius:50%;background:#0D172E;border:2px solid var(--cy);display:flex;align-items:center;justify-content:center;color:var(--cy);font-weight:800;font-size:12.5px;box-shadow:0 0 8px var(--cy-glow);flex-shrink:0">1</div>
+                  <div style="flex:1;min-width:0">
+                    <div style="font-weight:700;color:#fff;font-size:13px;line-height:1.2">Student Name 1</div>
+                    <div style="color:var(--cy);font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Lead Embedded Architect · OS Scheduler, FSM & DTC Core</div>
+                  </div>
+                  <span class="tag-hw" style="font-size:9.5px;padding:1px 5px">OS / APP</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;background:#090F1E;padding:6px 10px;border-radius:9px;border:1px solid var(--bd)">
+                  <div style="width:32px;height:32px;border-radius:50%;background:#0D172E;border:2px solid var(--cy);display:flex;align-items:center;justify-content:center;color:var(--cy);font-weight:800;font-size:12.5px;box-shadow:0 0 8px var(--cy-glow);flex-shrink:0">2</div>
+                  <div style="flex:1;min-width:0">
+                    <div style="font-weight:700;color:#fff;font-size:13px;line-height:1.2">Student Name 2</div>
+                    <div style="color:var(--cy);font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Embedded Engineer · MCAL ADC & Sensors (LM35 / Battery Rail)</div>
+                  </div>
+                  <span class="tag-hw" style="font-size:9.5px;padding:1px 5px">ADC / SENS</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;background:#090F1E;padding:6px 10px;border-radius:9px;border:1px solid var(--bd)">
+                  <div style="width:32px;height:32px;border-radius:50%;background:#0D172E;border:2px solid var(--cy);display:flex;align-items:center;justify-content:center;color:var(--cy);font-weight:800;font-size:12.5px;box-shadow:0 0 8px var(--cy-glow);flex-shrink:0">3</div>
+                  <div style="flex:1;min-width:0">
+                    <div style="font-weight:700;color:#fff;font-size:13px;line-height:1.2">Student Name 3</div>
+                    <div style="color:var(--cy);font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Embedded Engineer · Actuators & Timer0 Fast PWM Fan Driver</div>
+                  </div>
+                  <span class="tag-hw" style="font-size:9.5px;padding:1px 5px">PWM / ACT</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;background:#090F1E;padding:6px 10px;border-radius:9px;border:1px solid var(--bd)">
+                  <div style="width:32px;height:32px;border-radius:50%;background:#0D172E;border:2px solid var(--cy);display:flex;align-items:center;justify-content:center;color:var(--cy);font-weight:800;font-size:12.5px;box-shadow:0 0 8px var(--cy-glow);flex-shrink:0">4</div>
+                  <div style="flex:1;min-width:0">
+                    <div style="font-weight:700;color:#fff;font-size:13px;line-height:1.2">Student Name 4</div>
+                    <div style="color:var(--cy);font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Embedded Engineer · HD44780 LCD 20×4 & EXTI Interrupt Drivers</div>
+                  </div>
+                  <span class="tag-hw" style="font-size:9.5px;padding:1px 5px">LCD / EXTI</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;background:#090F1E;padding:6px 10px;border-radius:9px;border:1px solid var(--bd)">
+                  <div style="width:32px;height:32px;border-radius:50%;background:#0D172E;border:2px solid var(--cy);display:flex;align-items:center;justify-content:center;color:var(--cy);font-weight:800;font-size:12.5px;box-shadow:0 0 8px var(--cy-glow);flex-shrink:0">5</div>
+                  <div style="flex:1;min-width:0">
+                    <div style="font-weight:700;color:#fff;font-size:13px;line-height:1.2">Student Name 5</div>
+                    <div style="color:var(--cy);font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Embedded Engineer · Bluetooth SPP Stack & Frame Parser (HC-05)</div>
+                  </div>
+                  <span class="tag-hw" style="font-size:9.5px;padding:1px 5px">USART0 / BT</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;background:#090F1E;padding:6px 10px;border-radius:9px;border:1px solid var(--bd)">
+                  <div style="width:32px;height:32px;border-radius:50%;background:#0D172E;border:2px solid var(--cy);display:flex;align-items:center;justify-content:center;color:var(--cy);font-weight:800;font-size:12.5px;box-shadow:0 0 8px var(--cy-glow);flex-shrink:0">6</div>
+                  <div style="flex:1;min-width:0">
+                    <div style="font-weight:700;color:#fff;font-size:13px;line-height:1.2">Student Name 6</div>
+                    <div style="color:var(--cy);font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Embedded Engineer · Wi-Fi ESP-01 AT Engine & TCP Telemetry Stream</div>
+                  </div>
+                  <span class="tag-hw" style="font-size:9.5px;padding:1px 5px">USART1 / WiFi</span>
+                </div>
+              </div>
+              <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center">
+                <span class="pill sm" style="color:var(--gr);border-color:rgba(0,230,118,0.3)">🎓 6 Embedded Engineers · Cohort 2024 / 2025</span>
+                <span class="mono mu" style="font-size:11px">Gestell Automotive Training</span>
+              </div>
+            </div>
+
+            <div class="card glow-cyan" style="text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px">
+              <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQoAAAD9CAYAAABEKzncAAAcyklEQVR4nO3deZxdRZXA8V8RdgViAFkKNMqiKMi+LyK7GwwyAQQUAUFlRHQExW2EGRQEjTiDsugosgwiI4MBBkJkGRAEohAgshgwQDgskX1LGJKc+aNeTzqdft3v3le36t73zvfz6U864b06B8g7XbdWMMYYY4wxxhhjjDHGGGOMMcYYY4wxxhhjjDHGGGP6kOiSuVMwZjhL5E6g74lui+hJiN4MvILoJ3OnZMxQ9hMsB9FtgE8B+wGrDPmnqyXPx5hRWKFIRXQD4DBgAjA+bzLGFGOFokqibwY+0/par8N3LaguIWPKsUJRBdGNgWOATwBLF3y3FQpTO1YoYhFdCjgc+DywYRctzY+TkBmW6CHAkcDFwEV493LmjBrBZj26JboyohOB54Gz6a5IgPUoqnYSsBNwFjAL0e8hOi5zTrVnhaIs0TUQ/QXwDPAl4E2RWrYeRVVEdwDeOehPVgK+AjyO6ImIxvp/2HOsUBQlujai5wNPEKY4Y9MK2jTBUW3+fDng24Ag+nVb+LY4KxSdEh2P6MXAY4RByqpYoahCmIGaMMqrVgK+AzyB6NHVJ9UcVihGI7omohcBM4EDE0R0CWL0ownAsh2+dlXgx4hOR3SPCnNqDCsU7YiuhOjZgAAH5U7HdO1zJd7zXmAyor9GdI3YCTWJFYrhiH4beJawUMo0nej6wJZdtDCBMEPyDUT7ssdnhWIw0X0QfRI4ERiTORsTz2ER2hgDnAzcg+i2EdprFCsUAKIrIno5cDmwet5kTFShBxBz8HlD4FZET0e0b36YWKEQPYqwFmKf3Km02DqKuA4EfAXtHgc81C+Dnf1bKETHIXotcA6wVO50TGWOq7Dt8YTBznN7fbFWfxYK0b8HngJ2z52KqZDo+4DNEkQ6ktC72CVBrCz6r1CIfh+4lPr2ImyvRzxHJoy1OnAdoicmjJlM/yxVFV0emAzskDuVUdgYRQxhoLHKFbTtfBvRzYCP4d28DPEr0R89CtEdgUeof5GAfire1fogYUl2Dh8F7kB0fKb40fV+oRA9DbiJsCy3CfpyQU8FvpA5/qbADEQ/mjmPKHq3UIiORfT3wPG5UynIxii6Jboe9RioXhKYhOj3cifSrd4sFKJbAI8C2+dOpQQrFN37dO4EhvgKor/NnUQ3eq9QiP4dMBVYMXMmZT2fO4FGE12WtLMdndob0dsQzTVu0pXeKhSiXwX+K3caJV0CfATvLs+dSMN9HHhL7iTa2BqYhujauRMpqncKhei/AqfmTqOgmcAJwNvx7kC8uyp3Qj3gHuDu3EmMYDwwFdFuz1ZNqjdG2EUnEaakmmIScBre3ZI7kZ4VdnieAWyVOZN2FgA74t2tuRPpRLMLRTjbcDLQhKWz84BzCQXi0dzJ9A3RrQkzX3tTv9W484Hd8O7G3ImMprmFIhSJm4FtcqfSgQuBE/BOcifSt8KU6S+o50zYXng3OXcSI2lmoQhF4n+A7XKnMooLgH/Cu0dyJ2JawrEC/woskzuVIXbDu+tyJ9FOUwvFLdS7SFwBHId3f8mdiBmG6ArAROq33mIXvLshdxLDaV6hEJ0C7JY7jTbuAz6HdzflTsR0ICzMO5ew3LoOFgBb4N1duRMZqlmFQvQyYN/cabRxDN6dmTsJU4LoccDpudNomQtsULfH1easoxA9g3oWiUnAalYkGsy77wMbALflToVw98jNiK6SO5HBmtGjEP0m8C+50xjG4Xj3i9xJmIhETwBOyZ0GMB14H97V4ua4+hcK0QnAr3OnMcRfgX3wbnruREwFRD8I/Jz8J7JfiHc5Dt9ZTL0fPUR3pX5F4t/wbh0rEj3Mu6sJt57n3vF5CKK16EnXt0chugFh3X5dTnyaDRyKd9fkTsQkJHosYSl4Tp/Fu3NyJlDPQiE6lrBhamzeRP7fjcDeePdy7kRMBqLbAVOA5TNmsQ3e3Z4reF0fPaZQnyJxOt59wIpEHwsbtzYmjE3lMgnRbNvn61coRH8JbJE7jZaD8e4ruZMwNeDdQ4TrBH+fKYO3Ar/JFLtmhUL088Anc6cBvABsi3f/kTsRUyPezQF2Jt/hSB9A9J9zBK7PGIXoVkC2Z7BB7iOsuX86dyKmxkTPBP4hU/Q98G5KyoD1KBSiyxDu3cg9b30zsGfrJ4cxIxM9hXBCWWqzgHel/Htal0ePS8lfJH6FdztZkTAd8+5rwJczRF4bOCtlwPyFQvSz5D/G7hy8+3jmHEwTeTcR+FaGyIcimmzvU95HD9H1gQez5gCntn4yGFNeOAE+9eHOzwDj8e7VqgPl7lFcnDm+FQkTh3ffI32hWAX4UYpA+QqF6DeAzbLFhx9akTBRhb9PP0kc9QhEP1x1kDyPHqJvI1z5l8v5eHdoxviml4leCVT+4R1kJrAu3lV2HWWuHkXqqjvYFCsSpmL7AncmjPcO4LtVBkjfoxB9P2GTVQ6zCYeB2GIqUy1RT7ixbOWEUTfFu2lVNJyjR3F+hpgAzwE7WJEwSYQ7XD6YOGplW9HTFgrRU4G3JY250Ifxbkam2KYfeTcVODxhxK0QPaSKhtM9eoQbnB9LFm9Rn8a7f88U2/Q70dMI1xqm8Ddg9dgDmyl7FLmOQz/HioTJKhxVMDVRtFWBL8ZuNE2PQnRjYFqSWIv6M7BRXU4yNn1MdC3gYWDpBNFeIlwhMTdWg6l6FGckijPYXGCCFQlTC949DnwqUbQVgaiLCavvUYTBlQsqj7O4T+JdjrjGtCd6CbB/gkgLgLXw7skYjaXoUXwnQYyhLrUiYWrq08BrCeIsARwXs7HqhN5E6unQp0g7JWVM58IhzZ9NFO2LiK4ao6GqexQ5Li85Eu9eyRDXmM6E3u4dCSItAXwhVkPVEP04ML6y9od3Id5dmTimMWUckSjOsYiu0G0jVfYoTqqw7eE8AxydOKYx5YQrKc9LEGkF4MBuG6mmUIh+CFivkrbb+6Jd0mMa5nhgfoI4XT9+VNWjSH0gzK14d1HimMZ0x7tngG8miLQhott000D8QiH6LmCH6O2OzB45TDN5dyphxWbVupppqaJH8bkK2hzJ+Xh3d+KYxsSU4iKh/REtfTZG3EIhuhRp1zAoeY5KNyYe7yYDN1QcZTngsLJvjt2j2IcwyprKj/Au19Z1Y2L6aoIYpe/1jV0oUo4VzAVOThjPmOqEQ26urjjKRohuWeaN8QpFOFn7A9HaG905ePdswnjGVC3FvSAHl3lTzB5F6eefks5IHM+Yanl3E9Wf3n0QoksWfVPMQpFyEHMS3j2SMJ4xqfyg4vZXBXYu+qY4hUJ0B9LuEs2xdd2YFC4GXqg4RuHzMGL1KD4RqZ1O3Ip3KXbeGZNeOJGt6l7FXogWOpKv+0Ih6khzYs+A0xLGMiaHiYRZvaqsDWxc5A2FBzWGsTMwNkI7nZgFTEoUy5g8vHsN0T2B7QgFQwnHVi5ofb9g0O9h4ZGWQ8+HHXjNEoPeNw+YA9xXJKUYhaLUdEtJZ9phuaYvhBmQm3KnMaD7w3VFZxNGUqumgI91WKgxpnPdjVGIvo80RQLgCisSxuTR7WDm7lGy6Mx5CWMZYwbptlCkuq35VeCaRLGMMUOULxSiY4Bt46Uyojvwbk6iWMaYIbrpUawHLB8rkVFYb8KYjLopFFtHy2J0VySMZYwZoptCsWe0LEZ2J97dnyiWMWYY3RSKnaJlMbKrEsUxxrRRrlCIrgn4uKm0dW2iOMaYNsr2KDaMmkV7bwD3JIpljGmjbKEode5eCdPw7qVEsYwxbZQtFF3dOlTAjYniGGNGUPdHj8mJ4hhjRlC8UIguD6wZP5XFzKPgnnljTDXK9CjeDhQ6Rqukh2y3qDH1UKZQvDt6FsOz2Q5jaqJModgoehbDuzdRHGPMKMoUivdGz2J4MxLFMcaMokyhWCt6FsOzgUxjaqJMoRgbO4lhzAFmJohjjOlAsUIR7vB4SzWpLBoJ715JEMcY04GiPYoVSFMoHksQwxjToaKFYhVg2SoSGeKRBDGMMR0qWijGVZLF4mYnimOM6UDRQrFGJVks7olEcYwxHbAehTFmVEULxYqVZLG4pxPFMcZ0oGihGFtFEsN4LlEcY0wHihaKN1WSxeKeTRTHGNOBooWi2ysIOzGPsDLTGFMTRT/4rpIsFvUaViiMqZWihWJMJVksSoEFCeIYYzqU4lGiqBS9FmNMAXUcoxiTKI4xpkNFP5DzK8liUWNI84hjjOlQ0UKRYuv3sqTZeGaM6VDRQpHq1q6VEsUxxnSgaKF4o5IsFvfmRHGMMR0oWiherySLxaXaU2KM6UDRQpFqD8aqieIYYzpQtFA8XkkWi3trojjGmA4sWfD1qQ68tR5FvxBdjnDE4oJBX0pYeDd0le7AD7bBi/IGXheLDvp1II/RFgEWWSQ48NolWPTfs92vw71fB71/uB/2bsivg5cbDPw3nY13cztNumiheLHg68t6e6I4JifRHwD/mDuNPjUF2KPTFxctFK8RFl1VvSBq/YrbNzmJvgn4LbBr7lT6WKEfxmUePeZRfaEYX3H7JhfRdYAbgLVzp9Lnli7y4mKDmeGZ5slC7yln9dazq+klotsBf8KKRB0U2nxZZvNVipmPpbC/TL1FdH/gFmzVbV0U+uyXKRQPl3hPGe9KFMdUTfSrwCW50zCLKDRTVKZQPFDiPWVsnSiOqYroMoheAZyaOxXTnaKDmQCPRs9ieFsmimOqIOoJjxo21V1PlfcoHizxnjK2RNTOpWiiMGg5CysSPaNMoXgqehbDewu2nqJ5RA8g9CTsSMN6q7hH4d0TpLt3Y4dEcUwMot8BfpU7DRNf2bMp746aRXu7J4pjuiV6GfD13GmYapQtFDdHzaK9jteim0xExyL6Z2Df3KmY6tS9R7ESopsnimWKEt2EsK7mPZkzMRUrWyj+FDWLkVmvoo5EDwXuAsblTsVUr2yhmEW6067+LlEc0ynRU4Dzcqdh0ilXKLxT4Ka4qbS1FaJ24lUdiDpErwVOyJ2KSaubG7lujJVEB/ZMGMsMJ6y0fACbiepL3RSK66NlMbqDE8YyQ4nuTli6bwvg+lQ3heI+0p2huSuidtdHDqLHAtdi1zz2tfKFwrv5pOtVLAnsnSiWGSD6S+CM3GmY/Lq9NXxSlCw6c3jCWP1NdCVE7wI+mTsVUw/dFopro2TRmV0RXTNhvP4kuiXwBLBJ5kxMjXRXKLybBdwbJ5WO2E+4KokeBNwBLJ87FVO5ys+jGOo/IrTRqc8kjNVfRCcCF+VOwySzYPSXLBSjUFweoY1OjUd0x4Tx+kPY+fml3GmY+uq+UHj3AGGqNJVjEsbqbaKrIDod2/lpRhGjRwHwy0jtdGIConbEWrdENyKstHxv7lRMFskfPSD9s+1XEsfrLeG4unuAlXOnYpohTqHwTgjXxKXyaURXSBivd4gehx1XZwqK1aMA+LeIbY1maeAfEsbrDaLnAafnTsPUQqFHj3gnJYsuBcwGxkZrc2TPAau0trybkYRt+r8FtsmdiqmNB/Hu3Z2+OF6Pwrs3gJ9Ga29047BexejC7eHXE4rEG8DrhBvpXwf+t/X9wNeCNl8DxbhIUdZBX0P/vFOFfuoNE0NZmP98wr/jwH+DucAc4OXW10uETY7PAa8BfysZuyfFvXtBdF1gRtQ2RzYb71ZLGK95RJcAVgFebf3JvNavAx/CTj+4btCvA98vGPS9DnndgiG/h/CDacGg79sZmtPQv6cDcXVIPgPvHVwoHKFIhD8brQcquizezUV0PGHaf7kRX99cD+DdBp2+OP4lLaI3ADtHb7e94/DuBwnjmV4nujbwR6CXT1YrVChiDmYOSP2hPRXRlRLHNL1KdDVgKr1dJCDDXo9FeXcl6a4dhHBWxY8TxjO9SnRlwuNGPzzOZi4UwfcqaredgxHdKXFM00vCupyp9M/1A4U++1UVirNZOHiWytmJ45leIboM4VKrd+ROpa6qKRTezQVOrqTt9jZA1JZ2m2JElwOm0X9FotBERnVX04uOISzASt2VG493jyaOaZoo9CTup/+KBGRbcDVUOHz3m5W1397PMsQ0TSPqgD/Qn0UCMu0ebecc0s6AAOyG6JGJY5rmmQpsmjuJpqi2UHi3ADi+0hjD+wmia2WIa5pA9BZg89xpNEnVPQrw7kLS3n4OYW3FbxLHNE0gejuwXe40mqb6QhEcnSjOYFsh+t0McU1did4IbJU7jSZKUyi8uwO4JkmsRX0N0Y9kiGvqRvQ64P2502iqVD0KgC8kjDXY5a1draZfiV4B7JI7jSZLVyi8m0HaU7AGjAGmtNZ1mH4j+jvAepVdStmjAPga4dCQ1MYDl2aIa3ISvQbYNXcavSBtofDuVfLdy7EvonZeZL8IYxJ75k6jxmqxKaw9735K2vtKBzsO0c9lim1SCY8bNiYRUfpCEeS8bPgniH4sY3xTpXDCmj1ujK7QPq88hcK7aYTl3bn8BtEPZYxvqhDWSeycOYuelKtHAXAs4eTjXK5CdLeM8U0soksgehvNWycxP2PsBvQoALx7HTgwW/xgCqJ7Zc7BdCPcJ3MHsHXuVAo6Czg3Y/yGFAoA764m7yMIwNWI7pM5B1OG6NKEgfGmbfC6Du+OJtwtkkuDCgWAd58FHsmcxeWI5u7dmOJuBN6VO4mCbsW7gUfeJbNmUkD+QhF8OHcCwMWIfil3EqYDYUzidmDb3KkUdBsw+BDoee1emEDDehQA3t0HfDl3GsBERM/InYQZQbj57A6atwv0d3i3bevkt8apR6EA8G4iMDl3GsCxiF7ZOirN1InossB0mjcmcS/wwdxJdKM+hSI4CHgxdxKER6FprfsnTR2EInEn0PE1eDUxHdge74Z7zCh7CXNy9SoU3j1HfXb6vQ/4C6J1GD/pbwuP1G9akXgE2A7vXs6dSLfqVSgAvPs9+TaODbUUcCWip+VOpG+Fa/6m0bzZjYeArUYpEvX7/LVRz0S9OxOYmDuNQY5H9BZE++W6uXoQfTvwMLB+7lQKehzYBu/+ljuREdTi7tHuefdl4PLcaQyyHTDTjtZLRHRtwjV/TbupfgawKd4928FrC31YI6v5NvMivNsXuD13GoOsCFyBaI6TuvqH6PqEG7yaViQeJvQknunw9Y2ZWat3oQj2BGblTmKIzyM6E9GdcyfSc0TfQZjdeFPuVAqaDmzRGpDvVM4FV4XUv1B49yKwJdBplU5lPHADoj9rjcqbbom+m7DmoGlF4n5CT+KFgu/L+ejRwJWZo/HuacKJRXVc1XYE8AyiR+VOpNFCkZhK84rEvcDWrWMei7J1FNF5dy+wTe402lgeOAfROxFt2v6D/EQ3JjxuvDl3KgXNAHbsYp1EzkLRgz2KAd79kXpfB7cpcCuiv0F0ndzJNILo5oQB66Y9vj0IbNt6NC6rjj3kYTWrUAB49wdgx9xpjOJjwEOIno3oirmTqS3RTYE/AsvkTqWgWcAOHU6BjsQGMysVVm82YT3DZ4DnEf0uomNzJ1MroisBV+ZOo4QXgJ0LTIGOxApF5by7imbc27AE4eKj5xE9q7XasL+FWaLbgTVzp1LQq4THjb9Gas/Oo0jCu2uBJh2QG07zEr0a0UZvO+7STTRv78YsYCO8eyBimznHKAoNpDa7UAB4dx2wMfC/uVMpYC/gvxF9FNFvIbpG7oSSEb0F2CJ3GgU9TdjgNTNyuzlnPd4o8uLmFwoA7+4BNiL8D22StwH/DDyB6PWIHozo8rmTqozoJdR71mo4jwOb4d1TFbSd89HjlSIv7o1CAeDdX4B3ALfmTqWkDwAXAi8gOhnRIxFdK3dS0YhOBPbPnUZBs4DN8e6JitrP2aN4sMiLe6dQAHg3B++2B36aO5UuLAXsQbjzYRaiDyN6IaKHItq0wb8g3PfatIOLpwOb4N3sCmPk7FFcVeTFjdm9VpjoQcBFudOowEzgD4Sj6qcCM0ouH05D9ADgV7nTKOgOYKfWJVXVET0C+FmlMYY3HxiHdx3f1Ne7hQIGVv1dDaxK6Ob1Vg9qoSeB+wj7Du4ldCv/CryUtYiEBVV3ZotfziS8S3MhlOhhwM+TxFrUeXh3WJE39HahgIEr534OHJI7lQyUsEDoNeDZ1vfPE+58fYmwLuAlYAwwHe8uixY5HGH3MM06U+Kc1oVUaYh+Ajg/WbyF3ll0BqcxNxWV5t0bwCcQ/SNwRuZsUnPAW1pffpTXxrvgN1x1cBPNKhLH4933E8fMMZg5scw0b692xRfn3Y8Iu0/n5E6lhvbDu5sitvc74D0R26vSfOCjGYrEQOyUhLBKuLD+KRQA3t0OrEYYtzDBP0V+5DiXcHZIE8wGNsa7XHtOUh9ccyDelVqY2F+FAsC7l/HuQ8CE3KnUwGV49y/RWhP9BnBktPaqdRuwLt79OWMOKQvF0a3NlKX0X6EY4N1/EmZD+rV3MRXv9ovWmughwMnR2qvWz1v3gOa+mCdVofg63p3VTQP9WygAvHum1bvYH6h2zrxeZhNzM53obsAF0dqr1lF4d0TuJFpSjFGchHendNtIfxeKAd5dShi7mJQ7lQTmEa6563ixzYjCatEm9MqeJRxbV6dVu1XPelyCdyfGaMgKxQDvXmwttNmdsNagV30M7x6O0pLo0oRVonWfZr8UWLubZ/SKFNrBWdC5eHdgrMasUAzl3e8IYxcn5U6lAqfg3RUR25tM2AFbV68CB+Dd/nhXx2nxqnoU38S7z8Rs0ArFcLyb3+qyrUzYnNUL/gvvvh6tNdGLgZ2jtRffr4E18O7XuRMZQRU9iv3w7juxG7VCMRLvnmtV5vE0e4PZY8ScDhY9EYjWrY3sIWBXvDugBrMaKT1NuPM03pqYQaxQdMK7R/HuEELBaNqA53xgF7yLM8Iueijw7ShtxfctvFsP767PnUiHYk2PzgDei3fTIrW3GCsURYSCsQ+wOXBD7nQ6dGjEwcudgPOitBXXFOBteNeUdRwDYpxHcRmwYYSrA0ZkhaIM7+7Eu12AzSh4AEhiP8S7OI9MouOAa6O0Fc/1hGPq9sC7ul1k3YluexTH4N1+ZZdlF2GFohve3YV3HwHWAX5MvTacTca7f4zY3o3U56Ke3wPb492ueHdX7mS6UPZx8EnCEX1nxkxmJFYoYvDur3j3eWAccBQFzyOswEwg3uErolMIhxfndgXheLod8a6pZ6MOVqYncAGwFt4lPRCo9w+uySWcrnUMsDfhPIhUXicMbMUal7iAvIf+PEv4cPwQ7x7LmEd8opsAnfaI5gCfyjXda4WiauEQl62AAwgfuFUrjrgX3k2O0pLoKcAJUdoq7lbgdLy7PFP86oluSDi6cDRTgI9XPWA5EisUqYluSygauwIbRm79q3h3WpSWRD8F/CJKW517mXBs4U9a1y/0NtH3ACNtc3+BsD384jQJtWeFIifRtxL2lkwgnL61WhetnY93h0bKawfg5ihtjW424bLiC/DuxkQx60F0XcIaiOGcS5jVqMUNeFYo6kR0PcLZlbsDmwDrd/jOu/Fuk0g5rE44wXu5KO0tbh7wJ8L8/1WZD47Ja/hCcT9wBN79IUNGbVmhqLPwod2QMMaxPaHXMW7Iq14CNohym5XokoQZm3d23dZCcwjP4VcSNpHdXfl9GU0hug5hyfmAHAf8dqTu24P7W7jv8inCYbUDVw+s2/ryhB7HNZGKxBjCatNuisQcwhH99xO2n98C3IN3c7vOrzcNLE+YDBxe4dWFXbMehQlETwa+0eafLiCc0fEKoRj8jbBWYxbwKPCX1tfTeJfzPs1mEX0zYfn1bblTGY0VChOIbgCsQbj7dAHhLIdXgBcJjzevtO5IMcYYY4wxxhhjjDHGGGOMMcYYY4wxxhhjjDHGlPZ/8wjzDGOmrusAAAAASUVORK5CYII=" height="88" alt="Gestell">
+              <b style="font-size:20px;color:#fff">Gestell</b>
+              <span style="color:var(--cy);font-weight:600">Automotive Training Solutions</span>
+              <p class="mu" style="font-size:12px;margin:0">Professional embedded systems training projects following industry-grade AUTOSAR standards.</p>
+              <div style="display:flex;gap:8px;margin-top:8px">
+                <a class="btn o sm" href="https://gestell.io" target="_blank">🌐 gestell.io</a>
+                <a class="btn o sm" href="https://github.com" target="_blank">🐙 GitHub</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Clear DTCs Confirmation Modal -->
+<div class="modal-overlay" id="modal-clear-dtc">
+  <div class="modal-box">
+    <h3 style="margin:0 0 10px;color:#fff;font-size:18px">Clear all active &amp; stored DTCs?</h3>
+    <p class="mu" style="font-size:13px;line-height:1.5">This will transmit <code>$CLEAR_DTC,ALL</code> and erase diagnostic fault records from the physical ATmega128 EEPROM storage.</p>
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:18px">
+      <button class="btn" onclick="closeClearModal()">Cancel</button>
+      <button class="btn rd" onclick="confirmClearDtc()">Confirm &amp; Erase</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- Interactive Engine Logic Script -->
+<script>
+// --- State & Variables ---
+const state = {
+  temp: 42.5,
+  volt: 12.42,
+  fanPct: 75,
+  ignition: true,
+  estop: false,
+  fsmState: 'RUN', // OFF, RUN, FAULT, SAFE_MODE, E-STOP
+  activeDtc: null, // null or 'F001', 'F002', etc.
+  dtcActiveList: [],
+  dtcStoredList: [
+    { code: 'F002', name: 'Battery Voltage Fault', desc: 'Voltage < 10.5V', detected: '00:10:05', cleared: '00:12:30', status: 'CLEARED' },
+    { code: 'F003', name: 'Sensor Disconnection', desc: 'ADC0 saturated (0/1023)', detected: '00:05:44', cleared: '00:06:10', status: 'CLEARED' },
+    { code: 'F004', name: 'Wireless Comms Timeout', desc: 'No BT/WiFi RX > 10s', detected: '00:01:22', cleared: '00:01:35', status: 'CLEARED' }
+  ],
+  tempHistory: [],
+  voltHistory: [],
+  packetLog: [],
+  rxCount: 1042,
+  txCount: 350,
+  logPaused: false,
+  logFilter: 'ALL',
+  searchQuery: '',
+  selectedPacketNum: null,
+  uptimeSec: 6150,
+  sessionSec: 1423,
+  t0: Date.now()
+};
+
+// Seed initial histories
+for (let i = 0; i < 60; i++) {
+  state.tempHistory.push(42.5 + Math.sin(i / 6) * 0.8);
+  state.voltHistory.push(12.42 + Math.cos(i / 7) * 0.08);
+}
+
+// Seed console packet log
+const seedPackets = [
+  { n: 1, time: '00:21:05.102', dir: 'TX', type: 'CMD', s: '{"cmd":"CMD_GET_ALL","src":"WEB_DASHBOARD"}' },
+  { n: 2, time: '00:21:05.120', dir: 'RX', type: 'TELEMETRY', s: '{"ecu_id":"GESTELL_ECU_01","mode":"RUN","temp_c":42.5,"battery_v":12.42,"fan_pwm":75,"fault":"NONE"}' },
+  { n: 3, time: '00:21:08.001', dir: 'TX', type: 'CMD', s: '{"cmd":"HEARTBEAT"}' },
+  { n: 4, time: '00:21:08.014', dir: 'RX', type: 'ACK', s: '{"ack":"HEARTBEAT:ACK"}' },
+  { n: 5, time: '00:21:10.450', dir: 'RX', type: 'WARN', s: '{"alert":"WARN_TEMP_RISING","val":88.5,"threshold":90.0}' }
+];
+seedPackets.forEach(p => state.packetLog.push(p));
+
+// --- Routing & Tab Switching ---
+function initRouting() {
+  const navLinks = document.querySelectorAll('#master-nav a');
+  navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const targetId = link.getAttribute('data-target');
+      switchPage(targetId);
+      location.hash = link.getAttribute('href');
+    });
+  });
+
+  // Handle URL hash changes
+  window.addEventListener('hashchange', () => {
+    const hash = location.hash.replace('#', '') || 'overview';
+    const match = {
+      'overview': 'p-overview',
+      'dtc': 'p-dtc',
+      'faults': 'p-faults',
+      'console': 'p-console',
+      'settings': 'p-settings'
+    }[hash] || 'p-overview';
+    switchPage(match);
+  });
+}
+
+function switchPage(pageId) {
+  document.querySelectorAll('.page').forEach(pg => pg.classList.remove('on'));
+  document.querySelectorAll('#master-nav a').forEach(a => a.classList.remove('on'));
+  
+  const targetPage = document.getElementById(pageId);
+  if (targetPage) targetPage.classList.add('on');
+
+  const activeLink = document.querySelector(`#master-nav a[data-target="${pageId}"]`);
+  if (activeLink) activeLink.classList.add('on');
+}
+
+// Settings Sub-tab Switching
+function initSettingsSubtabs() {
+  const btns = document.querySelectorAll('#settings-menu button');
+  btns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      btns.forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.settings-content').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      const targetContent = document.getElementById(btn.getAttribute('data-tab'));
+      if (targetContent) targetContent.classList.add('active');
+    });
+  });
+}
+
+// --- Canvas Spline Graph Engine ---
+function renderCanvasGraph(canvasId, data, lo, hi, zones, unit) {
+  const cv = document.getElementById(canvasId);
+  if (!cv) return;
+  const ctx = cv.getContext('2d');
+  const w = cv.width = cv.clientWidth * 2;
+  const h = cv.height = 310;
+
+  // Background zones
+  zones.forEach(z => {
+    const yTop = h - ((z[1] - lo) / (hi - lo)) * h;
+    const zHeight = ((z[1] - z[0]) / (hi - lo)) * h;
+    ctx.fillStyle = z[2];
+    ctx.fillRect(0, yTop, w, zHeight);
+  });
+
+  // Spline Path
+  ctx.strokeStyle = '#00E5FF';
+  ctx.lineWidth = 3.5;
+  ctx.shadowColor = '#00E5FF';
+  ctx.shadowBlur = 10;
+  ctx.beginPath();
+
+  data.forEach((val, i) => {
+    const x = (i / (data.length - 1)) * w;
+    const clamped = Math.min(hi, Math.max(lo, val));
+    const y = h - ((clamped - lo) / (hi - lo)) * h;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // Area Under Curve
+  ctx.lineTo(w, h);
+  ctx.lineTo(0, h);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(0, 229, 255, 0.08)';
+  ctx.fill();
+
+  // Draw current point indicator
+  const lastVal = data[data.length - 1];
+  const lastX = w;
+  const lastY = h - ((Math.min(hi, Math.max(lo, lastVal)) - lo) / (hi - lo)) * h;
+  ctx.fillStyle = '#FFFFFF';
+  ctx.beginPath();
+  ctx.arc(lastX, lastY, 5, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+// --- Core Telemetry Loop ---
+function startTelemetryLoop() {
+  setInterval(() => {
+    state.uptimeSec++;
+    state.sessionSec++;
+
+    // Calculate dynamic values
+    if (!state.activeDtc && state.ignition && !state.estop) {
+      state.temp += (Math.random() - 0.5) * 0.4 + (42.5 - state.temp) * 0.05;
+      state.volt += (Math.random() - 0.5) * 0.05 + (12.42 - state.volt) * 0.04;
+      state.fanPct = Math.round(Math.min(100, Math.max(0, (state.temp - 40) / (90 - 40) * 100)));
+      state.fsmState = 'RUN';
+    } else if (state.activeDtc === 'F001') {
+      state.fanPct = 0; // Cut fan PWM
+      state.fsmState = 'SAFE MODE';
+    } else if (state.estop) {
+      state.fanPct = 0;
+      state.fsmState = 'E-STOP';
+    } else if (!state.ignition) {
+      state.fanPct = 0;
+      state.fsmState = 'OFF';
+    }
+
+    // Append history
+    state.tempHistory.push(state.temp);
+    state.tempHistory.shift();
+    state.voltHistory.push(state.volt);
+    state.voltHistory.shift();
+
+    // Redraw Canvas Charts
+    renderCanvasGraph('cv-temp', state.tempHistory, 20, 120, [
+      [20, 70, 'rgba(0, 230, 118, 0.08)'],
+      [70, 90, 'rgba(255, 179, 0, 0.1)'],
+      [90, 120, 'rgba(255, 23, 68, 0.15)']
+    ], '°C');
+
+    renderCanvasGraph('cv-volt', state.voltHistory, 8, 17, [
+      [8, 10.5, 'rgba(255, 23, 68, 0.15)'],
+      [10.5, 14.5, 'rgba(0, 230, 118, 0.08)'],
+      [14.5, 17, 'rgba(255, 179, 0, 0.12)']
+    ], 'V');
+
+    // Update Overview Stats
+    const minT = Math.min(...state.tempHistory).toFixed(1);
+    const maxT = Math.max(...state.tempHistory).toFixed(1);
+    const avgT = (state.tempHistory.reduce((a, b) => a + b, 0) / state.tempHistory.length).toFixed(1);
+    document.getElementById('temp-stat-minmax').textContent = `Min: ${minT}°C | Max: ${maxT}°C | Avg: ${avgT}°C`;
+    document.getElementById('volt-stat-val').textContent = state.volt.toFixed(2) + ' V';
+    document.getElementById('volt-stat-val').style.color = state.volt < 10.5 ? 'var(--rd)' : 'var(--gr)';
+
+    // Update Dual-Arc Dial
+    document.getElementById('dial-temp-val').innerHTML = state.temp.toFixed(1) + '<small style="font-size:18px;color:var(--mu)">°C</small>';
+    const tempOffset = 280 * (1 - Math.min(120, Math.max(0, state.temp)) / 120);
+    document.getElementById('dial-temp-arc').setAttribute('stroke-dashoffset', tempOffset);
+    const fanOffset = 210 * (1 - state.fanPct / 100);
+    document.getElementById('dial-fan-arc').setAttribute('stroke-dashoffset', fanOffset);
+    const angle = -140 + (state.temp / 120) * 280;
+    document.getElementById('dial-needle').setAttribute('transform', `rotate(${angle} 110 140)`);
+    document.getElementById('dial-fan-subtitle').textContent = `COOLING FAN PWM: ${state.fanPct}%`;
+
+    // Demand Pill
+    const demPill = document.getElementById('demand-pill');
+    if (state.temp >= 90) { demPill.textContent = 'DEMAND: CRITICAL'; demPill.style.color = 'var(--rd)'; }
+    else if (state.temp >= 70) { demPill.textContent = 'DEMAND: HIGH'; demPill.style.color = 'var(--am)'; }
+    else { demPill.textContent = 'DEMAND: NORMAL'; demPill.style.color = 'var(--gr)'; }
+
+    // Cooling fan widget
+    document.getElementById('fan-pct-txt').textContent = state.fanPct + '%';
+    const fanRingOffset = 251 * (1 - state.fanPct / 100);
+    document.getElementById('fan-ring-progress').setAttribute('stroke-dashoffset', fanRingOffset);
+    const ocrVal = Math.round(state.fanPct * 2.55);
+    document.getElementById('fan-ocr-txt').textContent = ocrVal;
+    const fanBlade = document.getElementById('fan-blades-group');
+    if (state.fanPct > 0) {
+      fanBlade.style.animationPlayState = 'running';
+      fanBlade.style.animationDuration = (2.2 - (state.fanPct / 100) * 1.8) + 's';
+    } else {
+      fanBlade.style.animationPlayState = 'paused';
+    }
+
+    // Uptime strings
+    const pad = n => String(n).padStart(2, '0');
+    const uStr = `${pad(state.uptimeSec / 3600 | 0)}:${pad((state.uptimeSec / 60 | 0) % 60)}:${pad(state.uptimeSec % 60)}`;
+    document.getElementById('uptime-pill').textContent = `⏱ Uptime: ${uStr}.${String(Date.now() % 1000).padStart(3, '0')}`;
+    document.getElementById('hud-session').textContent = uStr;
+
+    // Periodic live telemetry packet emission
+    if (state.uptimeSec % 2 === 0 && !state.logPaused) {
+      appendPacket('RX', 'TELEMETRY', `{"ecu_id":"GESTELL_ECU_01","mode":"${state.fsmState}","temp_c":${state.temp.toFixed(1)},"battery_v":${state.volt.toFixed(2)},"fan_pwm":${state.fanPct},"fault":"${state.activeDtc || 'NONE'}"}`);
+    }
+  }, 500);
+}
+
+// --- Fault Injection & HIL Engine ---
+const faultMeta = {
+  F001: { name: 'Engine Over-Temperature', desc: 'Engine Temp > 90.0°C', mod: 'HAL_LM35 / ADC0', lim: '> 90.0°C' },
+  F002: { name: 'Battery Voltage Fault', desc: 'Battery Voltage < 10.5V', mod: 'HAL_ADC1 / Divider', lim: '< 10.5V' },
+  F003: { name: 'Sensor Disconnection', desc: 'ADC0 Saturation (0/1023)', mod: 'MCAL_ADC', lim: '0 LSB (30ms)' },
+  F004: { name: 'Wireless Comms Timeout', desc: 'Loss of USART0/1 link > 10s', mod: 'HAL_UART', lim: '> 10s' }
+};
+
+function injectFault(code, customVal) {
+  if (state.estop) return showToast('Cannot inject faults while E-STOP is active');
+  state.activeDtc = code;
+  state.fsmState = code === 'F001' ? 'SAFE MODE' : 'FAULT';
+
+  if (code === 'F001') {
+    state.temp = customVal || 93.2;
+    state.fanPct = 0;
+  } else if (code === 'F002') {
+    state.volt = customVal || 9.2;
+  }
+
+  // Update UI Elements
+  document.getElementById('hud-mode').textContent = `🔴 MODE: ${state.fsmState}`;
+  document.getElementById('hud-mode').className = 'pill r';
+  document.getElementById('hil-state-pill').textContent = `ECU State: ${state.fsmState}`;
+  document.getElementById('hil-state-pill').className = 'pill r';
+  document.getElementById('txt-interlock').textContent = 'Interlock: TRIPPED';
+  document.getElementById('txt-interlock').style.color = 'var(--rd)';
+
+  // Shield
+  document.getElementById('svg-shield').style.color = 'var(--rd)';
+  document.getElementById('svg-shield-icon').setAttribute('d', 'M32 20 v18 M32 46 v1');
+  document.getElementById('shield-title').textContent = `CRITICAL: ${code} ACTIVE`;
+  document.getElementById('shield-title').style.color = 'var(--rd)';
+
+  // LEDs
+  document.getElementById('led-warn').style.background = 'var(--rd)';
+  document.getElementById('led-warn').className = 'blink';
+  document.getElementById('led-buzzer').style.background = 'var(--rd)';
+  document.getElementById('led-buzzer').className = 'blink';
+
+  // Log to Console
+  appendPacket('RX', 'DTC', `{"dtc_event":"${code}","state":"${state.fsmState}","action":"PWM_CUT","lock":"SAFE_MODE"}`);
+  appendPacket('RX', 'WARN', `{"alert":"EMERGENCY_FAILSAFE_TRIGGERED","code":"${code}","latency":"32ms"}`);
+
+  // DTC Manager Table Update
+  renderDtcActiveTable(code);
+  updateDtcCounters();
+  playBuzzerBeep();
+  showToast(`Fault ${code} injected! ECU transitioned to ${state.fsmState}`);
+}
+
+function resetAllFaults() {
+  state.activeDtc = null;
+  state.temp = 42.5;
+  state.volt = 12.42;
+  state.fsmState = state.ignition ? 'RUN' : 'OFF';
+
+  document.getElementById('hud-mode').textContent = `🟢 MODE: ${state.fsmState}`;
+  document.getElementById('hud-mode').className = 'pill g';
+  document.getElementById('hil-state-pill').textContent = `ECU State: ${state.fsmState} OK`;
+  document.getElementById('hil-state-pill').className = 'pill g';
+  document.getElementById('txt-interlock').textContent = 'Interlock: ARMED';
+  document.getElementById('txt-interlock').style.color = 'var(--gr)';
+
+  document.getElementById('svg-shield').style.color = 'var(--gr)';
+  document.getElementById('svg-shield-icon').setAttribute('d', 'm21 32 l8 8 l15 -16');
+  document.getElementById('shield-title').textContent = 'No Active Faults';
+  document.getElementById('shield-title').style.color = 'var(--gr)';
+
+  document.getElementById('led-warn').style.background = '#334155';
+  document.getElementById('led-warn').className = '';
+  document.getElementById('led-buzzer').style.background = '#334155';
+  document.getElementById('led-buzzer').className = '';
+
+  document.getElementById('dtc-active-body').innerHTML = `<tr><td colspan="7" style="padding:16px;color:var(--mu);text-align:center">No active faults detected. System healthy.</td></tr>`;
+  updateDtcCounters();
+  appendPacket('TX', 'CMD', '$CLEAR_DTC,ALL');
+  appendPacket('RX', 'ACK', '{"ack":"ALL_FAULTS_CLEARED","state":"RUN"}');
+  showToast('All faults cleared and ECU restored to nominal');
+}
+
+function renderDtcActiveTable(code) {
+  const m = faultMeta[code];
+  const timeStr = document.getElementById('hud-session').textContent;
+  const tbody = document.getElementById('dtc-active-body');
+  tbody.innerHTML = `
+    <tr class="clickable" onclick="toggleFreezeFrame()">
+      <td style="padding-left:14px" class="mono"><b style="color:var(--rd)">${code}</b></td>
+      <td><span class="pill r sm">CRITICAL</span></td>
+      <td><b>${m.name}</b></td>
+      <td class="mono">${m.mod}</td>
+      <td class="mono">${m.lim}</td>
+      <td class="mono">${timeStr}</td>
+      <td style="text-align:right;padding-right:14px">
+        <button class="btn sm rd" onclick="event.stopPropagation();resetAllFaults()">Clear</button>
+      </td>
+    </tr>
+    <tr id="ff-row" class="freeze-frame">
+      <td colspan="7">
+        <b>FREEZE FRAME DATA SNAPSHOT ▸</b> Temp: ${state.temp.toFixed(1)}°C · Battery: ${state.volt.toFixed(2)}V · Fan: 100% (OCR0=255)<br>
+        FSM Transition: RUN → FAULT → SAFE MODE in 32ms · FDIR Interlock: Fan Cut to 0%, Warning LED 2Hz, Buzzer 2kHz Active<br>
+        Safety Recovery Condition: Engine temperature must drop below 75.0°C hysteresis threshold before restart is permitted.
+      </td>
+    </tr>
+  `;
+}
+
+function toggleFreezeFrame() {
+  const ff = document.getElementById('ff-row');
+  if (ff) ff.style.display = ff.style.display === 'none' ? 'table-row' : 'none';
+}
+
+function renderStoredDtcTable() {
+  const tbody = document.getElementById('dtc-stored-body');
+  tbody.innerHTML = state.dtcStoredList.map(item => `
+    <tr>
+      <td style="padding-left:14px" class="mono"><b>${item.code}</b></td>
+      <td>${item.name}</td>
+      <td class="mu">${item.desc}</td>
+      <td class="mono">${item.detected}</td>
+      <td class="mono">${item.cleared}</td>
+      <td><span class="pill g sm">${item.status}</span></td>
+    </tr>
+  `).join('');
+}
+
+function updateDtcCounters() {
+  const activeCount = state.activeDtc ? 1 : 0;
+  document.getElementById('dtc-pill-active').textContent = `Active: ${activeCount}`;
+  document.getElementById('dtc-pill-active').className = `pill ${activeCount ? 'r' : ''}`;
+  document.getElementById('dtc-pill-mil').textContent = `MIL Lamp: ${activeCount ? 'ON' : 'OFF'}`;
+  document.getElementById('dtc-pill-mil').className = `pill ${activeCount ? 'r' : ''}`;
+  document.getElementById('dtc-total-counter').textContent = `Total Stored DTCs: ${state.dtcStoredList.length}`;
+}
+
+// Compliance Test Suite Runner
+function runComplianceSuite(btn) {
+  const tests = ['F001', 'F002', 'F003', 'F004'];
+  let idx = 0;
+  btn.disabled = true;
+  showToast('Starting 5-stage automated compliance validation suite...');
+  
+  const timer = setInterval(() => {
+    if (idx < tests.length) {
+      btn.textContent = `Stage ${idx + 1}/5: Testing ${tests[idx]}...`;
+      injectFault(tests[idx++]);
+    } else {
+      clearInterval(timer);
+      resetAllFaults();
+      btn.textContent = '⚡ RUN 5-STAGE COMPLIANCE SUITE';
+      btn.disabled = false;
+      showToast('Compliance validation suite PASSED successfully!');
+    }
+  }, 1400);
+}
+
+// --- Protocol Analyzer & Console Stream ---
+function appendPacket(dir, type, payload) {
+  const now = new Date();
+  const timeStr = `${now.toTimeString().slice(0, 8)}.${String(now.getMilliseconds()).padStart(3, '0')}`;
+  const num = state.packetLog.length + 1;
+  const pkt = { n: num, time: timeStr, dir, type, s: payload };
+  state.packetLog.push(pkt);
+  if (state.packetLog.length > 500) state.packetLog.shift();
+
+  if (dir === 'TX') state.txCount++;
+  else state.rxCount++;
+  document.getElementById('stat-rx-count').textContent = state.rxCount.toLocaleString();
+  document.getElementById('stat-tx-count').textContent = state.txCount.toLocaleString();
+
+  renderConsoleTable();
+}
+
+function renderConsoleTable() {
+  const tbody = document.getElementById('term-tbody');
+  if (!tbody) return;
+
+  const filtered = state.packetLog.filter(p => {
+    const matchFilter = state.logFilter === 'ALL' || p.type === state.logFilter;
+    const matchSearch = !state.searchQuery || p.s.toLowerCase().includes(state.searchQuery);
+    return matchFilter && matchSearch;
+  });
+
+  tbody.innerHTML = filtered.slice(-100).map(p => {
+    const colorClass = p.dir === 'TX' ? 'tx-line' : p.type === 'DTC' ? 'crit-line' : p.type === 'WARN' ? 'warn-line' : 'rx-line';
+    const isSel = state.selectedPacketNum === p.n;
+    return `
+      <tr class="clickable ${isSel ? 'style=background:rgba(0,229,255,0.1)' : ''}" onclick="selectPacketRow(${p.n})">
+        <td class="mono mu">${p.n}</td>
+        <td class="mono mu">${p.time}</td>
+        <td class="mono" style="color:${p.dir==='TX'?'var(--cy)':'var(--gr)'}">${p.dir==='TX'?'▶ TX':'◀ RX'}</td>
+        <td class="mono"><span class="pill sm ${p.type==='DTC'?'r':p.type==='WARN'?'am':'c'}">${p.type}</span></td>
+        <td class="${colorClass}">${p.s.replace(/</g, '&lt;')}</td>
+        <td class="mono mu">${p.s.length}</td>
+      </tr>
+    `;
+  }).join('');
+
+  if (document.getElementById('chk-autoscroll').checked) {
+    const box = document.getElementById('term-box');
+    box.scrollTop = box.scrollHeight;
+  }
+}
+
+function selectPacketRow(num) {
+  state.selectedPacketNum = num;
+  renderConsoleTable();
+  const pkt = state.packetLog.find(p => p.n === num);
+  if (!pkt) return;
+
+  let parsedTree = '';
+  try {
+    const obj = JSON.parse(pkt.s);
+    parsedTree = Object.entries(obj).map(([k, v]) => `
+      <div class="kv-row"><span>${k}</span><b>${v}</b></div>
+    `).join('');
+  } catch (e) {
+    parsedTree = `<div class="kv-row"><span>Raw ASCII</span><b>${pkt.s.replace(/</g, '&lt;')}</b></div>`;
+  }
+
+  // Hex dump
+  const hexDump = [...pkt.s].slice(0, 32).map(c => '0x' + c.charCodeAt(0).toString(16).toUpperCase().padStart(2, '0')).join(' ');
+  
+  // XOR Checksum
+  let xorVal = 0;
+  for (let i = 0; i < pkt.s.length; i++) xorVal ^= pkt.s.charCodeAt(i);
+  const xorHex = '0x' + xorVal.toString(16).toUpperCase().padStart(2, '0');
+
+  document.getElementById('inspector-body').innerHTML = `
+    <div style="margin-bottom:10px" class="mono"><b>Packet #${pkt.n}</b> · ${pkt.dir} · Length: ${pkt.s.length} Bytes</div>
+    <div style="margin-bottom:12px">${parsedTree}</div>
+    <h4 style="margin:10px 0 6px;color:#fff;font-size:12px">Hexadecimal Byte Stream</h4>
+    <div class="mono mu" style="font-size:11px;background:#050914;padding:8px;border-radius:6px;word-break:break-all">${hexDump} …</div>
+    <h4 style="margin:10px 0 6px;color:#fff;font-size:12px">Frame Checksum Integrity</h4>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span class="mono">Calculated: <b>${xorHex}</b></span>
+      <span class="pill g sm">MATCH OK</span>
+    </div>
+  `;
+}
+
+function toggleFilter(btn, filterName) {
+  document.querySelectorAll('#filter-chips button').forEach(b => b.className = 'btn sm');
+  btn.className = 'btn sm cy';
+  state.logFilter = filterName;
+  renderConsoleTable();
+}
+
+function filterConsoleSearch(val) {
+  state.searchQuery = val.toLowerCase();
+  renderConsoleTable();
+}
+
+function sendSerialCmd(cmd) {
+  appendPacket('TX', 'CMD', cmd);
+  showToast(`Transmitted: ${cmd}`);
+  setTimeout(() => {
+    if (cmd === 'PING') appendPacket('RX', 'ACK', '{"pong":1,"rtt":"12ms"}');
+    else if (cmd.includes('CLEAR')) appendPacket('RX', 'ACK', '{"ack":"DTC_CLEARED_OK"}');
+    else appendPacket('RX', 'ACK', `{"ack":"${cmd}"}`);
+  }, 120);
+}
+
+function sendFromInput() {
+  const inp = document.getElementById('cmd-input');
+  const val = inp.value.trim();
+  if (!val) return;
+  inp.value = '';
+  sendSerialCmd(val);
+}
+
+function togglePauseLog() {
+  state.logPaused = !state.logPaused;
+  const btn = document.getElementById('btn-pause-log');
+  btn.textContent = state.logPaused ? '▶ Resume' : '⏸ Pause';
+  showToast(state.logPaused ? 'Console packet capture paused' : 'Console packet capture resumed');
+}
+
+function clearConsoleLog() {
+  state.packetLog = [];
+  renderConsoleTable();
+  showToast('Console stream cleared');
+}
+
+function copyConsoleLog() {
+  const csv = 'Number,Time,Direction,Type,Payload\n' + state.packetLog.map(p => `${p.n},${p.time},${p.dir},${p.type},"${p.s.replace(/"/g, '""')}"`).join('\n');
+  navigator.clipboard.writeText(csv);
+  showToast('Console log exported to clipboard as CSV');
+}
+
+// --- E-STOP & Ignition Controls ---
+function toggleEstop() {
+  const btn = document.getElementById('btn-estop');
+  const banner = document.getElementById('estop-alert');
+  state.estop = !state.estop;
+
+  if (state.estop) {
+    btn.classList.add('active');
+    banner.classList.add('show');
+    state.ignition = false;
+    document.getElementById('sw-ignition').checked = false;
+    document.getElementById('hud-ign').textContent = '⚫ IGN: OFF';
+    document.getElementById('hud-ign').className = 'pill';
+    document.getElementById('hud-mode').textContent = '🛑 MODE: E-STOP';
+    document.getElementById('hud-mode').className = 'pill r';
+    appendPacket('TX', 'CMD', '$ESTOP_TRIPPED');
+    appendPacket('RX', 'DTC', '{"alert":"HARDWARE_ESTOP_LATCHED","all_actuators_cut":true}');
+    playBuzzerBeep();
+    showToast('EMERGENCY STOP LATCHED! All power cut.');
+  } else {
+    btn.classList.remove('active');
+    banner.classList.remove('show');
+    state.ignition = true;
+    document.getElementById('sw-ignition').checked = true;
+    document.getElementById('hud-ign').textContent = '⚡ IGN: ON';
+    document.getElementById('hud-ign').className = 'pill c';
+    resetAllFaults();
+    appendPacket('TX', 'CMD', '$ESTOP_RELEASED');
+    showToast('Emergency Stop released. System returned to RUN mode.');
+  }
+}
+
+function setIgnition(on) {
+  if (state.estop || state.activeDtc) return showToast('Cannot start engine: Safety Interlock Tripped');
+  state.ignition = on;
+  document.getElementById('sw-ignition').checked = on;
+  document.getElementById('hud-ign').textContent = on ? '⚡ IGN: ON' : '⚫ IGN: OFF';
+  document.getElementById('hud-ign').className = on ? 'pill c' : 'pill';
+  state.fsmState = on ? 'RUN' : 'OFF';
+  document.getElementById('hud-mode').textContent = on ? '🟢 MODE: RUN' : '⚫ MODE: OFF';
+  document.getElementById('hud-mode').className = on ? 'pill g' : 'pill';
+  appendPacket('TX', 'CMD', on ? '$IGN_START' : '$IGN_STOP');
+  showToast(on ? 'Engine Started (MODE: RUN)' : 'Engine Safely Stopped (MODE: OFF)');
+}
+
+document.getElementById('sw-ignition').addEventListener('change', (e) => {
+  setIgnition(e.target.checked);
+});
+
+// Quick Scan
+function triggerQuickScan(btn) {
+  btn.textContent = 'Scanning EEPROM...';
+  setTimeout(() => {
+    btn.textContent = '⚡ RUN QUICK SCAN';
+    showToast(state.activeDtc ? `Scan complete: 1 active fault found (${state.activeDtc})` : 'Scan complete: No faults detected in MCU EEPROM');
+  }, 1000);
+}
+
+// Modal & Toast Helpers
+function openClearModal() { document.getElementById('modal-clear-dtc').classList.add('show'); }
+function closeClearModal() { document.getElementById('modal-clear-dtc').classList.remove('show'); }
+function confirmClearDtc() {
+  closeClearModal();
+  resetAllFaults();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+function togglePwdVisibility(id) {
+  const inp = document.getElementById(id);
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+function setSeg(btn) {
+  btn.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+function copyDtcLog() {
+  const csv = 'Code,Name,Description,Status\n' + state.dtcStoredList.map(d => `${d.code},${d.name},"${d.desc}",${d.status}`).join('\n');
+  navigator.clipboard.writeText(csv);
+  showToast('DTC log copied to clipboard as CSV');
+}
+
+function refreshDtcList() {
+  renderStoredDtcTable();
+  updateDtcCounters();
+  showToast('DTC table refreshed from EEPROM storage');
+}
+
+function playBuzzerBeep() {
+  if (!document.getElementById('chk-audio-buzzer').checked) return;
+  try {
+    const actx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = actx.createOscillator();
+    const gain = actx.createGain();
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(2000, actx.currentTime); // 2 kHz tone
+    gain.gain.setValueAtTime(0.08, actx.currentTime);
+    osc.connect(gain);
+    gain.connect(actx.destination);
+    osc.start();
+    osc.stop(actx.currentTime + 0.35);
+  } catch (e) {}
+}
+
+// --- Bootstrap Initialization ---
+window.addEventListener('DOMContentLoaded', () => {
+  initRouting();
+  initSettingsSubtabs();
+  renderStoredDtcTable();
+  renderConsoleTable();
+  updateDtcCounters();
+  startTelemetryLoop();
+});
+</script>
+</body>
+</html>
