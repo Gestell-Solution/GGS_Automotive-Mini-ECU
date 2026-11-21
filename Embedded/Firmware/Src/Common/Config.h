@@ -47,6 +47,7 @@
 #define ModuleFsmEnabled      1
 #define ModuleFaultEnabled    1
 #define ModuleDtcEnabled      1
+#define ModuleUiEnabled       1
 /** @} */
 
 /**
