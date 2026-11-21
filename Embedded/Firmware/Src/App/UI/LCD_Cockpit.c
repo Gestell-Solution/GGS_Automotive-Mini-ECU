@@ -75,6 +75,26 @@ static void LCD_Cockpit_SetRowString(uint8_t row, const char* str)
     g_cockpit.stagedBuffers[row][LCD_COCKPIT_COLS] = '\0';
 }
 
+/**
+ * @brief  Simple helper to copy characters from str into row starting at startCol.
+ *         Operates without strlen, memcpy, or dynamic memory.
+ * @param  row      Target line buffer.
+ * @param  startCol Column offset (0 to 19).
+ * @param  str      Null-terminated source string.
+ */
+static void LCD_Cockpit_PutString(char* row, uint8_t startCol, const char* str)
+{
+    if ((row != NULL) && (str != NULL))
+    {
+        while ((*str != '\0') && (startCol < LCD_COCKPIT_COLS))
+        {
+            row[startCol] = *str;
+            startCol++;
+            str++;
+        }
+    }
+}
+
 /* =========================================================================
    PUBLIC API FUNCTION PROTOTYPES WITH DETAILED DOXYGEN SPECIFICATIONS
    ========================================================================= */
@@ -317,7 +337,98 @@ void LCD_Cockpit_FormatFloat1dp(char* outBuf, uint8_t maxLen, float value)
 void LCD_Cockpit_RenderLiveScreen(void)
 {
     g_cockpit.currentScreenMode = LCD_SCREEN_LIVE_COCKPIT;
+
+    /* 1. Retrieve const pointer to telemetry data */
+    const ECUData_t* p = FSM_GetECUData();
+
+    /* 2. Format temporary numeric buffers */
+    char tempStr[8];
+    char battStr[8];
+    LCD_Cockpit_FormatFloat1dp(tempStr, sizeof(tempStr), p->engineTemp_C);
+    LCD_Cockpit_FormatFloat1dp(battStr, sizeof(battStr), p->batteryVoltage_V);
+
+    /* 3. Synthesize Line 1 (MODE & IGNITION) */
+    memset(g_cockpit.stagedBuffers[0U], ' ', LCD_COCKPIT_COLS);
+    LCD_Cockpit_PutString(g_cockpit.stagedBuffers[0U], 0U, "MODE: RUN   IGN: ");
+    LCD_Cockpit_PutString(g_cockpit.stagedBuffers[0U], 17U, p->ignitionActive ? "ON " : "OFF");
+
+    /* 4. Synthesize Line 2 (TEMPERATURE & BATTERY) */
+    memset(g_cockpit.stagedBuffers[1U], ' ', LCD_COCKPIT_COLS);
+    LCD_Cockpit_PutString(g_cockpit.stagedBuffers[1U], 0U, tempStr);
+    g_cockpit.stagedBuffers[1U][4U] = LCD_ICON_DEGREE[0];
+    g_cockpit.stagedBuffers[1U][5U] = 'C';
+    g_cockpit.stagedBuffers[1U][11U] = LCD_ICON_BATTERY[0];
+    LCD_Cockpit_PutString(g_cockpit.stagedBuffers[1U], 13U, battStr);
+    g_cockpit.stagedBuffers[1U][17U] = 'V';
+
+    /* 5. Synthesize Line 3 (FAN SPEED & ACTIVE DTC) */
+    memset(g_cockpit.stagedBuffers[2U], ' ', LCD_COCKPIT_COLS);
+    g_cockpit.stagedBuffers[2U][0U] = LCD_ICON_FAN[0];
+    LCD_Cockpit_PutString(g_cockpit.stagedBuffers[2U], 1U, "FAN:");
+    if (p->fanDutyPct >= 100U)
+    {
+        LCD_Cockpit_PutString(g_cockpit.stagedBuffers[2U], 5U, "100%");
+    }
+    else if (p->fanDutyPct >= 10U)
+    {
+        g_cockpit.stagedBuffers[2U][6U] = (char)('0' + (p->fanDutyPct / 10U));
+        g_cockpit.stagedBuffers[2U][7U] = (char)('0' + (p->fanDutyPct % 10U));
+        g_cockpit.stagedBuffers[2U][8U] = '%';
+    }
+    else
+    {
+        g_cockpit.stagedBuffers[2U][7U] = (char)('0' + p->fanDutyPct);
+        g_cockpit.stagedBuffers[2U][8U] = '%';
+    }
+
+    LCD_Cockpit_PutString(g_cockpit.stagedBuffers[2U], 10U, "FLT:");
+    const char* dtcStr = "NONE";
+    if (p->activeDTC == DTC_F001_OVER_TEMP)
+    {
+        dtcStr = "F001";
+    }
+    else if (p->activeDTC == DTC_F002_BATT_VOLT)
+    {
+        dtcStr = "F002";
+    }
+    else if (p->activeDTC == DTC_F003_SENSOR_DISC)
+    {
+        dtcStr = "F003";
+    }
+    else if (p->activeDTC == DTC_F004_COMMS_TIMEOUT)
+    {
+        dtcStr = "F004";
+    }
+    else if (p->activeDTC == DTC_F005_WATCHDOG_RESET)
+    {
+        dtcStr = "F005";
+    }
+    LCD_Cockpit_PutString(g_cockpit.stagedBuffers[2U], 15U, dtcStr);
+
+    /* 6. Synthesize Line 4 (WIRELESS LINK HEALTH) */
+    memset(g_cockpit.stagedBuffers[3U], ' ', LCD_COCKPIT_COLS);
+    bool btTimeout = (p->activeDTC == DTC_F004_COMMS_TIMEOUT);
+    bool wifiTimeout = (p->activeDTC == DTC_F004_COMMS_TIMEOUT);
+    const char* btText = btTimeout ? "ERR  " : (p->btConnected ? "OK   " : "DISC ");
+    const char* wifiText = wifiTimeout ? "LOST   " : (p->wifiConnected ? "ONLINE " : "DISC   ");
+
+    g_cockpit.stagedBuffers[3U][0U] = LCD_ICON_BLUETOOTH[0];
+    LCD_Cockpit_PutString(g_cockpit.stagedBuffers[3U], 1U, "BT:");
+    LCD_Cockpit_PutString(g_cockpit.stagedBuffers[3U], 4U, btText);
+
+    g_cockpit.stagedBuffers[3U][9U] = LCD_ICON_WIFI[0];
+    LCD_Cockpit_PutString(g_cockpit.stagedBuffers[3U], 10U, "WF:");
+    LCD_Cockpit_PutString(g_cockpit.stagedBuffers[3U], 13U, wifiText);
+
+    /* 7. Enforce exact 20-character null-termination on all rows */
+    for (uint8_t r = 0U; r < LCD_COCKPIT_ROWS; r++)
+    {
+        g_cockpit.stagedBuffers[r][LCD_COCKPIT_COLS] = '\0';
+    }
+
+    /* 8. Return */
 }
+
 
 /**
  * @brief    Synthesizes emergency warning and DTC identification screen for STATE_SAFE_MODE.
