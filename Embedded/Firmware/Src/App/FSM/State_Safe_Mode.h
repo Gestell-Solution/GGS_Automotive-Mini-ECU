@@ -15,7 +15,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-
 #include "../../Common/Config.h"
 #include "../../Common/Definition.h"
 #include "../../Common/MacroFunction.h"

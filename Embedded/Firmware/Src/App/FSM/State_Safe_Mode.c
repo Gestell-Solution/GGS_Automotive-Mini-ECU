@@ -109,7 +109,7 @@ void State_SAFE_MODE_OnRun(void){
     /**
      * Check Barrier 1 (Physical Parameter Recovery with Hysteresis)
      */
-    if(lockedDTC == DtcF001OverTemp){
+    if(g_safeModeControl.lockedDTC == DtcF001OverTemp){
         if(g_ecuData.engineTemp_C < SAFE_MODE_TEMP_RECOVERY_C){
             g_safeModeControl.recoveryConditionsMet = true;
         }
@@ -121,7 +121,7 @@ void State_SAFE_MODE_OnRun(void){
     /**
      * check on BATT Voltage Recovery with Hysteresis
      */
-    if(lockedDTC == DtcF002BatteryFault){
+    if(g_safeModeControl.lockedDTC == DtcF002BatteryFault){
         if(g_ecuData.batteryVoltage_V >= 12.0f && g_ecuData.batteryVoltage_V <= 14.0f){
             g_safeModeControl.recoveryConditionsMet = true;
         }
@@ -131,7 +131,7 @@ void State_SAFE_MODE_OnRun(void){
         }
     }
     /**
-     * Check Barrier 2 (Reset Signal Received)
+     * TODO: Check Barrier 2 (Reset Signal Received)
      */
     EventMask_t evt = Event_Consume(EVENT_FAULT_RESET);
     if(evt & EVENT_FAULT_RESET){
