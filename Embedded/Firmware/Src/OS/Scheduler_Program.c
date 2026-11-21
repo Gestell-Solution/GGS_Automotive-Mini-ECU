@@ -94,12 +94,13 @@ void Scheduler_Init(void)
             g_taskTable[i].name[j] = '\0';
         }
     }
+    
+    /* Initialize MCAL Timer2 in 10ms CTC mode */
+    mTimer2_Init_CTC_10ms();
 
     /* Register SysTick ISR hook callback with MCAL Timer2 */
     mTimer2_SetCallback(Scheduler_Tick_ISR);
 
-    /* Initialize MCAL Timer2 in 10ms CTC mode */
-    mTimer2_Init_CTC_10ms();
 
     g_schedulerRunning = True;
 
