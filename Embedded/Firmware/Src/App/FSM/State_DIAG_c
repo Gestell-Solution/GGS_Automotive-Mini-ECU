@@ -29,17 +29,17 @@ void State_DIAG_OnEntry(void)
     g_diagSession.reportTransmitted = false;
 
     /**
-     * Initializes the Lcd display for the diagnostic session for Mode and serv
+     *  TODO: Sets the Lcd display for the diagnostic session for Mode and service
      */
-    hLCD_WriteString(FirstLine, 0, "MODE:DIAG | SERV:ON");
+    LCD_Cockpit_SetScreenMode(LCD_SCREEN_DIAGNOSTIC);
 
     /**
-     * @brief todo  Retrieve stored DTCs via
+     *  TODO: Retrieve stored DTCs via
      */
     DTC_GetAll();
-   
+
     /**
-     * @brief todo Dispatch payload to serial transmit buffers
+     *  TODO: Dispatch payload to serial transmit buffers
      */
     Tele_BuildDiagReport();
     Tele_BroadcastBothChannels();
@@ -58,7 +58,7 @@ void State_DIAG_OnRun(void)
      */
     if (g_diagSession.reportTransmitted || elapsed >= DIAG_SESSION_TIMEOUT_MS)
     {
-        FSM_Transition(STATE_RUN); 
+        FSM_Transition(STATE_RUN);
     }
 }
 /**
@@ -66,10 +66,35 @@ void State_DIAG_OnRun(void)
  */
 void State_DIAG_OnExit(void)
 {
+
     /**
      * Perform cleanup operations before transitioning out of the diagnostic state.
      */
+    g_diagSession.sessionStartTime_ms = 0;
     g_diagSession.reportTransmitted = false;
+
+    /**
+     * if Fan Stopped supposed to back to normal operation
+     */
+    if (hFAN_GetSpeed() == 0U)
+    {
+        hFAN_SetSpeedFromTemp(g_diagSession.tempHistory[g_diagSession.historyCount - 1U]);
+    }
+
+    /**
+     *  TODO: Reset the cyclic telemetry
+     */
+    telemetry_ResetCyclic();
+
+    /**
+     *  TODO: Reset the Lcd display to the normal operation screen
+     */
+    LCD_Cockpit_SetScreenMode(LCD_SCREEN_LIVE_COCKPIT);
+
+    /**
+     * TODO: Flushes diagnostic report buffers and resets the report transmission flag
+     */
+    Tele_FlushDiagBuffers();
 }
 
 /**
