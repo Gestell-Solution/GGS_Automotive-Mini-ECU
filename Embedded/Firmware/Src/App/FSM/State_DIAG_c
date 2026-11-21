@@ -43,12 +43,25 @@ void State_DIAG_OnEntry(void)
      */
     Tele_BuildDiagReport();
     Tele_BroadcastBothChannels();
+    /**
+     * Mark the diagnostic report as transmitted
+     */
+    g_diagSession.reportTransmitted = True;
 }
 /**
  * @brief Executes the periodic tasks and state logic during the diagnostic state.
  */
 void State_DIAG_OnRun(void)
 {
+    /*
+     * If engine temperature exceeds 90.0 C during STATE_DIAGNOSTIC,
+     * immediately abort the diagnostic session and jump to STATE_FAULT.
+     */
+    if (hLM35_IsOverTemp() || (hLM35_GetLastTemp_C() > 90.0f))
+    {
+        FSM_Transition(STATE_FAULT);
+        return;
+    }
     /**
      * Calculate elapsed session duration
      */
@@ -72,14 +85,6 @@ void State_DIAG_OnExit(void)
      */
     g_diagSession.sessionStartTime_ms = 0;
     g_diagSession.reportTransmitted = false;
-
-    /**
-     * if Fan Stopped supposed to back to normal operation
-     */
-    if (hFAN_GetSpeed() == 0U)
-    {
-        hFAN_SetSpeedFromTemp(g_diagSession.tempHistory[g_diagSession.historyCount - 1U]);
-    }
 
     /**
      *  TODO: Reset the cyclic telemetry
