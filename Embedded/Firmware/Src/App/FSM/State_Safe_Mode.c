@@ -17,7 +17,6 @@
 
 static SafeModeControlBlock_t g_safeModeControl;
 
-
 /**
  * @brief   Entry handler for STATE_FAULT.
  * @details Latches the active DTC, captures entry timestamp, enforces emergency
@@ -42,7 +41,6 @@ void State_FAULT_OnEntry(void)
      */
     hBUZZER_SetState(BUZZER_STATE_ON);
     hLED_SetState(LED_WARNING_YELLOW, LED_STATE_ON);
-    
 }
 
 /**
@@ -56,7 +54,6 @@ void State_FAULT_OnRun(void)
      * The system Auto transitions to STATE_SAFE_MODE after a 5-second stabilization period in STATE_FAULT.
      */
     FSM_Transition(StateSafeMode);
-    
 }
 
 /**
@@ -64,7 +61,8 @@ void State_FAULT_OnRun(void)
  * @brief   Exit handler for STATE_FAULT.
  * @details Performs cleanup actions prior to transitioning out of the immediate fault state.
  */
-void State_FAULT_OnExit(void){
+void State_FAULT_OnExit(void)
+{
     return;
 }
 
@@ -86,7 +84,7 @@ void State_SAFE_MODE_OnEntry(void)
     hBUZZER_SetBeep(BUZZER_MODE_BEEP);
     hLED_SetState(LED_STATUS_BLUE, LED_STATE_OFF);
     /**
-     * TODO: Update LCD cockpit display
+     * Update LCD cockpit display
      */
     hLCD_WriteString(FirstLine, 0, "MODE: SAFE | ALARM!");
     hLCD_WriteString(SecondLine, 0, "COOLING AT 100%");
@@ -97,7 +95,6 @@ void State_SAFE_MODE_OnEntry(void)
      */
     g_safeModeControl.recoveryConditionsMet = false;
     g_safeModeControl.resetSignalReceived = false;
-    
 }
 
 /**
@@ -105,15 +102,18 @@ void State_SAFE_MODE_OnEntry(void)
  * @details Evaluates sensor recovery thresholds and listens for hardware reset
  *          (PE5 / INT5) or wireless CLEAR_DTC commands to restore normal drive mode.
  */
-void State_SAFE_MODE_OnRun(void){
+void State_SAFE_MODE_OnRun(void)
+{
     /**
      * Check Barrier 1 (Physical Parameter Recovery with Hysteresis)
      */
-    if(g_safeModeControl.lockedDTC == DtcF001OverTemp){
-        if(g_ecuData.engineTemp_C < SAFE_MODE_TEMP_RECOVERY_C){
+    if (g_safeModeControl.lockedDTC == DtcF001OverTemp)
+    {
+        if (g_ecuData.engineTemp_C < SAFE_MODE_TEMP_RECOVERY_C)
+        {
             g_safeModeControl.recoveryConditionsMet = true;
         }
-        else 
+        else
         {
             g_safeModeControl.recoveryConditionsMet = false;
         }
@@ -121,26 +121,30 @@ void State_SAFE_MODE_OnRun(void){
     /**
      * check on BATT Voltage Recovery with Hysteresis
      */
-    if(g_safeModeControl.lockedDTC == DtcF002BatteryFault){
-        if(g_ecuData.batteryVoltage_V >= 12.0f && g_ecuData.batteryVoltage_V <= 14.0f){
+    if (g_safeModeControl.lockedDTC == DtcF002BatteryFault)
+    {
+        if (g_ecuData.batteryVoltage_V >= 12.0f && g_ecuData.batteryVoltage_V <= 14.0f)
+        {
             g_safeModeControl.recoveryConditionsMet = true;
         }
-        else 
+        else
         {
             g_safeModeControl.recoveryConditionsMet = false;
         }
     }
     /**
-     * TODO: Check Barrier 2 (Reset Signal Received)
+     * Check Barrier 2 (Reset Signal Received)
      */
     EventMask_t evt = Event_Consume(EVENT_FAULT_RESET);
-    if(evt & EVENT_FAULT_RESET){
+    if (evt & EVENT_FAULT_RESET)
+    {
         g_safeModeControl.resetSignalReceived = true;
     }
     /**
      * If both recovery conditions are met, transition back to STATE_RUN
      */
-    if(g_safeModeControl.recoveryConditionsMet == true && g_safeModeControl.resetSignalReceived == true){
+    if (g_safeModeControl.recoveryConditionsMet == true && g_safeModeControl.resetSignalReceived == true)
+    {
         DTC_Clear(g_safeModeControl.lockedDTC);
         FSM_Transition(StateOff);
     }
@@ -151,7 +155,8 @@ void State_SAFE_MODE_OnRun(void){
  * @details Clears latched fault flags in the control block and restores normal
  *          operational LCD indicators upon returning to STATE_RUN.
  */
-void State_SAFE_MODE_OnExit(void){
+void State_SAFE_MODE_OnExit(void)
+{
     /**
      * Silence emergency alarms
      */
@@ -173,18 +178,19 @@ void State_SAFE_MODE_OnExit(void){
  *          battery voltage is within [SAFE_MODE_BATT_MIN_RECOVERY_V, SAFE_MODE_BATT_MAX_RECOVERY_V],
  *          and a valid reset signal (EVENT_FAULT_RESET / CLEAR_DTC) has been received.
  */
-uint8_t State_SAFE_MODE_IsRecoveryAllowed(void){
+uint8_t State_SAFE_MODE_IsRecoveryAllowed(void)
+{
     /**
      * Check if both recovery conditions are met: physical parameter recovery and reset signal received
      * Returns 1 (true) if both conditions are satisfied, otherwise returns 0 (false).
      */
-    if ((g_safeModeControl.recoveryConditionsMet == True) && (g_safeModeControl.resetSignalReceived == True)) 
+    if ((g_safeModeControl.recoveryConditionsMet == True) && (g_safeModeControl.resetSignalReceived == True))
     {
         return True;
     }
     else
     {
-    return False;
+        return False;
     }
 }
 
