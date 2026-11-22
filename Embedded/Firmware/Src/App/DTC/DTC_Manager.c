@@ -3,9 +3,12 @@
 uint8_t EEPROM_ReadByte(uint16_t address)
 {
     /* Step 1: Wait for completion of previous write */
-    while (EECR_Reg & (1U << 1U)) {
-        /* Busy wait for EEWE to clear */
+    
+    uint16_t timeout = 10000U;
+    while (((EECR_Reg & (1U << 1U)) != 0U) && (timeout > 0U)) {
+        timeout--;
     }
+
 
     /* Step 2: Set up address registers */
     EEARH_Reg = (uint8_t)((address >> 8U) & 0x0FU);
@@ -20,9 +23,12 @@ uint8_t EEPROM_ReadByte(uint16_t address)
 
 void EEPROM_WriteByte(uint16_t address, uint8_t data)
 {
-    /* Step 1: Wait for completion of previous write */
-    while (EECR_Reg & (1U << 1U)) {
-        /* Busy wait for EEWE to clear */
+    // /* Step 1: Wait for completion of previous write */
+    uint16_t timeout = 10000U;
+
+    /* Wait for previous write to finish, but don't wait forever */
+    while (((EECR_Reg & (1U << 1U)) != 0U) && (timeout > 0U)) {
+        timeout--;
     }
 
     /* Step 2: Set up address and data registers */
