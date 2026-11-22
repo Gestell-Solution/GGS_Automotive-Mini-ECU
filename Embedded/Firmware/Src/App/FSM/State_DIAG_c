@@ -29,9 +29,9 @@ void State_DIAG_OnEntry(void)
     g_diagSession.reportTransmitted = false;
 
     /**
-     *  TODO: Sets the Lcd display for the diagnostic session for Mode and service
+     *  Sets the Lcd display for the diagnostic session for Mode and service
      */
-    LCD_Cockpit_SetScreenMode(LCD_SCREEN_DIAGNOSTIC);
+    hLCD_WriteString(FirstLine, 0, "MODE:DIAG | SERV:ON");
 
     /**
      *  TODO: Retrieve stored DTCs via
@@ -92,9 +92,9 @@ void State_DIAG_OnExit(void)
     telemetry_ResetCyclic();
 
     /**
-     *  TODO: Reset the Lcd display to the normal operation screen
+     *  Reset the Lcd display to the normal operation screen
      */
-    LCD_Cockpit_SetScreenMode(LCD_SCREEN_LIVE_COCKPIT);
+    hLCD_WriteString(FirstLine, 0, "MODE:RUN | SERV:OFF");
 
     /**
      * TODO: Flushes diagnostic report buffers and resets the report transmission flag
