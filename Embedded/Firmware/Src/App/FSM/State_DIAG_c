@@ -34,7 +34,7 @@ void State_DIAG_OnEntry(void)
     hLCD_WriteString(FirstLine, 0, "MODE:DIAG | SERV:ON");
 
     /**
-     *  TODO: Retrieve stored DTCs via
+     * Retrieve stored DTCs via
      */
     DTC_GetAll();
 
