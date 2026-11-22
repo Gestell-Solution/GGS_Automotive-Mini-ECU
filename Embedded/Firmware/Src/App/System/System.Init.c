@@ -165,7 +165,8 @@ void System_Init_HAL(void)
     hFAN_Init();
     hLED_Init();
     hLED_SetState(LED_POWER_GREEN,LED_STATE_ON);
-    hLED_SetState(LED_WARNING_YELLOW,LED_STATE_OFF);
+    hLED_SetState(LED_WARNING_YELLOW,LED_STATE_ON);
+
 
     /* 2. HD44780 20x4 Character LCD:
      *    - Apply 40 ms hardware power-on delay
@@ -196,6 +197,7 @@ void System_Init_HAL(void)
      *    - Verify sensor disconnection thresholds
      */
     hLM35_Init();
+
     #if 0
     hBATT_Init();
 
@@ -235,17 +237,18 @@ void System_Init_OS(void)
     Scheduler_RegisterTask(3U, Task_LcdRefresh,   200U,  4U);
     Scheduler_RegisterTask(4U, Task_Telemetry,    500U,  5U);
     Scheduler_RegisterTask(5U, Task_Heartbeat,    1000U, 6U);
-
+    #endif
     /* 5. Configure & Arm Hardware Watchdog Timer (Timeout = 2048 ms) */
     /* Timed sequence: Set WDTOE and WDE, then write prescaler bits */
+
     uint8_t sreg = SREG_Reg;
     __asm__ __volatile__ ("cli" ::: "memory");
     WDTCR_Reg |= (1U << 4U) | (1U << 3U);
     WDTCR_Reg = (1U << 3U) | (1U << 2U) | (1U << 1U) | (1U << 0U);
     SREG_Reg = sreg;
-    #endif
-
+    
     systemBootInfo.watchdogArmed = true;
+    
 }
 
 void System_Init_APP(void)
@@ -259,15 +262,20 @@ void System_Init_APP(void)
 
     /* 2. Anomaly Check: If reboot was caused by Watchdog, record DTC_F005 */
     if (systemBootInfo.resetReason == RESET_REASON_WATCHDOG) {
-        DTC_Log(DTC_F005_WATCHDOG_RESET, 0U, (int16_t)systemBootInfo.resetReason);
+        DTC_Log(DtcF005Watchdog, 0U, (int16_t)systemBootInfo.resetReason);
     }
 
     /* 3. Cockpit UI Renderer:
      *    - Clear display buffer
      *    - Render Boot Splash Screen
      */
+    /**
+     * @todo waiting for the driver not sure what to write
+     */
+    #if 0
     LCD_Cockpit_Init();
 
+    #endif
     /* 4. Telemetry Manager:
      *    - Reset transmission buffers
      */
@@ -287,8 +295,8 @@ void System_Init_APP(void)
      */
     #if 0
     FSM_Init();
-    #endif
     State_OFF_OnEntry();
+    #endif
 }
 
 void System_Init(void)
@@ -303,14 +311,14 @@ void System_Init(void)
     /* Phase 2: Hardware Abstraction Layer */
     System_Init_HAL();
 
-    #if 0
+    
     /* Phase 3: Operating System Services */
     System_Init_OS();
 
+    
     /* Phase 4: Application Core Logic */
     System_Init_APP();
 
-    #endif
     systemBootInfo.initStatus = SYS_INIT_OK;
     
 }
