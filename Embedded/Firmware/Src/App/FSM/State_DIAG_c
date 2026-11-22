@@ -59,7 +59,7 @@ void State_DIAG_OnRun(void)
      */
     if (hLM35_IsOverTemp() || (hLM35_GetLastTemp_C() > 90.0f))
     {
-        FSM_Transition(STATE_FAULT);
+        FSM_Transition(StateFault);
         return;
     }
     /**
@@ -71,7 +71,7 @@ void State_DIAG_OnRun(void)
      */
     if (g_diagSession.reportTransmitted || elapsed >= DIAG_SESSION_TIMEOUT_MS)
     {
-        FSM_Transition(STATE_RUN);
+        FSM_Transition(StateRun);
     }
 }
 /**
