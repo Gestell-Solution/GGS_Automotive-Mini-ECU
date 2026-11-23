@@ -1,12 +1,15 @@
+
 /**
  * @file      FSM_Private.h
- * @brief     FSM driver Private APIs and enums.
- * @details   
+ * @brief     Private definitions for the FSM state table, internal structures, and transition validation.
+ * @details   Declares internal action callback types, state descriptor structures, the master
+ *            state table registry, and the static helper function used to validate transition
+ *            legality against the ECU state transition matrix.
  * @version   1.0.0
  * @author    Developer: Naira Mohammed (naira.mohammed.76@gmail.com)
- * @author    Reviewer: Abdulrahman Ali
  * @date      2026-11-17
  * @copyright Copyright (c) 2026 Gestell. All rights reserved.
+ * @see       FSM_Interface.h, FSM_Config.h, FSM_Program.c
  */
 
 
@@ -16,23 +19,10 @@
  #include <stdint.h>
  #include <stdbool.h> 
 
- typedef enum {
-     STATE_OFF         = 0U,
-     STATE_START       = 1U,
-     STATE_RUN         = 2U,
-     STATE_DIAGNOSTIC  = 3U,
-    STATE_FAULT        = 4U,
-    STATE_SAFE_MODE    = 5U
-} ECU_State_t;
-
-typedef enum {
-    DTC_NONE                 = 0x00U,
-    DTC_F001_OVER_TEMP       = 0x01U,
-    DTC_F002_BATT_VOLT       = 0x02U,
-    DTC_F003_SENSOR_DISC     = 0x03U,
-    DTC_F004_COMMS_TIMEOUT   = 0x04U,
-    DTC_F005_WATCHDOG_RESET  = 0x05U
-} DTC_Code_t;
+ /**
+ * @brief Function pointer type for state lifecycle callbacks (onEntry, onRun, onExit).
+ */
+typedef void (*FSM_ActionFunc_t)(void);
 
 typedef struct {
     ECU_State_t   currentState;
@@ -49,8 +39,10 @@ typedef struct {
     uint32_t      uptimeSeconds;
 } ECUData_t;
 
-typedef void (*FSM_ActionFunc_t)(void);
 
+/**
+ * @brief Descriptor structure binding an ECU state to its lifecycle hooks and display name.
+ */
 typedef struct {
     ECU_State_t       stateId;
     FSM_ActionFunc_t  onEntry;
@@ -59,5 +51,17 @@ typedef struct {
     const char*       stateName;
 } FSM_StateDescriptor_t;
 
+/**
+ * @brief Master state descriptor table indexed by ECU_State_t.
+ */
+static const FSM_StateDescriptor_t g_fsmStateTable[FSM_NUM_STATES];
+
+/**
+ * @brief  Validates whether a transition from currentState to targetState is permitted.
+ * @param  currentState The active ECU state.
+ * @param  targetState  The requested destination ECU state.
+ * @return true if the transition is legal according to the transition matrix, false otherwise.
+ */
+static bool FSM_IsTransitionLegal(ECU_State_t currentState, ECU_State_t targetState);
 
 #endif

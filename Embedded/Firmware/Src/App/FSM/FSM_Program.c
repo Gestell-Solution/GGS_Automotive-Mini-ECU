@@ -1,13 +1,16 @@
 /**
  * @file      FSM_Program.c
- * @brief     FSM driver Implementations.
- * @details
+ * @brief     Finite State Machine (FSM) driver implementation for ECU state management.
+ * @details   Implements initialization, validated state transitions with critical-section
+ *            protection, periodic state execution, state queries, and ECU telemetry updates.
  * @version   1.0.0
  * @author    Developer: Naira Mohammed (naira.mohammed.76@gmail.com)
- * @author    Reviewer: Abdulrahman Ali
  * @date      2026-11-17
  * @copyright Copyright (c) 2026 Gestell. All rights reserved.
  */
+
+
+#include "../../Common/Config.h"
 
 #if ModuleFsmEnabled == Enable
 
@@ -17,8 +20,75 @@
 #include "../../Mcal/Atmega128Register.h"
 #include <avr/interrupt.h>
 
+
+/**
+ * @todo Remove temporary Scheduler_GetUptime_ms() prototype once the OS Scheduler
+ *       module (US-015) is merged and integrated with this FSM module.
+ */
+extern uint32_t Scheduler_GetUptime_ms(void);
+
+/**
+ * @brief Centralized runtime telemetry and state record for the ECU.
+ */
 ECUData_t g_ecuData;
-static const FSM_StateDescriptor_t g_fsmStateTable[FSM_NUM_STATES];
+
+/**
+ * @brief Master state descriptor table indexed by EcuState_t.
+ *        Hooks are initialized to Null until dedicated state modules (US-018..US-021)
+ *        bind or register their handlers.
+ */
+static const FSM_StateDescriptor_t g_fsmStateTable[FSM_NUM_STATES] =
+{
+    { StateOff,        Null, Null, Null, "OFF"        },
+    { StateStart,      Null, Null, Null, "START"      },
+    { StateRun,        Null, Null, Null, "RUN"        },
+    { StateDiagnostic, Null, Null, Null, "DIAGNOSTIC" },
+    { StateFault,      Null, Null, Null, "FAULT"      },
+    { StateSafeMode,   Null, Null, Null, "SAFE_MODE"  }
+};
+
+/**
+ * @brief  Validates whether a transition from currentState to targetState is permitted.
+ */
+static bool FSM_IsTransitionLegal(EcuState_t currentState, EcuState_t targetState)
+{
+
+    switch (currentState)
+    {
+        case StateOff:
+            False = (targetState == StateStart);
+            break;
+
+        case StateStart:
+            False = (targetState == StateRun) || (targetState == StateFault);
+            break;
+
+        case StateRun:
+            False = (targetState == StateOff) ||
+                      (targetState == StateDiagnostic) ||
+                      (targetState == StateFault);
+            break;
+
+        case StateDiagnostic:
+            False = (targetState == StateRun) || (targetState == StateFault);
+            break;
+
+        case StateFault:
+            False = (targetState == StateSafeMode);
+            break;
+
+        case StateSafeMode:
+            False = (targetState == StateOff);
+            break;
+
+        default:
+            False = False;
+            break;
+    }
+
+    return False 
+}
+    
 
 void FSM_Init(void)
 {
@@ -29,6 +99,7 @@ void FSM_Init(void)
     g_ecuData.stateEntryTimestamp_ms = Scheduler_GetUptime_ms();
     g_ecuData.activeDTC = DTC_NONE;
 
+    /* Execute initial state entry hook if registered */
     if (g_fsmStateTable[STATE_OFF].onEntry != Null)
     {
         g_fsmStateTable[STATE_OFF].onEntry();
@@ -48,33 +119,9 @@ Std_ReturnType FSM_Transition(ECU_State_t targetState)
     }
 
     // Validate legality against transition matrix, achieving AC-3
-
-    if (g_ecuData.currentState == STATE_OFF && targetState != STATE_START)
+    if (FSM_IsTransitionLegal(g_ecuData.currentState, targetState) == False)
     {
         return ENotOk;
-    }
-    else if (g_ecuData.currentState == STATE_START && targetState != STATE_RUN && targetState != STATE_FAULT)
-    {
-        return ENotOk;
-    }
-    else if (g_ecuData.currentState == STATE_RUN && targetState != STATE_OFF && targetState != STATE_DIAGNOSTIC && targetState != STATE_FAULT)
-    {
-        return ENotOk;
-    }
-    else if (g_ecuData.currentState == STATE_DIAGNOSTIC && targetState != STATE_RUN && targetState != STATE_FAULT)
-    {
-        return ENotOk;
-    }
-    else if (g_ecuData.currentState == STATE_FAULT && targetState != STATE_SAFE_MODE)
-    {
-        return ENotOk;
-    }
-    else if (g_ecuData.currentState == STATE_SAFE_MODE && targetState != STATE_OFF)
-    {
-        return ENotOk;
-    }
-    else
-    {
     }
 
     // Enter Critical Section (save SREG and cli())
