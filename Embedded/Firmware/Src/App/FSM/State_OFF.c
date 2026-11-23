@@ -21,7 +21,6 @@
 #include "../../Hal/Actuators/Led/LED_Private.h"
 #include "../../Hal/Lcd/Lcd_Interface.h"
 
-
 /** @brief Internal ignition control and arbitration block initialized to safe default values. */
 static IgnitionControlBlock_t g_ignitionControl = {
     .ignitionState = false,
