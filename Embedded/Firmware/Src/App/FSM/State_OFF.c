@@ -5,7 +5,6 @@
  *            filtering, safety fault checks, and state exit cleanup for STATE_OFF.
  * @version   1.0.0
  * @author    Developer: Naira Mohammed (naira.mohammed.76@gmail.com)
- * @author    Reviewer: Abdulrahman Ali
  * @date      2026-11-17
  * @copyright Copyright (c) 2026 Gestell. All rights reserved.
  */
@@ -19,6 +18,7 @@
 #include "../../Hal/Actuators/Buzzer/Buzzer_Interface.h"
 #include "../../Hal/Actuators/Fan/FAN_Interface.h"
 #include "../../Hal/Actuators/Led/LED_Interface.h"
+#include "../../Hal/Actuators/Led/LED_Private.h"
 #include "../../Hal/Lcd/Lcd_Interface.h"
 
 
@@ -34,7 +34,7 @@ void State_OFF_OnEntry(void)
     /* 1. Silence actuators: stop fan, turn off status/warning LEDs, silence buzzer */
     hFAN_Stop();
     hLED_Set(LED_STATUS_BLUE, LED_STATE_OFF);
-    hLED_Set(LED_WARNING_RED, LED_STATE_OFF);
+    hLED_Set(LED_WARNING_YELLOW, LED_STATE_OFF);
     hBUZZER_SetState(BUZZER_STATE_OFF);
 
     /* 2. Update LCD cockpit layout to standby mode */
@@ -42,6 +42,8 @@ void State_OFF_OnEntry(void)
 
     /* 3. Update shared ignition state to off */
     g_ignitionControl.ignitionState = false;
+
+    Scheduler_DisableTask("ADC");
 }
 
 void State_OFF_OnRun(void)
@@ -76,7 +78,9 @@ Std_ReturnType State_OFF_TriggerIgnition(IgnitionSource_t source, bool startRequ
     /* 3. If startRequested is true: verify safety, update control block, transition to STATE_START */
     if (startRequested == true)
     {
-        /* Verify safety: reject if an active DTC forbids ignition */        if (DTC_GetActiveCode() != DTC_NONE)
+        /* Verify safety: reject if an active DTC forbids ignition */        
+        
+        if (DTC_GetActiveCode() != DTC_NONE)
         {
             return ENotOk;
         }
