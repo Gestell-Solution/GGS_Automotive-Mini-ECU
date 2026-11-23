@@ -1,11 +1,13 @@
 /**
- * @file      State_RUN.h
- * @brief     Public interface header for the FSM State RUN.
- * @details   Contains public function APIs, configuration macros.
+ * @file      State_START.c
+ * @brief     Implementation of ECU STATE_START boot and hardware self-test logic.
+ * @details   Executes the 2000 ms Power-On Self-Test (POST) sequence, validates
+ *            LM35 (ADC0) and Battery (ADC1) channels across consecutive samples,
+ *            verifies LCD and Timer0 PWM readiness, and transitions to StateRun
+ *            on success or StateFault on failure.
  * @version   1.0.0
  * @author    Developer: Naira Mohammed (naira.mohammed.76@gmail.com)
- * @author    Reviewer: Abdelrahman Ali
- * @date      2026-10-19
+ * @date      2026-11-21
  * @copyright Copyright (c) 2026 Gestell. All rights reserved.
  */
 
@@ -13,7 +15,7 @@
 #include "../../Common/Definition.h"
 
 #if ModuleFsmEnabled == Enable
-#include "State_RUN.h"
+#include "State_START.h"
 #include "../../Hal/Lcd/Lcd_Interface.h"
 
 static StartControlBlock_t g_startControl;
@@ -38,6 +40,8 @@ void State_START_OnRun(void){
     
 
 }
-void State_START_OnExit(void);
+void State_START_OnExit(void){
+    //implementation
+}
 
 #endif
