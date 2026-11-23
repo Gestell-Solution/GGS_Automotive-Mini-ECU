@@ -52,41 +52,55 @@ static const FSM_StateDescriptor_t g_fsmStateTable[FSM_NUM_STATES] =
  */
 static bool FSM_IsTransitionLegal(EcuState_t currentState, EcuState_t targetState)
 {
-
     switch (currentState)
     {
         case StateOff:
-            False = (targetState == StateStart);
-            break;
+            if (targetState == StateStart)
+            {
+                return True;
+            }
+            return False;
 
         case StateStart:
-            False = (targetState == StateRun) || (targetState == StateFault);
-            break;
+            if ((targetState == StateRun) || (targetState == StateFault))
+            {
+                return True;
+            }
+            return False;
 
         case StateRun:
-            False = (targetState == StateOff) ||
-                      (targetState == StateDiagnostic) ||
-                      (targetState == StateFault);
-            break;
+            if ((targetState == StateOff) ||
+                (targetState == StateDiagnostic) ||
+                (targetState == StateFault))
+            {
+                return True;
+            }
+            return False;
 
         case StateDiagnostic:
-            False = (targetState == StateRun) || (targetState == StateFault);
-            break;
+            if ((targetState == StateRun) || (targetState == StateFault))
+            {
+                return True;
+            }
+            return False;
 
         case StateFault:
-            False = (targetState == StateSafeMode);
-            break;
+            if (targetState == StateSafeMode)
+            {
+                return True;
+            }
+            return False;
 
         case StateSafeMode:
-            False = (targetState == StateOff);
-            break;
+            if (targetState == StateOff)
+            {
+                return True;
+            }
+            return False;
 
         default:
-            False = False;
-            break;
+            return False;
     }
-
-    return False 
 }
     
 
