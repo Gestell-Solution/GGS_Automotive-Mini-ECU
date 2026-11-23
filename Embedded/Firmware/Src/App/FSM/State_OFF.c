@@ -33,8 +33,8 @@ void State_OFF_OnEntry(void)
 {
     /* 1. Silence actuators: stop fan, turn off status/warning LEDs, silence buzzer */
     hFAN_Stop();
-    hLED_Set(LED_STATUS_BLUE, LED_STATE_OFF);
-    hLED_Set(LED_WARNING_YELLOW, LED_STATE_OFF);
+    hLED_SetState(LED_STATUS_BLUE, LED_STATE_OFF);
+    hLED_SetState(LED_WARNING_YELLOW, LED_STATE_OFF);
     hBUZZER_SetState(BUZZER_STATE_OFF);
 
     /* 2. Update LCD cockpit layout to standby mode */
