@@ -43,7 +43,7 @@ void State_FAULT_OnEntry(void)
     /**
      * Turning on the buzzer and red warning LED to alert the user of the fault condition.
      */
-    hBUZZER_SetState(BUZZER_STATE_ON);
+    hBUZZER_SetBeep(BUZZER_STATE_ON);
     hLED_SetState(LED_WARNING_YELLOW, LED_STATE_ON);
 }
 
@@ -57,7 +57,7 @@ void State_FAULT_OnRun(void)
     /**
      * The system Auto transitions to STATE_SAFE_MODE after a 5-second stabilization period in STATE_FAULT.
      */
-    FSM_Transition(StateSafeMode);
+    FSM_Transition(STATE_SAFE_MODE);
 }
 
 /**
@@ -150,7 +150,8 @@ void State_SAFE_MODE_OnRun(void)
     if (g_safeModeControl.recoveryConditionsMet == true && g_safeModeControl.resetSignalReceived == true)
     {
         DTC_Clear(g_safeModeControl.lockedDTC);
-        FSM_Transition(StateOff);
+        FSM_Transition(STATE_OFF);
+        return;
     }
 }
 
@@ -173,7 +174,7 @@ void State_SAFE_MODE_OnExit(void)
     /**
      * Clear internal control block
      */
-    g_safeModeControl.lockedDTC = DtcNone;
+    g_safeModeControl.lockedDTC = DTC_NONE;
 }
 
 /**
