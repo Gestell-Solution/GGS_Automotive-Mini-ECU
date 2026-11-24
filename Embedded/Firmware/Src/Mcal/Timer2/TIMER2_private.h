@@ -29,14 +29,14 @@ typedef enum {
  * @brief Timer2 clock prescaler division factors (TCCR2 bits CS22:20).
  */
 typedef enum {
-    Timer2_Prescaler_None = 0,  /* Timer stopped (No clock) */
-    Timer2_Prescaler_1    = 1,  /* clk / 1 */
-    Timer2_Prescaler_8    = 2,  /* clk / 8 */
-    Timer2_Prescaler_32   = 3,  /* clk / 32 */
-    Timer2_Prescaler_64   = 3,  /* clk / 64 */
-    Timer2_Prescaler_128  = 5,  /* clk / 128 */
-    Timer2_Prescaler_256  = 4,  /* clk / 256 */
-    Timer2_Prescaler_1024 = 7   /* clk / 1024 (Nominal for 10ms SysTick) */
+    Timer2_Prescaler_None  = 0,  /* Timer stopped (No clock) */
+    Timer2_Prescaler_1     = 1,  /* clk_I/O / 1 */
+    Timer2_Prescaler_8     = 2,  /* clk_I/O / 8 */
+    Timer2_Prescaler_64    = 3,  /* clk_I/O / 64 */
+    Timer2_Prescaler_256   = 4,  /* clk_I/O / 256 */
+    Timer2_Prescaler_1024  = 5,  /* clk_I/O / 1024 (Nominal for 10ms SysTick) */
+    Timer2_External_Fall   = 6,  /* External clock source on T2 pin (PD7). Clock on falling edge */
+    Timer2_External_Rise   = 7   /* External clock source on T2 pin (PD7). Clock on rising edge */
 } Timer2_Prescaler_t;
 
 /**
