@@ -36,6 +36,7 @@
 #define ModuleBuzzerEnabled   1
 #define ModuleHc05Enabled     1
 #define ModuleEsp01Enabled    1
+#define ModuleBattEnabled     1
 /** @} */
 
 /**
@@ -46,6 +47,7 @@
 #define ModuleFsmEnabled      1
 #define ModuleFaultEnabled    1
 #define ModuleDtcEnabled      1
+#define ModuleUiEnabled       1
 /** @} */
 
 /**
