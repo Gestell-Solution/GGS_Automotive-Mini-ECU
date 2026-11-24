@@ -29,9 +29,9 @@
 #include "../../Mcal/Adc/ADC_Interface.h"
 #include "../../Hal/Sensors/Batt/BATT_Interface.h"
 #include "../../Hal/Lcd/Lcd_Interface.h"
-#include "../../OS/Scheduler_Interface.h"
-#include "../FSM/FSM_Interface.h"
-#include "../DTC/DTC_Interface.h"
+#include "../../OS/Schedular/Scheduler_Interface.h"
+#include "../FSM/CORE/FSM_Interface.h"
+#include "../DTC/DTC_Manager_Interface.h"
 
 /* Configuration parameters */
 

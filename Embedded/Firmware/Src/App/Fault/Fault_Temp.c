@@ -16,7 +16,7 @@
  */
 
 #include "Fault_Temp.h"
-#include "Definition.h"
+#include "../../Common/Definition.h"
 /**
  * @todo Replace temporary extern declarations with official module headers
  *       once integrated:
@@ -25,14 +25,9 @@
  *       - Include Scheduler header for Scheduler_GetUptime_ms().
  *       - Include Fan/FSM headers for hFAN_ForceMax() and FSM_Transition().
  */
-typedef struct {
-    DtcCode_t activeDTC;
-} EcuData_t;
-
-extern EcuData_t g_ecuData;
-extern uint32_t Scheduler_GetUptime_ms(void);
-extern void hFAN_ForceMax(void);
-extern void FSM_Transition(EcuState_t state);
+#include "../FSM/CORE/FSM_Interface.h"
+#include "../../OS/Schedular/Scheduler_Interface.h"
+#include "../../Hal/Actuators/Fan/FAN_Interface.h"
 /**
 - @brief Stores the internal state of the over-temperature fault detector.
  *
@@ -44,6 +39,8 @@ extern void FSM_Transition(EcuState_t state);
  */
 
 static FaultTempControlBlock_t g_faultTempControl;
+
+extern ECUData_t g_ecuData; 
 
 /**
 - @fn Fault_Temp_Init

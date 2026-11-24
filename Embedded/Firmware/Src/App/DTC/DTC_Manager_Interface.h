@@ -10,16 +10,7 @@
 #include"../../Mcal/Atmega128Register.h"
 #include <stddef.h>
 
-#if 0
-typedef enum {
-    DTC_NONE                    = 0x00U,
-    DTC_F001_OVER_TEMP          = 0x01U,
-    DTC_F002_BATT_VOLT          = 0x02U,
-    DTC_F003_SENSOR_DISC        = 0x03U,
-    DTC_F004_COMMS_TIMEOUT      = 0x04U,
-    DTC_F005_WATCHDOG_RESET     = 0x05U
-} DtcCode_t;
-#endif
+
 typedef enum {
     DTC_SEVERITY_NONE           = 0x00U,
     DTC_SEVERITY_WARNING        = 0x01U,

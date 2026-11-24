@@ -9,34 +9,24 @@
  * @copyright Copyright (c) 2026 GESTELL
  */
 #include"System_Init.h"
-#include"../../MCAL/Dio/DIO_Interface.h"
-#include"../../MCAL/Adc/ADC_Interface.h"
-#include"../../MCAL/Timer0/Timer0_Interface.h"
-#include"../../MCAL/Timer2/TIMER2_interface.h"
-#include"../../MCAL/Usart0/Usart0_Interface.h"
-/**
- * @todo add the uart1 when it is wrote 
- */
-#include"../../Mcal/Usart1/Usart1_Interface.h"
-#include"../../MCAL/Exti/EXTI_Interface.h"
-#include"../../HAL/Actuators/Buzzer/Buzzer_Interface.h"
-#include"../../HAL/Actuators/Fan/FAN_Interface.h"
-#include"../../HAL/Actuators/Led/LED_Interface.h"
-#include"../../HAL/Lcd/Lcd_Interface.h"
-#include"../../HAL/Sensors/Batt/BATT_Interface.h"
-#include"../../HAL/Sensors/LM35/LM35_Interface.h"
-/**
- * @todo add the bluetooth when it is wrote
- */
-#include"../../HAL/Bluetooth/bluetooth_interface.h"
-/**
- * @todo add the wifi when it is wrote 
- */
-#include"../../HAL/Wifi/wifi_interface.h"
-#include"../../APP/FMS/State_OFF.h"
-#include"../../APP/DTC/DTC_Manager_Interface.h"
-#include"../../APP/UI/LCD_Cockpit.h"
-#include"../../OS/Scheduler/Scheduler_Interface.h"
+#include "../../Mcal/Dio/DIO_Interface.h"
+#include "../../Mcal/Adc/ADC_Interface.h"
+#include "../../Mcal/Timer0/Timer0_Interface.h"
+#include "../../Mcal/Timer2/TIMER2_interface.h"
+#include "../../Mcal/Usart0/Usart0_Interface.h"
+#include "../../Mcal/Exti/EXTI_Interface.h"
+#include "../../Hal/Actuators/Buzzer/Buzzer_Interface.h"
+#include "../../Hal/Actuators/Fan/FAN_Interface.h"
+#include "../../Hal/Actuators/Led/LED_Interface.h"
+#include "../../Hal/Lcd/Lcd_Interface.h"
+#include "../../Hal/Sensors/Batt/BATT_Interface.h"
+#include "../../Hal/Sensors/LM35/LM35_Interface.h"
+#include "../FSM/STATE_Off/State_OFF.h"
+#include "../FSM/CORE/FSM_Interface.h"
+#include "../DTC/DTC_Manager_Interface.h"
+#include "../UI/LCD_Cockpit.h"
+#include "../../OS/Schedular/Scheduler_Interface.h"
+#include "../../OS/RingBuffer/RingBuffer_Interface.h"
 
 static System_BootInfo_t systemBootInfo = {
     .resetReason     = RESET_REASON_UNKNOWN,
@@ -75,7 +65,7 @@ void System_Init_MCAL(void)
 {
     /* 1. DIO Driver: Configure Pin Directions & Default Logic Levels */
    /* GROUP B*/
-    mDIO_InitPin(GroupB,Pin4,DIO_Output);//fan 
+    mDIO_InitPin(GroupB,Pin4,DIO_Output);//fan  // why not using The Hal Layer ????
     mDIO_WritePin(GroupB,Pin4,Dio_Low);
     /* GROUP C*/
     mDIO_InitPin(GroupC,Pin0,DIO_Output);//lcd rs

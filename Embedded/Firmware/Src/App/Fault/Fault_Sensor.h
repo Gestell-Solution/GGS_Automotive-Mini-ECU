@@ -13,7 +13,7 @@
 #define FAULT_SENSOR_H
 #include <stdint.h>
 #include <stdbool.h>
-#include "Definition.h"
+#include "../../Common/Definition.h"
 /**
  * @defgroup Fault_Sensor_Config Sensor Fault Detector Configuration
  * @brief Thresholds, debounce cycles, and channel count for harness monitoring.

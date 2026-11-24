@@ -16,7 +16,7 @@
 #ifndef FAULT_BATT_H
 #define FAULT_BATT_H
 
-#include "Definition.h"
+#include "../../Common/Definition.h"
 #include <stdint.h>
 #include <stdbool.h>
 /**

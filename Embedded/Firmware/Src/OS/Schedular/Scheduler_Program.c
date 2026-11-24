@@ -9,8 +9,8 @@
 * @copyright  Copyright (c) 2026, Gestell Company
 */
 
-#include "../Common/Definition.h"
-#include "../Common/Config.h"
+#include "../../Common/Definition.h"
+#include "../../Common/Config.h"
 
 #if (ModuleOsEnabled == Enable) 
 

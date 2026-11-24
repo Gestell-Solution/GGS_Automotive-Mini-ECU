@@ -15,8 +15,9 @@
 
  #include "FSM_Private.h"
  #include "FSM_Config.h"
- #include "../../Common/Definition.h" 
+#include "../../../Common/Definition.h"
 #include <stdbool.h> 
+extern ECUData_t g_ecuData; 
 
 /**
  * @brief  Initializes the FSM state machine, clears shared ECU data, and enters STATE_OFF.

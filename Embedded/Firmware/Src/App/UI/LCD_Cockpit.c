@@ -12,6 +12,7 @@
 
 #include "../../Common/Config.h"
 #include "../../Common/Definition.h"
+#include <string.h>
 
 
 #if (ModuleUiEnabled == Enable)
@@ -234,7 +235,7 @@ switch (state)
     case STATE_RUN:
     default:
     {
-        g.cockpit.currentScreenMode = LCD_SCREEN_LIVE_COCKPIT;
+        g_cockpit.currentScreenMode = LCD_SCREEN_LIVE_COCKPIT;
         LCD_Cockpit_RenderLiveScreen();
         break;
     }
@@ -383,23 +384,23 @@ void LCD_Cockpit_RenderLiveScreen(void)
 
     LCD_Cockpit_PutString(g_cockpit.stagedBuffers[2U], 10U, "FLT:");
     const char* dtcStr = "NONE";
-    if (p->activeDTC == DTC_F001_OVER_TEMP)
+    if (p->activeDTC == DtcF001OverTemp)
     {
         dtcStr = "F001";
     }
-    else if (p->activeDTC == DTC_F002_BATT_VOLT)
+    else if (p->activeDTC == DtcF002BatteryFault)
     {
         dtcStr = "F002";
     }
-    else if (p->activeDTC == DTC_F003_SENSOR_DISC)
+    else if (p->activeDTC == DtcF003SensorError)
     {
         dtcStr = "F003";
     }
-    else if (p->activeDTC == DTC_F004_COMMS_TIMEOUT)
+    else if (p->activeDTC == DtcF004CommsTimeout)
     {
         dtcStr = "F004";
     }
-    else if (p->activeDTC == DTC_F005_WATCHDOG_RESET)
+    else if (p->activeDTC == DtcF005Watchdog)
     {
         dtcStr = "F005";
     }
@@ -407,8 +408,8 @@ void LCD_Cockpit_RenderLiveScreen(void)
 
     /* 6. Synthesize Line 4 (WIRELESS LINK HEALTH) */
     memset(g_cockpit.stagedBuffers[3U], ' ', LCD_COCKPIT_COLS);
-    bool btTimeout = (p->activeDTC == DTC_F004_COMMS_TIMEOUT);
-    bool wifiTimeout = (p->activeDTC == DTC_F004_COMMS_TIMEOUT);
+    bool btTimeout = (p->activeDTC == DtcF004CommsTimeout);
+    bool wifiTimeout = (p->activeDTC == DtcF004CommsTimeout);
     const char* btText = btTimeout ? "ERR  " : (p->btConnected ? "OK   " : "DISC ");
     const char* wifiText = wifiTimeout ? "LOST   " : (p->wifiConnected ? "ONLINE " : "DISC   ");
 
@@ -448,22 +449,22 @@ void LCD_Cockpit_RenderSafeModeScreen(void)
 
     switch (p->activeDTC)
     {
-        case DTC_F001_OVER_TEMP:
+        case DtcF001OverTemp:
             LCD_Cockpit_SetRowString(1U, "DTC:F001 (OVER-TEMP)");
             break;
-        case DTC_F002_BATT_VOLT:
+        case DtcF002BatteryFault:
             LCD_Cockpit_SetRowString(1U, "DTC:F002 (BATT-VOLT)");
             break;
-        case DTC_F003_SENSOR_DISC:
+        case DtcF003SensorError:
             LCD_Cockpit_SetRowString(1U, "DTC:F003 (SENS-DISC)");
             break;
-        case DTC_F004_COMMS_TIMEOUT:
+        case DtcF004CommsTimeout:
             LCD_Cockpit_SetRowString(1U, "DTC:F004 (COMMS-TO) ");
             break;
-        case DTC_F005_WATCHDOG_RESET:
+        case DtcF005Watchdog:
             LCD_Cockpit_SetRowString(1U, "DTC:F005 (WATCHDOG) ");
             break;
-        case DTC_NONE:
+        case DtcNone:
         default:
             LCD_Cockpit_SetRowString(1U, "DTC: NONE           ");
             break;

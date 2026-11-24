@@ -17,7 +17,9 @@
  #define _FSM_PRIVATE_H_
 
  #include <stdint.h>
- #include <stdbool.h> 
+ #include <stdbool.h>
+ #include "../../../Common/Definition.h"
+ #include "FSM_Config.h"
 
  /**
  * @brief Function pointer type for state lifecycle callbacks (onEntry, onRun, onExit).
@@ -50,18 +52,5 @@ typedef struct {
     FSM_ActionFunc_t  onExit;
     const char*       stateName;
 } FSM_StateDescriptor_t;
-
-/**
- * @brief Master state descriptor table indexed by ECU_State_t.
- */
-static const FSM_StateDescriptor_t g_fsmStateTable[FSM_NUM_STATES];
-
-/**
- * @brief  Validates whether a transition from currentState to targetState is permitted.
- * @param  currentState The active ECU state.
- * @param  targetState  The requested destination ECU state.
- * @return true if the transition is legal according to the transition matrix, false otherwise.
- */
-static bool FSM_IsTransitionLegal(ECU_State_t currentState, ECU_State_t targetState);
 
 #endif

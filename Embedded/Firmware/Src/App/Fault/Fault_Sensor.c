@@ -10,25 +10,11 @@
  * @copyright Copyright (c) 2026 Gestell. All rights reserved.
  */
 #include "Fault_Sensor.h"
-/**
- * @struct ECU_SensorSharedData_t
- * @brief Shared ECU diagnostic data subset used by the sensor fault detector.
- */
-typedef struct {
-    DtcCode_t activeDTC;
-} ECU_SensorSharedData_t;
-/** @brief Shared ECU data instance defined externally. */
-extern ECU_SensorSharedData_t g_ecuData;
-/**
- * @fn FSM_Transition
- * @brief Requests an ECU state machine transition to targetState.
- * @param[in] targetState Target ECU state defined by EcuState_t.
- * @return Status of the requested transition.
- */
-extern Std_ReturnType FSM_Transition(EcuState_t targetState);
+#include "../FSM/CORE/FSM_Interface.h"
 /** @brief Internal control block instance for sensor fault detection. */
 static FaultSensorControlBlock_t g_faultSensorControl;
 
+extern ECUData_t g_ecuData;
 
 /**
  * @fn Fault_Sensor_Init

@@ -9,17 +9,21 @@
  * @copyright Copyright (c) 2026 Gestell. All rights reserved.
  */
 
-#include "../../Common/Config.h"
+#include "../../../Common/Config.h"
 #include <stdint.h>
 #include "State_OFF.h"
 
 #if ModuleFsmEnabled == Enable
 
-#include "../../Hal/Actuators/Buzzer/Buzzer_Interface.h"
-#include "../../Hal/Actuators/Fan/FAN_Interface.h"
-#include "../../Hal/Actuators/Led/LED_Interface.h"
-#include "../../Hal/Actuators/Led/LED_Private.h"
-#include "../../Hal/Lcd/Lcd_Interface.h"
+#include "../../../Hal/Actuators/Buzzer/Buzzer_Interface.h"
+#include "../../../Hal/Actuators/Fan/FAN_Interface.h"
+#include "../../../Hal/Actuators/Led/LED_Interface.h"
+#include "../../../Hal/Actuators/Led/LED_Private.h"
+#include "../../../Hal/Lcd/Lcd_Interface.h"
+#include "../../../OS/Schedular/Scheduler_Interface.h"
+#include "../../../OS/EventFlags/EventFlags_Interface.h"
+#include "../CORE/FSM_Interface.h"
+#include "../../DTC/DTC_Manager_Interface.h"
 
 /** @brief Internal ignition control and arbitration block initialized to safe default values. */
 static IgnitionControlBlock_t g_ignitionControl = {
@@ -60,7 +64,7 @@ void State_OFF_OnRun(void)
 void State_OFF_OnExit(void)
 {
     /* Clear pending ignition event flags on exit from STATE_OFF */
-    Event_ClearIgnition();
+    Event_Clear(EVENT_IGNITION_ON | EVENT_IGNITION_OFF);
 }
 
 Std_ReturnType State_OFF_TriggerIgnition(IgnitionSource_t source, bool startRequested)

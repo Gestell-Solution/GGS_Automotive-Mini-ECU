@@ -10,8 +10,8 @@
  * @copyright Copyright (c) 2026 Gestell. All rights reserved.
  */
 
-#include "../../Common/Config.h"
-#include "../../Common/Definition.h"
+#include "../../../Common/Config.h"
+#include "../../../Common/Definition.h"
 
 #if ModuleFsmEnabled == Enable
 #include "State_RUN.h"

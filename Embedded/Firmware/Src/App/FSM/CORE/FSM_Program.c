@@ -10,22 +10,16 @@
  */
 
 
-#include "../../Common/Config.h"
-
+#include "../../../Common/Config.h"
+#include "../../../Common/Definition.h"
 #if ModuleFsmEnabled == Enable
 
 #include "FSM_Interface.h"
 #include "FSM_Config.h"
-#include "../../Common/Definition.h"
-#include "../../Mcal/Atmega128Register.h"
+#include "../../../Mcal/Atmega128Register.h"
+#include "../../../OS/Schedular/Scheduler_Interface.h"
 #include <avr/interrupt.h>
 
-
-/**
- * @todo Remove temporary Scheduler_GetUptime_ms() prototype once the OS Scheduler
- *       module (US-015) is merged and integrated with this FSM module.
- */
-extern uint32_t Scheduler_GetUptime_ms(void);
 
 /**
  * @brief Centralized runtime telemetry and state record for the ECU.

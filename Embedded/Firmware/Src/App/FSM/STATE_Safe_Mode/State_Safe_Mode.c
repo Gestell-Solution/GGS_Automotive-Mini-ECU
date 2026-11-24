@@ -9,8 +9,12 @@
  * @date      22/11/2026
  * @copyright Copyright (c) 2026, Gestell Company
  */
-#include "../../Common/Config.h"
-#include "../../Common/Definition.h"
+#include "../../../Common/Config.h"
+#include "../../../Common/Definition.h"
+#include "../../../OS/Schedular/Scheduler_Interface.h"
+#include "../../../OS/EventFlags/EventFlags_Interface.h"
+#include "../CORE/FSM_Interface.h"
+#include "../../DTC/DTC_Manager_Interface.h"
 #include "State_Safe_Mode.h"
 
 #if ModuleFsmEnabled == Enable
@@ -35,7 +39,7 @@ void State_FAULT_OnEntry(void)
     /**
      * Sending the latched DTC to EEPROM for persistent logging, along with the current uptime in seconds.
      */
-    DTC_Log(g_safeModeControl.lockedDTC, Scheduler_GetUptime_s());
+    DTC_Log(g_safeModeControl.lockedDTC, Scheduler_GetUptime_s(),0);
     /**
      * Turning on the buzzer and red warning LED to alert the user of the fault condition.
      */

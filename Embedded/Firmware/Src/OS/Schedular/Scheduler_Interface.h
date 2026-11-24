@@ -10,22 +10,26 @@
 */
 
 
+#ifndef SCHEDULER_INTERFACE_H
+#define SCHEDULER_INTERFACE_H
+
 /* Public library */
 #include <stdint.h>
 #include <stdbool.h>
 
 /* common library */
-#include "../Common/Config.h"
-#include "../Common/Definition.h"
-#include "../Common/MacroFunction.h"
+#include "../../Common/Config.h"
+#include "../../Common/Definition.h"
+#include "../../Common/MacroFunction.h"
 
 /* led library */
 #include "Scheduler_Private.h"
 #include "Scheduler_Config.h" 
 
 /* other dependencies */
-#include "../Mcal/Timer2/Timer2_Interface.h"
-#include "../Mcal/Gie/GIE_Interface.h"
+#include "../../Mcal/Timer2/TIMER2_interface.h"
+
+#include "../../Mcal/Gie/GIE_Interface.h"
 
 /**
  * @enum  SchedulerTaskId_t
@@ -173,3 +177,5 @@ Std_ReturnType Scheduler_DisableTaskById(uint8_t taskId);
  * @return     uint32_t Execution count, or 0 if taskId is invalid.
  */
 uint32_t Scheduler_GetTaskRunCountById(uint8_t taskId);
+
+#endif /* SCHEDULER_INTERFACE_H */

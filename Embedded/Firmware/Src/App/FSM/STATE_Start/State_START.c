@@ -11,12 +11,13 @@
  * @copyright Copyright (c) 2026 Gestell. All rights reserved.
  */
 
-#include "../../Common/Config.h"
-#include "../../Common/Definition.h"
+#include "../../../Common/Config.h"
+#include "../../../Common/Definition.h"
 
 #if ModuleFsmEnabled == Enable
 #include "State_START.h"
-#include "../../Hal/Lcd/Lcd_Interface.h"
+#include "../../../Hal/Lcd/Lcd_Interface.h"
+#include "../../../OS/Schedular/Scheduler_Interface.h"
 
 static StartControlBlock_t g_startControl;
 

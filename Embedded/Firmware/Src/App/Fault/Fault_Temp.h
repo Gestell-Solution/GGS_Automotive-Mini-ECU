@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <stdbool.h>
+#include "../../Common/Definition.h"
 #ifndef FAULT_TEMP_H
 #define FAULT_TEMP_H
 #define FAULT_TEMP_THRESHOLD_MAX        90.0f

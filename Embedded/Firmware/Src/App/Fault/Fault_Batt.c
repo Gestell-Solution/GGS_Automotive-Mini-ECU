@@ -14,7 +14,9 @@
 
 /* Includes */
 #include "Fault_Batt.h"
-#include "Definition.h"
+#include "../../Common/Definition.h"
+#include "../FSM/CORE/FSM_Interface.h"
+#include "../../OS/Schedular/Scheduler_Interface.h"
 
 /* Private definitions */
 
@@ -25,40 +27,7 @@
 #define FAULT_BATT_RECOVERY_ACTIVE_FLAG       0xFFU
 
 /* External dependencies */
-
-/**
- * @brief ECU shared data structure.
- * @details This declaration must match the ECUData_t definition in main.c.
- */
-typedef struct
-{
-    EcuState_t currentState;
-    EcuState_t previousState;
-    uint32_t stateEntryTimestamp_ms;
-    bool ignitionActive;
-    float engineTemp_C;
-    float batteryVoltage_V;
-    uint8_t fanDutyPct;
-    DtcCode_t activeDTC;
-    bool selfTestPassed;
-    bool btConnected;
-    bool wifiConnected;
-    uint32_t uptimeSeconds;
-} ECUData_t;
-
-/** @brief Shared ECU data instance. */
 extern ECUData_t g_ecuData;
-
-/** @brief Returns current scheduler uptime in milliseconds. */
-extern uint32_t Scheduler_GetUptime_ms(void);
-
-/**
- * @brief Requests an FSM state transition.
- * @param[in] targetState Target ECU state.
- * @return FSM transition status.
- */
-extern Std_ReturnType FSM_Transition(EcuState_t targetState);
-
 /* Private variables */
 
 /** @brief Battery fault detector control block. */

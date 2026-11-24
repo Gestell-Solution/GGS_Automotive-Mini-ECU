@@ -36,6 +36,14 @@ typedef enum {
     StateSafeMode
 } EcuState_t;
 
+typedef EcuState_t ECU_State_t;
+#define STATE_OFF        StateOff
+#define STATE_START      StateStart
+#define STATE_RUN        StateRun
+#define STATE_DIAGNOSTIC StateDiagnostic
+#define STATE_FAULT      StateFault
+#define STATE_SAFE_MODE  StateSafeMode
+
 /**
  * @brief Diagnostic Trouble Codes (DTCs)
  */
@@ -47,5 +55,8 @@ typedef enum {
     DtcF004CommsTimeout = 4, /**< No BT/WiFi RX > 10 sec */
     DtcF005Watchdog = 5      /**< Watchdog Reset */
 } DtcCode_t;
+
+typedef DtcCode_t DTC_Code_t;
+#define DTC_NONE DtcNone
 
 #endif// _EMBEDDED_FIRMWARE_SRC_COMMON_DEFINITION_H
