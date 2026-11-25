@@ -17,24 +17,6 @@
 
 static DiagSessionData_t g_diagSession;
 
-void State_DIAG_GetHistory(float outTemp[5], float outBatt[5], uint8_t *outCount)
-{
-    uint8_t i = 0U;
-
-    if ((outTemp != NULL) && (outBatt != NULL))
-    {
-        for (i = 0U; i < 5U; i++)
-        {
-            outTemp[i] = g_diagSession.tempHistory[i];
-            outBatt[i] = g_diagSession.battHistory[i];
-        }
-    }
-
-    if (outCount != NULL)
-    {
-        *outCount = g_diagSession.historyCount;
-    }
-}
 /**
  * @brief Initializes the diagnostic state upon entry and resets session data.
  */
