@@ -18,6 +18,9 @@
 #include "../../Common/MacroFunction.h"
 #include "../../Hal/Lcd/Lcd_Interface.h"
 
+#include "../../../OS/Schedular/Scheduler_Interface.h"
+#include "../../DTC/DTC_Manager_Interface.h"
+#include "../CORE/FSM_Interface.h"
 
 
 /**
@@ -42,7 +45,6 @@ typedef struct
     uint32_t sessionStartTime_ms;
     uint8_t reportTransmitted;
 } DiagSessionData_t;
-
 
 /**
  * @fn    void State_DIAG_OnEntry(void)

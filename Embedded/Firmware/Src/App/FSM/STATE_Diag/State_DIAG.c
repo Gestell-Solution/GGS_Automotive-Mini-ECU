@@ -13,7 +13,7 @@
 
 #if ModuleFsmEnabled == Enable
 
-#include "State_DIAG_h"
+#include "State_DIAG.h"
 
 static DiagSessionData_t g_diagSession;
 
@@ -36,13 +36,14 @@ void State_DIAG_OnEntry(void)
     /**
      * Retrieve stored DTCs via
      */
-    DTC_GetAll();
+    // DTC_GetAll();
+    DTC_GetActiveCode();
 
     /**
      *  TODO: Dispatch payload to serial transmit buffers
      */
-    Tele_BuildDiagReport();
-    Tele_BroadcastBothChannels();
+    // Tele_BuildDiagReport();
+    // Tele_BroadcastBothChannels();
     /**
      * Mark the diagnostic report as transmitted
      */
@@ -59,7 +60,7 @@ void State_DIAG_OnRun(void)
      */
     if (hLM35_IsOverTemp() || (hLM35_GetLastTemp_C() > 90.0f))
     {
-        FSM_Transition(StateFault);
+        FSM_Transition(STATE_FAULT);
         return;
     }
     /**
@@ -71,7 +72,7 @@ void State_DIAG_OnRun(void)
      */
     if (g_diagSession.reportTransmitted || elapsed >= DIAG_SESSION_TIMEOUT_MS)
     {
-        FSM_Transition(StateRun);
+        FSM_Transition(STATE_RUN);
     }
 }
 /**
@@ -89,7 +90,7 @@ void State_DIAG_OnExit(void)
     /**
      *  TODO: Reset the cyclic telemetry
      */
-    telemetry_ResetCyclic();
+    // telemetry_ResetCyclic();
 
     /**
      *  Reset the Lcd display to the normal operation screen
@@ -99,7 +100,7 @@ void State_DIAG_OnExit(void)
     /**
      * TODO: Flushes diagnostic report buffers and resets the report transmission flag
      */
-    Tele_FlushDiagBuffers();
+    // Tele_FlushDiagBuffers();
 }
 
 /**
