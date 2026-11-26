@@ -38,7 +38,7 @@
 #define LCD_COCKPIT_COLS                20U
 #define LCD_COCKPIT_ROWS                4U
 
-#define LCD_ICON_DEGREE                 "\x00"
+#define LCD_ICON_DEGREE                 "\x08"
 #define LCD_ICON_BATTERY                "\x01"
 #define LCD_ICON_FAN                    "\x02"
 #define LCD_ICON_BLUETOOTH              "\x03"
