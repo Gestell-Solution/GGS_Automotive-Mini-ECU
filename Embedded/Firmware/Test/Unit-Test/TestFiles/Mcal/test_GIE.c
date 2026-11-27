@@ -53,8 +53,8 @@
  */
 
 /* ============================== Includes ============================== */
-#include "..\..\vendor\unity\src\unity.h"
-#include "..\..\support\RegisterMock.h"
+#include "unity.h"
+#include "RegisterMock.h"
 #include "Atmega128Register.h"   /* SREG_Reg, redirected into the fake bank */
 #include "GIE_Interface.h"
 
