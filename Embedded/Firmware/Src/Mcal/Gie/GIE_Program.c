@@ -4,20 +4,24 @@
  * @brief
  *     Implementation of the Global Interrupt Enable (GIE) MCAL driver.
  * @version
- *     1.1.0
+ *     1.2.0
  * @author
  *     Developer: Yasseen Ahmed EL-Sayed <yasseen.ahmed2005@gmail.com>
  * @author
  *     Reviewer:  Beshoy Esmat
  * @date
- *     2026-11-16
+ *     2026-11-26
  * @copyright
  *     Copyright (c) 2026 Gestell. All rights reserved.
  */
+#include "../../Common/Config.h"
 #include "../../Common/MacroFunction.h"
 #include "../Atmega128Register.h"
+#include "GIE_Config.h"
 #include "GIE_Interface.h"
 #include "GIE_Private.h"
+
+#if ModuleGieEnabled == Enable
 
 /**
  * @brief Sets the I-bit of SREG.
@@ -56,3 +60,5 @@ void GIE_Restore(uint8_t State)
 {
     SREG_Reg = State;
 }
+
+#endif /* ModuleGieEnabled */

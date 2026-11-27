@@ -23,6 +23,7 @@
 #define ModuleUsart0Enabled   1
 #define ModuleUsart1Enabled   1
 #define ModuleExtiEnabled     1
+#define ModuleGieEnabled      1
 /** @} */
 
 /**
